@@ -1,0 +1,254 @@
+// Prisma schema for Glimmora Go — Admin Panel
+// Covers: admins, riders, drivers, rides, cities, fares, concessions,
+//         coupons, referrals, subscriptions, driver documents.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ AUTH / ADMIN ============
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         AdminRole @default(ADMIN)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  VIEWER
+}
+
+// ============ USERS ============
+
+model Rider {
+  id          String   @id @default(cuid())
+  phone       String   @unique
+  name        String?
+  language    String   @default("en") // en | hi
+  createdAt   DateTime @default(now())
+  rides       Ride[]
+  referralsMade Referral[] @relation("RiderReferrer")
+}
+
+model Driver {
+  id               String           @id @default(cuid())
+  phone            String           @unique
+  name             String
+  language         String           @default("en")
+  cityId           String?
+  city             City?            @relation(fields: [cityId], references: [id])
+  status           DriverStatus     @default(PENDING)
+  verificationNote String?
+  online           Boolean          @default(false)
+  lat              Float?
+  lng              Float?
+  dailyGoal        Int              @default(800) // INR
+  subscriptionUntil DateTime?
+  referralCode     String           @unique @default(cuid())
+  referredById     String?
+  referredBy       Driver?          @relation("DriverReferrals", fields: [referredById], references: [id])
+  referredDrivers  Driver[]         @relation("DriverReferrals")
+  documents        DriverDocument[]
+  rides            Ride[]
+  subscriptions    Subscription[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+enum DriverStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+model DriverDocument {
+  id         String             @id @default(cuid())
+  driverId   String
+  driver     Driver             @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  type       DocumentType
+  fileUrl    String
+  status     DocumentStatus     @default(PENDING)
+  reviewNote String?
+  uploadedAt DateTime           @default(now())
+}
+
+enum DocumentType {
+  LICENSE
+  RC
+  INSURANCE
+  AADHAAR
+  PAN
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ============ CITIES + FARES ============
+
+model City {
+  id             String        @id @default(cuid())
+  name           String        @unique
+  state          String
+  archetype      CityArchetype @default(SMALL_TOWN)
+  active         Boolean       @default(true)
+  matchingRadiusKm Float       @default(5)
+  surgeMultiplier Float        @default(1.0)
+  paymentOptions String[]      @default(["CASH"]) // CASH | UPI | CARD
+  fareConfig     FareConfig?
+  drivers        Driver[]
+  rides          Ride[]
+  createdAt      DateTime      @default(now())
+}
+
+enum CityArchetype {
+  METRO
+  SMALL_TOWN
+}
+
+model FareConfig {
+  id            String   @id @default(cuid())
+  cityId        String   @unique
+  city          City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  baseFare      Float    @default(30) // INR
+  perKm         Float    @default(12) // INR per km
+  perMin        Float    @default(1.5) // INR per min
+  minimumFare   Float    @default(50)
+  // Concession multipliers (apply to final fare)
+  womenMultiplier   Float @default(0.85)
+  seniorMultiplier  Float @default(0.80)
+  childrenMultiplier Float @default(0.90)
+  updatedAt     DateTime @updatedAt
+}
+
+// ============ RIDES ============
+
+model Ride {
+  id              String       @id @default(cuid())
+  riderId         String
+  rider           Rider        @relation(fields: [riderId], references: [id])
+  driverId        String?
+  driver          Driver?      @relation(fields: [driverId], references: [id])
+  cityId          String
+  city            City         @relation(fields: [cityId], references: [id])
+  pickupAddress   String
+  pickupLat       Float
+  pickupLng       Float
+  dropAddress     String
+  dropLat         Float
+  dropLng         Float
+  distanceKm      Float?
+  durationMin     Int?
+  fareEstimate    Float
+  fareFinal       Float?
+  concessionType  ConcessionType @default(NONE)
+  couponCode      String?
+  couponDiscount  Float?
+  status          RideStatus   @default(REQUESTED)
+  bookingChannel  BookingChannel @default(APP)
+  scheduledAt     DateTime?
+  otp             String?
+  sosTriggered    Boolean      @default(false)
+  rating          Int?
+  review          String?
+  createdAt       DateTime     @default(now())
+  completedAt     DateTime?
+}
+
+enum RideStatus {
+  REQUESTED
+  MATCHED
+  EN_ROUTE
+  ARRIVED
+  IN_TRIP
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingChannel {
+  APP
+  SMS
+  WHATSAPP
+  KIRANA
+  IVR
+}
+
+enum ConcessionType {
+  NONE
+  WOMEN
+  SENIOR
+  CHILDREN
+}
+
+// ============ COUPONS ============
+
+model Coupon {
+  id            String       @id @default(cuid())
+  code          String       @unique
+  description   String?
+  discountType  DiscountType
+  amount        Float         // flat INR or percent (0-100)
+  maxDiscount   Float?        // cap for percent discounts
+  usageLimit    Int?          // null = unlimited
+  usedCount     Int          @default(0)
+  perUserLimit  Int          @default(1)
+  validFrom     DateTime     @default(now())
+  validUntil    DateTime
+  active        Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+}
+
+enum DiscountType {
+  FLAT
+  PERCENT
+}
+
+// ============ REFERRALS ============
+
+model Referral {
+  id             String   @id @default(cuid())
+  referrerDriverId String?
+  referrerRiderId  String?
+  referrerRider  Rider?   @relation("RiderReferrer", fields: [referrerRiderId], references: [id])
+  refereePhone   String
+  refereeJoined  Boolean  @default(false)
+  ridesCompleted Int      @default(0)
+  rewardIssued   Boolean  @default(false)
+  rewardDays     Int      @default(7)
+  createdAt      DateTime @default(now())
+}
+
+// ============ SUBSCRIPTIONS ============
+
+model Subscription {
+  id         String           @id @default(cuid())
+  driverId   String
+  driver     Driver           @relation(fields: [driverId], references: [id], onDelete: Cascade)
+  plan       SubscriptionPlan
+  amount     Float
+  startedAt  DateTime         @default(now())
+  expiresAt  DateTime
+  active     Boolean          @default(true)
+}
+
+enum SubscriptionPlan {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
