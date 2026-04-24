@@ -1,14 +1,14 @@
-// Glimmora Go — Kirana PWA service worker
-// Scope is limited to /k/ (set via Service-Worker-Allowed header in next.config.js).
+// Glimmora Go — Partner PWA service worker
+// Scope is limited to /p/ (set via Service-Worker-Allowed header in next.config.js).
 // Strategy:
 //   - Static assets (_next/static, icons): cache-first
-//   - API under /api/kirana/*: network-first with short cache fallback for GETs
-//   - Navigations inside /k/*: network-first with offline fallback
+//   - API under /api/partner/*: network-first with short cache fallback for GETs
+//   - Navigations inside /p/*: network-first with offline fallback
 //   - Everything else (e.g. /api/track/*, admin): bypass
 
-const VERSION = "v1";
-const STATIC_CACHE = `glimmora-kirana-static-${VERSION}`;
-const RUNTIME_CACHE = `glimmora-kirana-runtime-${VERSION}`;
+const VERSION = "v2";
+const STATIC_CACHE = `glimmora-partner-static-${VERSION}`;
+const RUNTIME_CACHE = `glimmora-partner-runtime-${VERSION}`;
 const OFFLINE_URL = "/offline.html";
 
 const PRECACHE = [
@@ -46,15 +46,15 @@ function isStaticAsset(url) {
   );
 }
 
-function isKiranaNavigation(request, url) {
+function isPartnerNavigation(request, url) {
   return (
     request.mode === "navigate" &&
-    (url.pathname === "/k" || url.pathname.startsWith("/k/"))
+    (url.pathname === "/p" || url.pathname.startsWith("/p/"))
   );
 }
 
-function isKiranaApi(url) {
-  return url.pathname.startsWith("/api/kirana/");
+function isPartnerApi(url) {
+  return url.pathname.startsWith("/api/partner/");
 }
 
 self.addEventListener("fetch", (event) => {
@@ -79,7 +79,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (isKiranaApi(url)) {
+  if (isPartnerApi(url)) {
     event.respondWith(
       fetch(request)
         .then((res) => {
@@ -92,7 +92,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (isKiranaNavigation(request, url)) {
+  if (isPartnerNavigation(request, url)) {
     event.respondWith(
       fetch(request).catch(() =>
         caches.match(OFFLINE_URL).then(

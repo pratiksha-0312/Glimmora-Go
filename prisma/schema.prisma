@@ -122,7 +122,7 @@ model City {
   drivers        Driver[]
   rides          Ride[]
   admins         Admin[]
-  kiranaPartners KiranaPartner[]
+  partners       Partner[]
   tickets        Ticket[]
   corporates     Corporate[]
   createdAt      DateTime      @default(now())
@@ -189,7 +189,7 @@ model Ride {
   otp             String?
   trackingToken   String?      @unique
   bookedByPartnerId String?
-  bookedByPartner KiranaPartner? @relation("PartnerBookings", fields: [bookedByPartnerId], references: [id])
+  bookedByPartner Partner?       @relation("PartnerBookings", fields: [bookedByPartnerId], references: [id])
   sosTriggered    Boolean      @default(false)
   rating          Int?
   review          String?
@@ -214,7 +214,7 @@ enum BookingChannel {
   APP
   SMS
   WHATSAPP
-  KIRANA
+  PARTNER
   IVR
 }
 
@@ -282,13 +282,16 @@ enum SubscriptionPlan {
   MONTHLY
 }
 
-// ============ KIRANA (AGENT BOOKING) ============
+// ============ PARTNER / AGENT-BOOKING NODES ============
+// Covers kirana shops, CSCs, metro counters, hospital desks — any walk-in
+// location whose staff books rides on behalf of riders.
 
-model KiranaPartner {
+model Partner {
   id            String        @id @default(cuid())
   phone         String        @unique
   shopName      String
   ownerName     String
+  type          PartnerType   @default(KIRANA)
   cityId        String
   city          City          @relation(fields: [cityId], references: [id])
   commissionPct Float         @default(10) // % of fare paid to partner
@@ -298,6 +301,8 @@ model KiranaPartner {
   bookings      Ride[]        @relation("PartnerBookings")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+
+  @@map("KiranaPartner")
 }
 
 enum PartnerStatus {
@@ -307,10 +312,18 @@ enum PartnerStatus {
   SUSPENDED
 }
 
+enum PartnerType {
+  KIRANA
+  CSC
+  METRO_COUNTER
+  HOSPITAL_DESK
+  OTHER
+}
+
 model PartnerDocument {
   id         String         @id @default(cuid())
   partnerId  String
-  partner    KiranaPartner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  partner    Partner        @relation(fields: [partnerId], references: [id], onDelete: Cascade)
   type       String         // shop license, aadhaar, etc (free-form for MVP)
   fileUrl    String
   status     DocumentStatus @default(PENDING)
@@ -332,7 +345,7 @@ model OtpRequest {
 }
 
 enum OtpPurpose {
-  KIRANA_LOGIN
+  PARTNER_LOGIN
   RIDER_LOGIN
   DRIVER_LOGIN
 }

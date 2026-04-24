@@ -314,7 +314,7 @@ test.describe("Admin panel — every button / interaction", () => {
   }) => {
     await page.goto("/partners");
     await expect(
-      page.getByRole("heading", { name: "Kirana Partners" })
+      page.getByRole("heading", { name: "Partners" })
     ).toBeVisible();
 
     // Action buttons are hidden behind a "Review →" toggle per row.

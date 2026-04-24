@@ -32,7 +32,7 @@ export default async function PartnerDetailPage({
 }) {
   const session = await requireAccess("partners");
   const { id } = await params;
-  const partner = await prisma.kiranaPartner.findUnique({
+  const partner = await prisma.partner.findUnique({
     where: { id },
     include: {
       city: true,

@@ -24,7 +24,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
 
-  const partner = await prisma.kiranaPartner.findUnique({
+  const partner = await prisma.partner.findUnique({
     where: { id },
     select: { cityId: true },
   });
@@ -34,7 +34,7 @@ export async function PATCH(
   const scope = cityMismatch(auth.session, partner.cityId);
   if (scope) return scope;
 
-  const updated = await prisma.kiranaPartner.update({
+  const updated = await prisma.partner.update({
     where: { id },
     data: parsed.data,
   });
@@ -44,7 +44,7 @@ export async function PATCH(
     action: parsed.data.status
       ? `partner.${parsed.data.status.toLowerCase()}`
       : "partner.update",
-    entityType: "KiranaPartner",
+    entityType: "Partner",
     entityId: id,
     summary: `${updated.shopName}${parsed.data.status ? ` → ${parsed.data.status}` : ""}`,
   });

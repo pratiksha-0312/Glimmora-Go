@@ -33,7 +33,7 @@ const NAV: { href: string; label: string; icon: typeof Car; surface: Surface }[]
   { href: "/tickets", label: "Tickets", icon: LifeBuoy, surface: "tickets" },
   { href: "/drivers", label: "Drivers", icon: Users, surface: "drivers" },
   { href: "/riders", label: "Riders", icon: User, surface: "riders" },
-  { href: "/partners", label: "Kirana Partners", icon: Store, surface: "partners" },
+  { href: "/partners", label: "Partners", icon: Store, surface: "partners" },
   { href: "/corporates", label: "Enterprise", icon: Building2, surface: "corporates" },
   { href: "/fares", label: "Fares", icon: Banknote, surface: "fares" },
   { href: "/concessions", label: "Concessions", icon: Percent, surface: "concessions" },

@@ -7,17 +7,17 @@ const SECRET = new TextEncoder().encode(
 );
 
 const ADMIN_COOKIE = "glimmora_session";
-const KIRANA_COOKIE = "glimmora_kirana_session";
+const PARTNER_COOKIE = "glimmora_partner_session";
 
 const PUBLIC_PATHS = [
   "/login",
   "/api/auth/login",
   "/track",
   "/api/track",
-  "/k/login",
-  "/k/signup",
-  "/api/kirana/otp",
-  "/api/kirana/signup",
+  "/p/login",
+  "/p/signup",
+  "/api/partner/otp",
+  "/api/partner/signup",
 ];
 
 function isPublic(pathname: string): boolean {
@@ -26,8 +26,15 @@ function isPublic(pathname: string): boolean {
   );
 }
 
-function isKiranaPath(pathname: string): boolean {
-  return pathname === "/k" || pathname.startsWith("/k/") || pathname.startsWith("/api/kirana");
+function isPartnerPath(pathname: string): boolean {
+  // /p (partner PWA) + /api/partner/ — NOT /api/partners (admin CRUD for partner
+  // records). The trailing slash on /api/partner/ keeps them separate.
+  return (
+    pathname === "/p" ||
+    pathname.startsWith("/p/") ||
+    pathname === "/api/partner" ||
+    pathname.startsWith("/api/partner/")
+  );
 }
 
 async function verify(token: string): Promise<boolean> {
@@ -44,11 +51,11 @@ export async function middleware(req: NextRequest) {
 
   if (isPublic(pathname)) return NextResponse.next();
 
-  if (isKiranaPath(pathname)) {
-    const token = req.cookies.get(KIRANA_COOKIE)?.value;
+  if (isPartnerPath(pathname)) {
+    const token = req.cookies.get(PARTNER_COOKIE)?.value;
     if (!token || !(await verify(token))) {
       const url = req.nextUrl.clone();
-      url.pathname = "/k/login";
+      url.pathname = "/p/login";
       return NextResponse.redirect(url);
     }
     return NextResponse.next();

@@ -39,7 +39,7 @@ async function getPartners(
   if (cityId) where.cityId = cityId;
   if (status && status !== "ALL") where.status = status;
   try {
-    return await prisma.kiranaPartner.findMany({
+    return await prisma.partner.findMany({
       where,
       orderBy: { createdAt: "desc" },
       take: 100,
@@ -66,8 +66,8 @@ export default async function PartnersPage({
   return (
     <div>
       <PageHeader
-        title="Kirana Partners"
-        description="Shops and agents that book rides on behalf of walk-in customers"
+        title="Partners"
+        description="Kirana, CSC, metro counter, hospital desk — agents that book rides on behalf of walk-in customers"
       />
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -94,7 +94,8 @@ export default async function PartnersPage({
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
               <tr>
-                <th className="px-5 py-3 text-left">Shop</th>
+                <th className="px-5 py-3 text-left">Shop / counter</th>
+                <th className="px-5 py-3 text-left">Type</th>
                 <th className="px-5 py-3 text-left">Owner</th>
                 <th className="px-5 py-3 text-left">Phone</th>
                 <th className="px-5 py-3 text-left">City</th>
@@ -111,7 +112,7 @@ export default async function PartnersPage({
               {partners.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={canWrite ? 9 : 8}
+                    colSpan={canWrite ? 10 : 9}
                     className="px-5 py-12 text-center text-sm text-slate-400"
                   >
                     No partners found
@@ -127,6 +128,11 @@ export default async function PartnersPage({
                       >
                         {p.shopName}
                       </Link>
+                    </td>
+                    <td className="px-5 py-3">
+                      <Badge variant="default">
+                        {p.type.replace(/_/g, " ")}
+                      </Badge>
                     </td>
                     <td className="px-5 py-3 text-slate-700">{p.ownerName}</td>
                     <td className="px-5 py-3 font-mono text-xs text-slate-600">

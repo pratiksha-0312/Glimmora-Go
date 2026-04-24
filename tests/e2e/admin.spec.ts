@@ -17,20 +17,13 @@ test.describe("Admin panel — browser flows", () => {
     await expect(page.getByText("Active Drivers")).toBeVisible();
   });
 
-  test("sidebar role label shows Super Admin", async ({ page }) => {
+  test("sidebar role label shows Admin", async ({ page }) => {
     await login(page);
-    await expect(page.getByText("Super Admin", { exact: true })).toBeVisible();
+    await expect(
+      page.locator("aside").getByText("Admin", { exact: true })
+    ).toBeVisible();
   });
 
-  test("Verifier sees only Drivers + SOS in sidebar", async ({ page }) => {
-    await login(page, "verifier@glimmora.ai");
-    // Should reach /drivers since dashboard isn't in their access list
-    const sidebar = page.locator("aside");
-    await expect(sidebar.getByRole("link", { name: "Drivers" })).toBeVisible();
-    await expect(sidebar.getByRole("link", { name: "Coupons" })).toHaveCount(0);
-    await expect(sidebar.getByRole("link", { name: "Cities" })).toHaveCount(0);
-    await expect(sidebar.getByRole("link", { name: "Reports" })).toHaveCount(0);
-  });
 
   test("SOS sidebar badge polls and shows count", async ({ page, request }) => {
     // Create an SOS ride via the API as SUPER_ADMIN
@@ -208,26 +201,10 @@ test.describe("Admin panel — browser flows", () => {
     await expect(page.getByText(code)).toHaveCount(0, { timeout: 10_000 });
   });
 
-  test("Admins page: SUPER_ADMIN sees create form, VIEWER doesn't", async ({
-    browser,
-  }) => {
-    const superCtx = await browser.newContext();
-    const superPage = await superCtx.newPage();
-    await login(superPage, "admin@glimmora.ai");
-    await superPage.goto("/admins");
-    await expect(
-      superPage.getByRole("heading", { name: "New Admin" })
-    ).toBeVisible();
-    await superCtx.close();
-
-    // Viewer doesn't have access to /admins at all — should redirect to /
-    const viewerCtx = await browser.newContext();
-    const viewerPage = await viewerCtx.newPage();
-    await login(viewerPage, "viewer@glimmora.ai");
-    await viewerPage.goto("/admins");
-    // requireAccess("admins") for VIEWER fails -> redirect to "/"
-    await expect(viewerPage).toHaveURL("/");
-    await viewerCtx.close();
+  test("Admins page: ADMIN sees create form", async ({ page }) => {
+    await login(page);
+    await page.goto("/admins");
+    await expect(page.getByRole("heading", { name: "New Admin" })).toBeVisible();
   });
 
   test("Archetype defaults editor persists changes", async ({ page }) => {

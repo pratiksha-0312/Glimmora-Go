@@ -230,36 +230,70 @@ async function main() {
   });
   console.log(`  coupons: 2`);
 
-  // Kirana partners
+  // Partners — one per type, so the admin panel shows the full taxonomy
   if (rewa) {
-    await prisma.kiranaPartner.upsert({
+    await prisma.partner.upsert({
       where: { phone: "9888800001" },
       update: {},
       create: {
         phone: "9888800001",
         shopName: "Ramji Kirana Store",
         ownerName: "Ram Kumar",
+        type: "KIRANA",
         cityId: rewa.id,
         commissionPct: 10,
         status: "APPROVED",
       },
     });
-    console.log("  kirana (approved): Ramji Kirana Store / 9888800001");
+    console.log("  partner KIRANA (approved): Ramji Kirana Store / 9888800001");
   }
   if (indore) {
-    await prisma.kiranaPartner.upsert({
+    await prisma.partner.upsert({
       where: { phone: "9888800002" },
       update: {},
       create: {
         phone: "9888800002",
         shopName: "Sharma General Stores",
         ownerName: "Sharma",
+        type: "KIRANA",
         cityId: indore.id,
         commissionPct: 12,
         status: "PENDING",
       },
     });
-    console.log("  kirana (pending):  Sharma General Stores / 9888800002");
+    console.log("  partner KIRANA (pending):  Sharma General Stores / 9888800002");
+  }
+  if (rewa) {
+    await prisma.partner.upsert({
+      where: { phone: "9888800003" },
+      update: {},
+      create: {
+        phone: "9888800003",
+        shopName: "Rewa Common Service Centre",
+        ownerName: "Anil Mishra",
+        type: "CSC",
+        cityId: rewa.id,
+        commissionPct: 8,
+        status: "APPROVED",
+      },
+    });
+    console.log("  partner CSC (approved): Rewa CSC / 9888800003");
+  }
+  if (indore) {
+    await prisma.partner.upsert({
+      where: { phone: "9888800004" },
+      update: {},
+      create: {
+        phone: "9888800004",
+        shopName: "Bombay Hospital Help Desk",
+        ownerName: "Sister Elizabeth",
+        type: "HOSPITAL_DESK",
+        cityId: indore.id,
+        commissionPct: 7,
+        status: "APPROVED",
+      },
+    });
+    console.log("  partner HOSPITAL_DESK (approved): Bombay Hospital Desk / 9888800004");
   }
 
   // Sample support ticket

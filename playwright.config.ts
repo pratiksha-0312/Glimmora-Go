@@ -33,12 +33,12 @@ export default defineConfig({
         storageState: ADMIN_STATE,
       },
       dependencies: ["setup"],
-      testIgnore: /auth\.setup\.ts|public\..*\.spec\.ts/,
+      testIgnore: /auth\.setup\.ts|public\..*\.spec\.ts|partner\.spec\.ts/,
     },
     {
       name: "public-chromium",
       use: { ...devices["Desktop Chrome"] },
-      testMatch: /public\..*\.spec\.ts|kirana\.spec\.ts/,
+      testMatch: /public\..*\.spec\.ts|partner\.spec\.ts/,
     },
     {
       name: "firefox",
@@ -47,7 +47,7 @@ export default defineConfig({
         storageState: ADMIN_STATE,
       },
       dependencies: ["setup"],
-      testIgnore: /auth\.setup\.ts|public\..*\.spec\.ts/,
+      testIgnore: /auth\.setup\.ts|public\..*\.spec\.ts|partner\.spec\.ts/,
     },
     {
       name: "webkit",
@@ -56,7 +56,7 @@ export default defineConfig({
         storageState: ADMIN_STATE,
       },
       dependencies: ["setup"],
-      testIgnore: /auth\.setup\.ts|public\..*\.spec\.ts/,
+      testIgnore: /auth\.setup\.ts|public\..*\.spec\.ts|partner\.spec\.ts/,
     },
   ],
 });

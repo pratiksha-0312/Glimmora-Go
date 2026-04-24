@@ -1,6 +1,6 @@
-"""Builds docs/Glimmora_Go_Spec.xlsx — single reference sheet listing every
+﻿"""Builds docs/Glimmora_Go_Spec.xlsx — single reference sheet listing every
 role, page, feature, subfeature, and permission across the admin panel and
-Kirana PWA. Derived from the SOW + Frontend Tracker + current codebase."""
+Partner PWA. Derived from the SOW + Frontend Tracker + current codebase."""
 
 import sys, os
 from openpyxl import Workbook
@@ -59,7 +59,7 @@ ws = wb.active
 ws.title = "Overview"
 ws["A1"] = "Glimmora Go — Spec Sheet"
 ws["A1"].font = Font(bold=True, size=20, color="B45309")
-ws["A2"] = "Frontend team: admin panel (Next.js) + Kirana PWA + public tracking"
+ws["A2"] = "Frontend team: admin panel (Next.js) + Partner PWA + public tracking"
 ws["A2"].font = Font(size=11, color="475569")
 ws["A3"] = "Generated from Glimmora_Go_SOW.docx + Frontend Tracker + current codebase"
 ws["A3"].font = Font(size=10, italic=True, color="94A3B8")
@@ -87,7 +87,7 @@ sheets_toc = [
     ("Roles",            "All 8 roles, access surface, primary responsibilities"),
     ("Permissions",      "Role × surface × read/write matrix"),
     ("Admin Panel",      "Every page with its features + subfeatures + status"),
-    ("Kirana PWA",       "Every page with its features + subfeatures + status"),
+    ("Partner PWA",       "Every page with its features + subfeatures + status"),
     ("APIs",             "All HTTP endpoints with auth requirements"),
     ("Schema",           "Prisma models and what uses them"),
     ("Gaps",             "Items from the SOW not yet built"),
@@ -117,7 +117,7 @@ roles = [
     (1, "Admin", "Admin Panel (full)", "admin@glimmora.ai / admin123",
      "Everything in the admin panel — cities, fares, coupons, drivers, rides, tickets, reports, audit, partners, corporates, referrals, subscriptions, other admins",
      "Global (all cities)", "Done"),
-    (2, "Kirana Agent", "Kirana PWA", "phone + 6-digit OTP",
+    (2, "Partner Agent", "Partner PWA", "phone + 6-digit OTP",
      "Book rides on behalf of walk-in customers, view own bookings + commission, manage profile",
      "Own shop only (partnerId)", "Done"),
     (3, "Trusted Contact / Ride Recipient", "Public Tracking Link", "no login (opaque token URL)",
@@ -134,7 +134,7 @@ ws.row_dimensions[1].height = 32
 ws = wb.create_sheet("Permissions")
 write_header(
     ws,
-    ["Surface", "Admin", "Kirana Agent", "Trusted Contact", "Notes"],
+    ["Surface", "Admin", "Partner Agent", "Trusted Contact", "Notes"],
     [24, 12, 16, 18, 60],
 )
 
@@ -153,12 +153,12 @@ perm = [
     ("Referrals",         "W", "—", "—", "Auto-reward + manual override"),
     ("Subscriptions",     "W", "—", "—", "Grant/revoke driver plans"),
     ("Reports",           "R", "—", "—", "Includes CSV export + city breakdown"),
-    ("Kirana Partners",   "W", "—", "—", "Approve/reject + commission"),
+    ("Partners",   "W", "—", "—", "Approve/reject + commission"),
     ("Admins",            "W", "—", "—", "Self-delete/deactivate still blocked"),
     ("Tickets",           "W", "—", "—", "Create / triage / resolve"),
     ("Audit / Compliance","R", "—", "—", "Read-only log + fraud signals + CSV export"),
     ("Enterprise (B2B)",  "W", "—", "—", "Corporate accounts + wallet ledger"),
-    ("Kirana Book / History / Profile", "—", "W (own shop)", "—", "Kirana agent PWA"),
+    ("Partner Book / History / Profile", "—", "W (own shop)", "—", "Partner PWA"),
     ("Track public",      "—", "—", "R (one ride)", "Public, opaque token link"),
 ]
 for i, p in enumerate(perm, start=2):
@@ -258,7 +258,7 @@ admin_rows = [
     (44, "/reports", "CSV export", "GET /api/reports/export?days=N → rides-Nd-YYYY-MM-DD.csv", "same", "Done", "City-filtered for CITY_ADMIN"),
 
     # Partners
-    ("A", "KIRANA PARTNERS (admin side)", "", "", "", "", "", True),
+    ("A", "PARTNERS (admin side)", "", "", "", "", "", True),
     (45, "/partners", "Partner list with status filter", "Shop, owner, phone, city, commission %, bookings count, status + review note", "SUPER/ADMIN/CITY (write) · VIEW (read)", "Done", ""),
     (46, "/partners", "Approve / Reject / Suspend", "PATCH status + optional reviewNote", "SUPER/ADMIN/CITY", "Done", ""),
     (47, "/partners", "Commission % editor", "Per-partner override (default 10%)", "same", "Done", ""),
@@ -326,58 +326,58 @@ for item in admin_rows:
     row_idx += 1
 
 # ============================================================
-# SHEET 5: Kirana PWA
+# SHEET 5: Partner PWA
 # ============================================================
-ws = wb.create_sheet("Kirana PWA")
+ws = wb.create_sheet("Partner PWA")
 write_header(
     ws,
     ["#", "Page / Route", "Feature", "Sub-feature", "Access", "Status", "Notes"],
     [4, 26, 28, 46, 26, 10, 36],
 )
 
-kirana_rows = [
+partner_rows = [
     ("K", "PUBLIC (no session)", "", "", "", "", "", True),
-    (1, "/k/signup", "Partner onboarding form", "Shop name, owner name, 10-digit phone, city picker", "public", "Done", ""),
-    (2, "/k/signup", "Success screen", "'Application submitted' with link to /k/login", "public", "Done", ""),
-    (3, "/k/login", "Phone → OTP request", "10-digit validation, 'Send OTP' triggers /api/kirana/otp/request", "public", "Done", ""),
-    (4, "/k/login", "OTP entry screen", "6-digit code input, auto-surfaced in dev mode, back button", "public", "Done", ""),
-    (5, "/k/login", "Verify + session", "/api/kirana/otp/verify sets glimmora_kirana_session cookie", "public", "Done", ""),
+    (1, "/p/signup", "Partner onboarding form", "Shop name, owner name, 10-digit phone, city picker", "public", "Done", ""),
+    (2, "/p/signup", "Success screen", "'Application submitted' with link to /p/login", "public", "Done", ""),
+    (3, "/p/login", "Phone → OTP request", "10-digit validation, 'Send OTP' triggers /api/partner/otp/request", "public", "Done", ""),
+    (4, "/p/login", "OTP entry screen", "6-digit code input, auto-surfaced in dev mode, back button", "public", "Done", ""),
+    (5, "/p/login", "Verify + session", "/api/partner/otp/verify sets glimmora_partner_session cookie", "public", "Done", ""),
 
     ("K", "AUTHED (any status)", "", "", "", "", "", True),
     (6, "/k (any)", "Pending / Rejected / Suspended gate", "Blocks app with status-specific message + admin's review note + sign-out button", "Kirana partner (non-APPROVED)", "Done", ""),
-    (7, "/k (logout)", "Sign out", "POST /api/kirana/logout clears cookie → redirect /k/login", "Kirana partner", "Done", ""),
+    (7, "/k (logout)", "Sign out", "POST /api/partner/logout clears cookie → redirect /p/login", "Kirana partner", "Done", ""),
 
     ("K", "APPROVED PARTNER", "", "", "", "", "", True),
-    (8, "/k", "Dashboard today stats", "Today's bookings count, today's commission", "Approved partner", "Done", ""),
-    (9, "/k", "Lifetime commission card", "Total earned on COMPLETED rides × commissionPct", "same", "Done", ""),
-    (10, "/k", "CTA button", "'Book a ride for a customer' → /k/book", "same", "Done", ""),
-    (11, "/k", "Recent 5 bookings", "Pickup → drop, status badge, date, fare", "same", "Done", ""),
+    (8, "/p", "Dashboard today stats", "Today's bookings count, today's commission", "Approved partner", "Done", ""),
+    (9, "/p", "Lifetime commission card", "Total earned on COMPLETED rides × commissionPct", "same", "Done", ""),
+    (10, "/p", "CTA button", "'Book a ride for a customer' → /p/book", "same", "Done", ""),
+    (11, "/p", "Recent 5 bookings", "Pickup → drop, status badge, date, fare", "same", "Done", ""),
 
-    (12, "/k/book", "Customer section", "Rider phone (10-digit), optional name", "Approved partner", "Done", ""),
-    (13, "/k/book", "Pickup section", "Address + lat + lng", "same", "Done", ""),
-    ("—", "/k/book", "Map-based pickup/drop picker", "Leaflet + OSM Nominatim; click map or search address to set pickup and drop", "same", "Done", ""),
-    (14, "/k/book", "Drop section", "Address + lat + lng", "same", "Done", ""),
-    (15, "/k/book", "Concession selector", "None / Women / Senior / Children — applied to fare", "same", "Done", ""),
-    (16, "/k/book", "Fare estimate", "PUT /api/kirana/bookings returns fare + distance + duration + your commission", "same", "Done", ""),
-    (17, "/k/book", "Confirm → create ride", "POST /api/kirana/bookings creates Ride with bookingChannel=KIRANA, bookedByPartnerId=self", "same", "Done", ""),
-    ("—", "/k/book", "SMS notification to rider", "Text rider their pickup code + ETA", "same", "TODO", "Needs MSG91"),
-    ("—", "/k/book", "Auto-match driver", "Find nearest APPROVED online driver and assign", "same", "TODO", "No matching engine yet"),
+    (12, "/p/book", "Customer section", "Rider phone (10-digit), optional name", "Approved partner", "Done", ""),
+    (13, "/p/book", "Pickup section", "Address + lat + lng", "same", "Done", ""),
+    ("—", "/p/book", "Map-based pickup/drop picker", "Leaflet + OSM Nominatim; click map or search address to set pickup and drop", "same", "Done", ""),
+    (14, "/p/book", "Drop section", "Address + lat + lng", "same", "Done", ""),
+    (15, "/p/book", "Concession selector", "None / Women / Senior / Children — applied to fare", "same", "Done", ""),
+    (16, "/p/book", "Fare estimate", "PUT /api/partner/bookings returns fare + distance + duration + your commission", "same", "Done", ""),
+    (17, "/p/book", "Confirm → create ride", "POST /api/partner/bookings creates Ride with bookingChannel=KIRANA, bookedByPartnerId=self", "same", "Done", ""),
+    ("—", "/p/book", "SMS notification to rider", "Text rider their pickup code + ETA", "same", "TODO", "Needs MSG91"),
+    ("—", "/p/book", "Auto-match driver", "Find nearest APPROVED online driver and assign", "same", "TODO", "No matching engine yet"),
 
-    (18, "/k/bookings", "Bookings history list", "All partner's rides, status, rider phone, fare, commission earned", "Approved partner", "Done", ""),
-    (19, "/k/bookings", "Commission per row", "Shown only when ride is COMPLETED", "same", "Done", ""),
+    (18, "/p/bookings", "Bookings history list", "All partner's rides, status, rider phone, fare, commission earned", "Approved partner", "Done", ""),
+    (19, "/p/bookings", "Commission per row", "Shown only when ride is COMPLETED", "same", "Done", ""),
 
-    (20, "/k/profile", "Profile read-only", "Shop, owner, phone, city, commission %, joined, status badge", "Approved partner", "Done", ""),
-    (21, "/k/profile", "Sign out button", "Same as dashboard logout", "same", "Done", ""),
-    ("—", "/k/profile", "KYC document upload + status", "Pick type + file, upload to /api/kirana/documents; shows per-doc PENDING/APPROVED/REJECTED badge", "same", "Done", ""),
+    (20, "/p/profile", "Profile read-only", "Shop, owner, phone, city, commission %, joined, status badge", "Approved partner", "Done", ""),
+    (21, "/p/profile", "Sign out button", "Same as dashboard logout", "same", "Done", ""),
+    ("—", "/p/profile", "KYC document upload + status", "Pick type + file, upload to /api/partner/documents; shows per-doc PENDING/APPROVED/REJECTED badge", "same", "Done", ""),
 
     ("K", "NAVIGATION + LAYOUT", "", "", "", "", "", True),
     (22, "layout", "Mobile-first shell", "Top header with shop name, bottom nav (Home/Book/History/Profile)", "Approved partner", "Done", ""),
-    (23, "layout", "Session guard", "requireKirana() on every protected page", "all kirana routes", "Done", ""),
+    (23, "layout", "Session guard", "requireKirana() on every protected page", "all partner routes", "Done", ""),
 
     ("K", "PWA SHELL", "", "", "", "", "", True),
     ("—", "manifest", "Web App Manifest", "public/manifest.webmanifest scoped to /k/ with name/icons/theme/start_url", "public", "Done", ""),
     ("—", "icons", "App icons + apple-touch", "192/512 PNG + maskable 512 + 180 apple-touch, brand orange 'GG' monogram", "public", "Done", "Generated via scripts/build-pwa-icons.py"),
-    ("—", "service-worker", "Service worker (/sw.js, scope /k/)", "Cache-first static, network-first kirana APIs, offline fallback to /offline.html", "public", "Done", "Service-Worker-Allowed header set in next.config.js"),
+    ("—", "service-worker", "Service worker (/sw.js, scope /k/)", "Cache-first static, network-first partner APIs, offline fallback to /offline.html", "public", "Done", "Service-Worker-Allowed header set in next.config.js"),
     ("—", "install", "Install prompt component", "Captures beforeinstallprompt, shows 'Add to home screen' banner with dismiss persistence", "Approved partner", "Done", ""),
     ("—", "push", "Push notifications", "Driver matched / arrived / completed alerts", "system", "TODO", "SW ready; needs VAPID + backend trigger"),
 
@@ -386,11 +386,11 @@ kirana_rows = [
     (25, "OTP", "MSG91 send", "Actually send the code via SMS", "system", "TODO", "Stubbed; returns devCode in dev"),
     (26, "fare", "Haversine + concession", "src/lib/fare.ts shared with future rider/driver apps", "system", "Done", ""),
     (27, "commission", "Payout / settlement", "Actually paying partners their earned commission", "system", "TODO", "Tracks earned; no payout flow"),
-    (29, "i18n", "Hindi + English toggle", "react-i18next across all kirana strings", "system", "TODO", "Low priority"),
+    (29, "i18n", "Hindi + English toggle", "react-i18next across all partner strings", "system", "TODO", "Low priority"),
 ]
 
 row_idx = 2
-for item in kirana_rows:
+for item in partner_rows:
     if len(item) == 8 and item[-1] is True:
         for c in range(1, 8):
             cell = ws.cell(row=row_idx, column=c, value=item[1] if c == 1 else "")
@@ -471,12 +471,12 @@ apis = [
     # Public track
     ("GET",  "/api/track/[token]",              "Public ride state for tracking page", "public", "Done"),
     # Kirana
-    ("POST", "/api/kirana/signup",              "Partner application (creates PENDING)", "public", "Done"),
-    ("POST", "/api/kirana/otp/request",         "Generate 6-digit OTP (phone must belong to a partner)", "public", "Done"),
-    ("POST", "/api/kirana/otp/verify",          "Verify OTP + set kirana session cookie", "public", "Done"),
-    ("POST", "/api/kirana/logout",              "Clear kirana session",             "kirana session", "Done"),
-    ("PUT",  "/api/kirana/bookings",            "Fare estimate without creating",   "kirana session (any status)", "Done"),
-    ("POST", "/api/kirana/bookings",            "Create booking (REQUESTED ride with bookedByPartnerId)", "kirana session (APPROVED only)", "Done"),
+    ("POST", "/api/partner/signup",              "Partner application (creates PENDING)", "public", "Done"),
+    ("POST", "/api/partner/otp/request",         "Generate 6-digit OTP (phone must belong to a partner)", "public", "Done"),
+    ("POST", "/api/partner/otp/verify",          "Verify OTP + set partner session cookie", "public", "Done"),
+    ("POST", "/api/partner/logout",              "Clear partner session",             "partner session", "Done"),
+    ("PUT",  "/api/partner/bookings",            "Fare estimate without creating",   "partner session (any status)", "Done"),
+    ("POST", "/api/partner/bookings",            "Create booking (REQUESTED ride with bookedByPartnerId)", "partner session (APPROVED only)", "Done"),
 ]
 for i, a in enumerate(apis, start=2):
     write_row(ws, i, a, status_col=5)
@@ -493,7 +493,7 @@ write_header(
 schema = [
     ("Admin",              "Admin panel users",           "email, name, passwordHash, role, cityId", "Login, /admins page", "Done"),
     ("AdminRole (enum)",   "6 roles",                     "SUPER_ADMIN, ADMIN, CITY_ADMIN, VERIFIER, SUPPORT, VIEWER", "RBAC matrix", "Done"),
-    ("Rider",              "Ride customers",              "phone (unique), name, language", "/riders, kirana signup auto-creates", "Done"),
+    ("Rider",              "Ride customers",              "phone (unique), name, language", "/riders, partner signup auto-creates", "Done"),
     ("Driver",              "Fleet drivers",              "phone, name, cityId, status, online, lat/lng, referredById, referralRewardGranted", "/drivers", "Done"),
     ("DriverStatus (enum)","Driver KYC states",           "PENDING, APPROVED, REJECTED, SUSPENDED", "driver detail", "Done"),
     ("DriverDocument",     "KYC docs per driver",         "driverId, type, fileUrl, status, reviewNote", "driver detail + upload UI", "Done"),
@@ -503,20 +503,20 @@ schema = [
     ("CityArchetype (enum)","Tier",                       "METRO, SMALL_TOWN", "Drives defaults + UI", "Done"),
     ("ArchetypeDefaults",  "Tier defaults",               "archetype (PK), radius, surge, payments, baseFare, perKm, perMin, minFare", "/cities archetype editor, applied on new-city create", "Done"),
     ("FareConfig",         "Per-city fare rules",         "cityId (unique), baseFare, perKm, perMin, minimumFare, women/senior/children multipliers", "/fares, /concessions", "Done"),
-    ("Ride",               "Trips",                       "riderId, driverId, cityId, pickup/drop, fareEstimate, fareFinal, status, bookingChannel, trackingToken, bookedByPartnerId, sosTriggered", "/rides, /track, /sos, /reports, kirana bookings", "Done"),
+    ("Ride",               "Trips",                       "riderId, driverId, cityId, pickup/drop, fareEstimate, fareFinal, status, bookingChannel, trackingToken, bookedByPartnerId, sosTriggered", "/rides, /track, /sos, /reports, partner bookings", "Done"),
     ("RideStatus (enum)",  "Lifecycle",                   "REQUESTED, MATCHED, EN_ROUTE, ARRIVED, IN_TRIP, COMPLETED, CANCELLED", "Everywhere", "Done"),
-    ("BookingChannel",     "Where a ride came from",      "APP, SMS, WHATSAPP, KIRANA, IVR", "Reports, kirana rides", "Done"),
+    ("BookingChannel",     "Where a ride came from",      "APP, SMS, WHATSAPP, KIRANA, IVR", "Reports, partner rides", "Done"),
     ("ConcessionType",     "Fare discount category",      "NONE, WOMEN, SENIOR, CHILDREN", "Fare calc", "Done"),
     ("Coupon",             "Promo codes",                 "code (unique), discountType, amount, usageLimit, usedCount, validUntil, active", "/coupons", "Done"),
     ("DiscountType",       "Coupon type",                 "FLAT, PERCENT", "coupons", "Done"),
     ("Referral",           "Driver-to-driver referrals",  "referrerDriverId, referrerRiderId, refereePhone, refereeJoined, ridesCompleted, rewardIssued", "/referrals manual controls", "Done"),
     ("Subscription",       "Driver sachet packs",         "driverId, plan, amount, startedAt, expiresAt, active", "/subscriptions admin + referral reward extends this", "Done (admin grant; no driver-side purchase UI)"),
     ("SubscriptionPlan",   "Sachet durations",            "DAILY, WEEKLY, MONTHLY", "", "Done"),
-    ("KiranaPartner",      "Agent/kirana partners",       "phone (unique), shopName, ownerName, cityId, commissionPct, status, reviewNote", "/partners, Kirana PWA", "Done"),
+    ("Partner",      "Agent/partner partners",       "phone (unique), shopName, ownerName, cityId, commissionPct, status, reviewNote", "/partners, Partner PWA", "Done"),
     ("PartnerStatus",      "Partner KYC states",          "PENDING, APPROVED, REJECTED, SUSPENDED", "/partners", "Done"),
-    ("PartnerDocument",    "Partner KYC docs",            "partnerId, type, fileUrl, status", "Kirana /k/profile upload + /partners/[id] review", "Done"),
+    ("PartnerDocument",    "Partner KYC docs",            "partnerId, type, fileUrl, status", "Kirana /p/profile upload + /partners/[id] review", "Done"),
     ("OtpRequest",         "Phone OTP codes",             "phone, code, purpose, expiresAt, usedAt", "Kirana OTP flow", "Done"),
-    ("OtpPurpose",         "OTP use cases",               "KIRANA_LOGIN, RIDER_LOGIN, DRIVER_LOGIN", "Kirana now; rider/driver later", "Done (only Kirana used)"),
+    ("OtpPurpose",         "OTP use cases",               "PARTNER_LOGIN, RIDER_LOGIN, DRIVER_LOGIN", "Kirana now; rider/driver later", "Done (only Kirana used)"),
     ("Ticket",             "Complaints / support tickets","category, priority, status, assignee, rider/driver/ride/city links, resolution", "/tickets + /tickets/[id] + audit hook", "Done"),
     ("TicketCategory",     "Ticket category",             "RIDE_ISSUE, SAFETY, PAYMENT, DRIVER_BEHAVIOR, APP, OTHER", "ticket create form", "Done"),
     ("TicketStatus",       "Ticket lifecycle",            "OPEN, IN_PROGRESS, RESOLVED, CLOSED", "/tickets pills", "Done"),
@@ -563,11 +563,11 @@ gaps = [
     (21, "Audit log",                                  "Admin",         "Frontend + Backend", "Compliance, who-changed-what", "Done", "Shipped — /audit with filters + CSV export + fraud signals; hooked into 9 mutating APIs"),
     (22, "Enterprise / corporate admin console",       "Admin",         "Frontend", "B2B customer fleets", "Done", "Shipped — /corporates with members + wallet ledger; ride-fare deduction waits on payments"),
     (23, "Commission payout flow",                     "Admin + PWA",   "Backend + Frontend", "Actually paying partners", "P2", "Earnings tracked; no payout"),
-    (24, "Map-based pickup/drop picker (Kirana)",      "Kirana PWA",    "Frontend", "Stop asking agents for lat/lng", "Done", "Shipped — Leaflet + Nominatim"),
+    (24, "Map-based pickup/drop picker (Kirana)",      "Partner PWA",    "Frontend", "Stop asking agents for lat/lng", "Done", "Shipped — Leaflet + Nominatim"),
     (25, "IVR / missed-call booking",                  "Integrations",  "Backend", "Non-smartphone rider channel", "P3", "SOW explicitly deferred to Phase 2"),
     (26, "Driver subscription purchase UI",             "Driver PWA",    "App Dev + Backend", "Drivers buying their own plan; admin grant exists", "P1", "Admin /subscriptions shipped; waits on payments + Driver app"),
-    (27, "VAPID push notifications",                    "RN/PWA + Backend","App Dev + Backend", "Booking status push to kirana partners", "P2", "PWA service worker ready; needs backend trigger + VAPID keys"),
-    (28, "Bookings detail + live track in Kirana PWA",  "Kirana PWA",    "Frontend", "Partner can't watch a ride they booked", "P1", "Token API + public /track page already exist"),
+    (27, "VAPID push notifications",                    "RN/PWA + Backend","App Dev + Backend", "Booking status push to partner partners", "P2", "PWA service worker ready; needs backend trigger + VAPID keys"),
+    (28, "Bookings detail + live track in Partner PWA",  "Partner PWA",    "Frontend", "Partner can't watch a ride they booked", "P1", "Token API + public /track page already exist"),
     (29, "Per-document DELETE in partner docs review",  "Admin",         "Frontend", "Admins can approve/reject but not remove partner docs", "P3", ""),
 ]
 for i, g in enumerate(gaps, start=2):
