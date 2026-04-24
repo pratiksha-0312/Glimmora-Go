@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { canAccess } from "@/lib/rbac";
 
 function parseDays(value: string | null, fallback: number): number {
   const n = Number(value);
@@ -20,13 +21,17 @@ function csvEscape(value: unknown): string {
 export async function GET(req: Request) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!canAccess(session.role, "reports")) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const url = new URL(req.url);
   const days = parseDays(url.searchParams.get("days"), 7);
   const from = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  const cityFilter = session.cityId ? { cityId: session.cityId } : {};
 
   const rides = await prisma.ride.findMany({
-    where: { createdAt: { gte: from } },
+    where: { ...cityFilter, createdAt: { gte: from } },
     orderBy: { createdAt: "desc" },
     include: {
       rider: { select: { phone: true, name: true } },

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { requireWrite, cityMismatch } from "@/lib/apiAuth";
 
 const schema = z.object({
   baseFare: z.number().min(0),
@@ -14,10 +14,13 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireWrite("fares");
+  if (!auth.ok) return auth.response;
 
   const { id } = await params;
+  const scope = cityMismatch(auth.session, id);
+  if (scope) return scope;
+
   const body = await req.json().catch(() => null);
   const parsed = schema.safeParse(body);
   if (!parsed.success) {

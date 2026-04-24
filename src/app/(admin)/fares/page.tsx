@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FareEditor } from "./FareEditor";
+import { requireAccess } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-async function getCitiesWithFares() {
+async function getCitiesWithFares(cityId: string | null) {
   try {
     return await prisma.city.findMany({
+      where: cityId ? { id: cityId } : {},
       orderBy: { name: "asc" },
       include: { fareConfig: true },
     });
@@ -16,7 +18,8 @@ async function getCitiesWithFares() {
 }
 
 export default async function FaresPage() {
-  const cities = await getCitiesWithFares();
+  const session = await requireAccess("fares");
+  const cities = await getCitiesWithFares(session.cityId);
 
   return (
     <div>

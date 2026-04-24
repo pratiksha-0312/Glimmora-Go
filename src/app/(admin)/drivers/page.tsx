@@ -4,7 +4,8 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { driverStatusVariant } from "@/lib/format";
-import type { DriverStatus } from "../../../../generated/prisma";
+import { requireAccess } from "@/lib/auth";
+import type { AdminRole, DriverStatus } from "../../../../generated/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -16,13 +17,23 @@ const FILTERS: (DriverStatus | "ALL")[] = [
   "SUSPENDED",
 ];
 
-async function getDrivers(status?: string) {
+async function getDrivers(
+  status: string | undefined,
+  role: AdminRole,
+  cityId: string | null
+) {
+  const cityFilter = cityId ? { cityId } : {};
+  // Verifier only sees PENDING drivers
+  const verifierFilter = role === "VERIFIER" ? { status: "PENDING" as DriverStatus } : {};
   try {
     return await prisma.driver.findMany({
-      where:
-        status && status !== "ALL"
+      where: {
+        ...cityFilter,
+        ...verifierFilter,
+        ...(status && status !== "ALL"
           ? { status: status as DriverStatus }
-          : {},
+          : {}),
+      },
       orderBy: { createdAt: "desc" },
       take: 100,
       include: {
@@ -41,8 +52,9 @@ export default async function DriversPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
+  const session = await requireAccess("drivers");
   const { status } = await searchParams;
-  const drivers = await getDrivers(status);
+  const drivers = await getDrivers(status, session.role, session.cityId);
 
   return (
     <div>

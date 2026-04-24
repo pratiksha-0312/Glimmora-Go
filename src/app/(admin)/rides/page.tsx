@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/Badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { rideStatusVariant } from "@/lib/format";
 import { RideRowActions } from "./RideRowActions";
+import { AutoRefresh } from "./AutoRefresh";
+import { requireAccess, sessionCanWrite } from "@/lib/auth";
 import type { RideStatus } from "../../../../generated/prisma";
 
 export const dynamic = "force-dynamic";
@@ -17,12 +19,17 @@ const STATUS_FILTERS: (RideStatus | "ALL")[] = [
   "CANCELLED",
 ];
 
-async function getData(status?: string) {
+async function getData(status: string | undefined, cityId: string | null) {
+  const cityFilter = cityId ? { cityId } : {};
   try {
     const [rides, approvedDrivers] = await Promise.all([
       prisma.ride.findMany({
-        where:
-          status && status !== "ALL" ? { status: status as RideStatus } : {},
+        where: {
+          ...cityFilter,
+          ...(status && status !== "ALL"
+            ? { status: status as RideStatus }
+            : {}),
+        },
         orderBy: { createdAt: "desc" },
         take: 100,
         include: {
@@ -32,7 +39,7 @@ async function getData(status?: string) {
         },
       }),
       prisma.driver.findMany({
-        where: { status: "APPROVED" },
+        where: { ...cityFilter, status: "APPROVED" },
         select: { id: true, name: true, phone: true, cityId: true },
         orderBy: { name: "asc" },
       }),
@@ -48,14 +55,17 @@ export default async function RidesPage({
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
+  const session = await requireAccess("rides");
   const { status } = await searchParams;
-  const { rides, approvedDrivers } = await getData(status);
+  const { rides, approvedDrivers } = await getData(status, session.cityId);
+  const canWrite = sessionCanWrite(session, "rides");
 
   return (
     <div>
       <PageHeader
         title="Rides"
         description="Live ride monitoring with filters"
+        action={<AutoRefresh />}
       />
 
       <div className="mb-4 flex flex-wrap gap-2">
@@ -90,14 +100,16 @@ export default async function RidesPage({
                 <th className="px-5 py-3 text-left">Fare</th>
                 <th className="px-5 py-3 text-left">Status</th>
                 <th className="px-5 py-3 text-left">Started</th>
-                <th className="px-5 py-3 text-right">Actions</th>
+                {canWrite && (
+                  <th className="px-5 py-3 text-right">Actions</th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {rides.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={9}
+                    colSpan={canWrite ? 9 : 8}
                     className="px-5 py-12 text-center text-sm text-slate-400"
                   >
                     No rides found
@@ -155,14 +167,16 @@ export default async function RidesPage({
                       <td className="px-5 py-3 text-xs text-slate-500">
                         {formatDate(r.createdAt)}
                       </td>
-                      <td className="px-5 py-3 text-right">
-                        <RideRowActions
-                          id={r.id}
-                          status={r.status}
-                          currentDriverId={r.driverId}
-                          cityDrivers={cityDrivers}
-                        />
-                      </td>
+                      {canWrite && (
+                        <td className="px-5 py-3 text-right">
+                          <RideRowActions
+                            id={r.id}
+                            status={r.status}
+                            currentDriverId={r.driverId}
+                            cityDrivers={cityDrivers}
+                          />
+                        </td>
+                      )}
                     </tr>
                   );
                 })

@@ -18,7 +18,7 @@ export function DocumentActions({
   reviewNote: string | null;
 }) {
   const router = useRouter();
-  const [loading, setLoading] = useState<DocumentStatus | null>(null);
+  const [loading, setLoading] = useState<DocumentStatus | "DELETE" | null>(null);
   const [note, setNote] = useState(reviewNote ?? "");
   const [editing, setEditing] = useState(false);
 
@@ -34,6 +34,19 @@ export function DocumentActions({
         }),
       });
       setEditing(false);
+      router.refresh();
+    } finally {
+      setLoading(null);
+    }
+  }
+
+  async function remove() {
+    if (!confirm("Delete this document?")) return;
+    setLoading("DELETE");
+    try {
+      await fetch(`/api/drivers/${driverId}/documents/${docId}`, {
+        method: "DELETE",
+      });
       router.refresh();
     } finally {
       setLoading(null);
@@ -78,12 +91,21 @@ export function DocumentActions({
           </div>
         </div>
       ) : (
-        <button
-          onClick={() => setEditing(true)}
-          className="text-xs font-medium text-brand-600 hover:text-brand-700"
-        >
-          Review →
-        </button>
+        <div className="flex items-center gap-3 text-xs font-medium">
+          <button
+            onClick={() => setEditing(true)}
+            className="text-brand-600 hover:text-brand-700"
+          >
+            Review →
+          </button>
+          <button
+            onClick={remove}
+            disabled={loading === "DELETE"}
+            className="text-slate-400 hover:text-red-600 disabled:opacity-50"
+          >
+            {loading === "DELETE" ? "…" : "Delete"}
+          </button>
+        </div>
       )}
       {!editing && reviewNote && (
         <div className="max-w-[200px] text-right text-[11px] text-slate-500">

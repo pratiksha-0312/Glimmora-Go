@@ -15,19 +15,24 @@ datasource db {
 // ============ AUTH / ADMIN ============
 
 model Admin {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String    @id @default(cuid())
+  email        String    @unique
   name         String
   passwordHash String
   role         AdminRole @default(ADMIN)
-  active       Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  cityId       String?
+  city         City?     @relation(fields: [cityId], references: [id])
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 enum AdminRole {
   SUPER_ADMIN
   ADMIN
+  CITY_ADMIN
+  VERIFIER
+  SUPPORT
   VIEWER
 }
 
@@ -61,6 +66,7 @@ model Driver {
   referredById     String?
   referredBy       Driver?          @relation("DriverReferrals", fields: [referredById], references: [id])
   referredDrivers  Driver[]         @relation("DriverReferrals")
+  referralRewardGranted Boolean     @default(false)
   documents        DriverDocument[]
   rides            Ride[]
   subscriptions    Subscription[]
@@ -114,12 +120,26 @@ model City {
   fareConfig     FareConfig?
   drivers        Driver[]
   rides          Ride[]
+  admins         Admin[]
+  kiranaPartners KiranaPartner[]
   createdAt      DateTime      @default(now())
 }
 
 enum CityArchetype {
   METRO
   SMALL_TOWN
+}
+
+model ArchetypeDefaults {
+  archetype        CityArchetype @id
+  matchingRadiusKm Float
+  surgeMultiplier  Float
+  paymentOptions   String[]
+  baseFare         Float
+  perKm            Float
+  perMin           Float
+  minimumFare      Float
+  updatedAt        DateTime @updatedAt
 }
 
 model FareConfig {
@@ -164,6 +184,9 @@ model Ride {
   bookingChannel  BookingChannel @default(APP)
   scheduledAt     DateTime?
   otp             String?
+  trackingToken   String?      @unique
+  bookedByPartnerId String?
+  bookedByPartner KiranaPartner? @relation("PartnerBookings", fields: [bookedByPartnerId], references: [id])
   sosTriggered    Boolean      @default(false)
   rating          Int?
   review          String?
@@ -251,4 +274,59 @@ enum SubscriptionPlan {
   DAILY
   WEEKLY
   MONTHLY
+}
+
+// ============ KIRANA (AGENT BOOKING) ============
+
+model KiranaPartner {
+  id            String        @id @default(cuid())
+  phone         String        @unique
+  shopName      String
+  ownerName     String
+  cityId        String
+  city          City          @relation(fields: [cityId], references: [id])
+  commissionPct Float         @default(10) // % of fare paid to partner
+  status        PartnerStatus @default(PENDING)
+  reviewNote    String?
+  documents     PartnerDocument[]
+  bookings      Ride[]        @relation("PartnerBookings")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+enum PartnerStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+model PartnerDocument {
+  id         String         @id @default(cuid())
+  partnerId  String
+  partner    KiranaPartner  @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  type       String         // shop license, aadhaar, etc (free-form for MVP)
+  fileUrl    String
+  status     DocumentStatus @default(PENDING)
+  uploadedAt DateTime       @default(now())
+}
+
+// ============ OTP (used by kirana + future rider/driver apps) ============
+
+model OtpRequest {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String   // 6-digit
+  purpose   OtpPurpose
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([phone, purpose])
+}
+
+enum OtpPurpose {
+  KIRANA_LOGIN
+  RIDER_LOGIN
+  DRIVER_LOGIN
 }

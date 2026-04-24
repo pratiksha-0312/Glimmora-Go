@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { requireWrite, cityMismatch } from "@/lib/apiAuth";
+import { maybeGrantReferralReward } from "@/lib/referrals";
 
 const patchSchema = z.object({
   action: z.enum(["CANCEL", "COMPLETE", "REASSIGN"]),
@@ -13,8 +14,8 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireWrite("rides");
+  if (!auth.ok) return auth.response;
 
   const { id } = await params;
   const body = await req.json().catch(() => null);
@@ -27,6 +28,8 @@ export async function PATCH(
   if (!ride) {
     return NextResponse.json({ error: "Ride not found" }, { status: 404 });
   }
+  const scope = cityMismatch(auth.session, ride.cityId);
+  if (scope) return scope;
 
   if (ride.status === "COMPLETED" || ride.status === "CANCELLED") {
     return NextResponse.json(
@@ -54,7 +57,11 @@ export async function PATCH(
         fareFinal: fareFinal ?? ride.fareFinal ?? ride.fareEstimate,
       },
     });
-    return NextResponse.json({ ok: true, ride: updated });
+    let rewardGranted = false;
+    if (updated.driverId) {
+      rewardGranted = await maybeGrantReferralReward(updated.driverId);
+    }
+    return NextResponse.json({ ok: true, ride: updated, rewardGranted });
   }
 
   if (action === "REASSIGN") {
@@ -69,6 +76,12 @@ export async function PATCH(
       return NextResponse.json(
         { error: "Driver must be approved" },
         { status: 400 }
+      );
+    }
+    if (auth.session.cityId && driver.cityId !== auth.session.cityId) {
+      return NextResponse.json(
+        { error: "Driver is outside your city" },
+        { status: 403 }
       );
     }
     const updated = await prisma.ride.update({

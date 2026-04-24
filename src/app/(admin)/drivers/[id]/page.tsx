@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
@@ -6,6 +6,8 @@ import { formatDate } from "@/lib/utils";
 import { driverStatusVariant } from "@/lib/format";
 import { DriverActions } from "./DriverActions";
 import { DocumentActions } from "./DocumentActions";
+import { DocumentUpload } from "./DocumentUpload";
+import { requireAccess, sessionCanWrite } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +16,7 @@ export default async function DriverDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const session = await requireAccess("drivers");
   const { id } = await params;
   const driver = await prisma.driver
     .findUnique({
@@ -27,6 +30,10 @@ export default async function DriverDetailPage({
     .catch(() => null);
 
   if (!driver) notFound();
+  if (session.cityId && driver.cityId !== session.cityId) redirect("/drivers");
+
+  const canManageDriver = sessionCanWrite(session, "drivers");
+  const canManageDocs = sessionCanWrite(session, "documents");
 
   return (
     <div>
@@ -59,7 +66,9 @@ export default async function DriverDetailPage({
               </Row>
               <Row label="Joined">{formatDate(driver.createdAt)}</Row>
             </dl>
-            <DriverActions id={driver.id} status={driver.status} />
+            {canManageDriver && (
+              <DriverActions id={driver.id} status={driver.status} />
+            )}
           </div>
 
           {driver.verificationNote && (
@@ -80,7 +89,9 @@ export default async function DriverDetailPage({
             <div className="divide-y divide-slate-100">
               {driver.documents.length === 0 ? (
                 <div className="px-5 py-10 text-center text-sm text-slate-400">
-                  No documents uploaded
+                  {canManageDocs
+                    ? "No documents uploaded yet. Use the form below."
+                    : "No documents uploaded"}
                 </div>
               ) : (
                 driver.documents.map((doc) => (
@@ -104,16 +115,21 @@ export default async function DriverDetailPage({
                         View file →
                       </a>
                     </div>
-                    <DocumentActions
-                      driverId={driver.id}
-                      docId={doc.id}
-                      status={doc.status}
-                      reviewNote={doc.reviewNote}
-                    />
+                    {canManageDocs ? (
+                      <DocumentActions
+                        driverId={driver.id}
+                        docId={doc.id}
+                        status={doc.status}
+                        reviewNote={doc.reviewNote}
+                      />
+                    ) : (
+                      <Badge variant="default">{doc.status}</Badge>
+                    )}
                   </div>
                 ))
               )}
             </div>
+            {canManageDocs && <DocumentUpload driverId={driver.id} />}
           </div>
         </div>
       </div>

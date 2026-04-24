@@ -1,6 +1,9 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
+import type { AdminRole } from "../../generated/prisma";
+import { canAccess, canWrite, type Surface } from "./rbac";
 
 const SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "glimmora-go-dev-secret-change-me"
@@ -12,8 +15,9 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 export type SessionPayload = {
   adminId: string;
   email: string;
-  role: "SUPER_ADMIN" | "ADMIN" | "VIEWER";
+  role: AdminRole;
   name: string;
+  cityId: string | null;
 };
 
 export async function hashPassword(password: string): Promise<string> {
@@ -66,7 +70,23 @@ export async function getSession(): Promise<SessionPayload | null> {
   const store = await cookies();
   const token = store.get(COOKIE_NAME)?.value;
   if (!token) return null;
-  return verifySessionToken(token);
+  const payload = await verifySessionToken(token);
+  if (!payload) return null;
+  return { ...payload, cityId: payload.cityId ?? null };
 }
 
 export const SESSION_COOKIE_NAME = COOKIE_NAME;
+
+export async function requireAccess(surface: Surface): Promise<SessionPayload> {
+  const session = await getSession();
+  if (!session) redirect("/login");
+  if (!canAccess(session.role, surface)) redirect("/");
+  return session;
+}
+
+export function sessionCanWrite(
+  session: SessionPayload,
+  surface: Surface
+): boolean {
+  return canWrite(session.role, surface);
+}

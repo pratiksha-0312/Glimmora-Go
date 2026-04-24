@@ -6,19 +6,50 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding Glimmora Go admin data...");
 
-  // Admin
-  const adminPassword = await bcrypt.hash("admin123", 10);
-  const admin = await prisma.admin.upsert({
+  // Archetype defaults (used when creating new cities)
+  await prisma.archetypeDefaults.upsert({
+    where: { archetype: "METRO" },
+    update: {},
+    create: {
+      archetype: "METRO",
+      matchingRadiusKm: 3,
+      surgeMultiplier: 1.2,
+      paymentOptions: ["CASH", "UPI", "CARD"],
+      baseFare: 40,
+      perKm: 14,
+      perMin: 1.5,
+      minimumFare: 60,
+    },
+  });
+  await prisma.archetypeDefaults.upsert({
+    where: { archetype: "SMALL_TOWN" },
+    update: {},
+    create: {
+      archetype: "SMALL_TOWN",
+      matchingRadiusKm: 7,
+      surgeMultiplier: 1.0,
+      paymentOptions: ["CASH", "UPI"],
+      baseFare: 30,
+      perKm: 12,
+      perMin: 1.5,
+      minimumFare: 50,
+    },
+  });
+  console.log("  archetype defaults: METRO + SMALL_TOWN");
+
+  // Admins — one per role
+  const pwd = await bcrypt.hash("admin123", 10);
+  const superAdmin = await prisma.admin.upsert({
     where: { email: "admin@glimmora.ai" },
     update: {},
     create: {
       email: "admin@glimmora.ai",
       name: "Pratiksha",
-      passwordHash: adminPassword,
+      passwordHash: pwd,
       role: "SUPER_ADMIN",
     },
   });
-  console.log(`  admin: ${admin.email} / admin123`);
+  console.log(`  super_admin: ${superAdmin.email} / admin123`);
 
   // Cities
   const cities = [
@@ -70,6 +101,40 @@ async function main() {
   // Drivers
   const rewa = await prisma.city.findUnique({ where: { name: "Rewa" } });
   const indore = await prisma.city.findUnique({ where: { name: "Indore" } });
+
+  // Remaining admin roles
+  const roleAccounts: {
+    email: string;
+    name: string;
+    role: "ADMIN" | "CITY_ADMIN" | "VERIFIER" | "SUPPORT" | "VIEWER";
+    cityId?: string;
+  }[] = [
+    { email: "admin2@glimmora.ai", name: "General Admin", role: "ADMIN" },
+    {
+      email: "rewa.admin@glimmora.ai",
+      name: "Rewa City Admin",
+      role: "CITY_ADMIN",
+      cityId: rewa?.id,
+    },
+    { email: "verifier@glimmora.ai", name: "Doc Verifier", role: "VERIFIER" },
+    { email: "support@glimmora.ai", name: "Support Agent", role: "SUPPORT" },
+    { email: "viewer@glimmora.ai", name: "Read-Only Viewer", role: "VIEWER" },
+  ];
+
+  for (const r of roleAccounts) {
+    const a = await prisma.admin.upsert({
+      where: { email: r.email },
+      update: {},
+      create: {
+        email: r.email,
+        name: r.name,
+        passwordHash: pwd,
+        role: r.role,
+        cityId: r.cityId ?? null,
+      },
+    });
+    console.log(`  ${r.role.toLowerCase()}: ${a.email} / admin123`);
+  }
 
   const drivers = [
     {
@@ -198,6 +263,38 @@ async function main() {
     },
   });
   console.log(`  coupons: 2`);
+
+  // Kirana partners
+  if (rewa) {
+    await prisma.kiranaPartner.upsert({
+      where: { phone: "9888800001" },
+      update: {},
+      create: {
+        phone: "9888800001",
+        shopName: "Ramji Kirana Store",
+        ownerName: "Ram Kumar",
+        cityId: rewa.id,
+        commissionPct: 10,
+        status: "APPROVED",
+      },
+    });
+    console.log("  kirana (approved): Ramji Kirana Store / 9888800001");
+  }
+  if (indore) {
+    await prisma.kiranaPartner.upsert({
+      where: { phone: "9888800002" },
+      update: {},
+      create: {
+        phone: "9888800002",
+        shopName: "Sharma General Stores",
+        ownerName: "Sharma",
+        cityId: indore.id,
+        commissionPct: 12,
+        status: "PENDING",
+      },
+    });
+    console.log("  kirana (pending):  Sharma General Stores / 9888800002");
+  }
 
   console.log("\n✅ Seed complete.");
   console.log("\nLogin: admin@glimmora.ai / admin123");

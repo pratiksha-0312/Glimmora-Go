@@ -5,7 +5,17 @@ import { getSession, hashPassword } from "@/lib/auth";
 
 const patchSchema = z.object({
   active: z.boolean().optional(),
-  role: z.enum(["SUPER_ADMIN", "ADMIN", "VIEWER"]).optional(),
+  role: z
+    .enum([
+      "SUPER_ADMIN",
+      "ADMIN",
+      "CITY_ADMIN",
+      "VERIFIER",
+      "SUPPORT",
+      "VIEWER",
+    ])
+    .optional(),
+  cityId: z.string().nullable().optional(),
   password: z.string().min(8).optional(),
 });
 
@@ -36,6 +46,7 @@ export async function PATCH(
   const data: Record<string, unknown> = {};
   if (parsed.data.active !== undefined) data.active = parsed.data.active;
   if (parsed.data.role !== undefined) data.role = parsed.data.role;
+  if (parsed.data.cityId !== undefined) data.cityId = parsed.data.cityId;
   if (parsed.data.password) data.passwordHash = await hashPassword(parsed.data.password);
 
   const admin = await prisma.admin.update({

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { requireAccess } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,7 @@ export default async function RidersPage({
 }: {
   searchParams: Promise<{ q?: string }>;
 }) {
+  await requireAccess("riders");
   const { q } = await searchParams;
   const riders = await getRiders(q);
 

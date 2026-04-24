@@ -9,6 +9,9 @@ tsconfig.tsbuildinfo
 # Editor / tooling
 .claude/
 
+# Dev-only file uploads (prod uses Vercel Blob)
+public/uploads/
+
 # Environment variables
 .env
 .env.local

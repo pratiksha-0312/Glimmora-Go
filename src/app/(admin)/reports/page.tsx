@@ -4,6 +4,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { Car, Banknote, Users, Activity } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import { ReportsCharts } from "./ReportsCharts";
+import { requireAccess } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -15,18 +16,21 @@ function parseDays(value: string | undefined): number {
   return Math.floor(n);
 }
 
-async function getReportData(days: number) {
+async function getReportData(days: number, cityId: string | null) {
   try {
     const from = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const cityFilter = cityId ? { cityId } : {};
 
     const rides = await prisma.ride.findMany({
-      where: { createdAt: { gte: from } },
+      where: { ...cityFilter, createdAt: { gte: from } },
       select: {
         createdAt: true,
         status: true,
         fareFinal: true,
         fareEstimate: true,
         bookingChannel: true,
+        city: { select: { name: true } },
+        driver: { select: { id: true, name: true, phone: true } },
       },
     });
 
@@ -42,7 +46,7 @@ async function getReportData(days: number) {
       : 0;
 
     const activeDrivers = await prisma.driver.count({
-      where: { status: "APPROVED" },
+      where: { ...cityFilter, status: "APPROVED" },
     });
 
     const dayPoints: { date: string; rides: number; revenue: number }[] = [];
@@ -68,6 +72,52 @@ async function getReportData(days: number) {
       channels[r.bookingChannel] = (channels[r.bookingChannel] ?? 0) + 1;
     }
 
+    // City breakdown
+    const byCity = new Map<
+      string,
+      { rides: number; completed: number; revenue: number }
+    >();
+    for (const r of rides) {
+      const key = r.city.name;
+      const cur = byCity.get(key) ?? { rides: 0, completed: 0, revenue: 0 };
+      cur.rides++;
+      if (r.status === "COMPLETED") {
+        cur.completed++;
+        cur.revenue += r.fareFinal ?? 0;
+      }
+      byCity.set(key, cur);
+    }
+    const cityStats = Array.from(byCity.entries())
+      .map(([name, v]) => ({
+        name,
+        rides: v.rides,
+        completed: v.completed,
+        revenue: v.revenue,
+        completion: v.rides ? Math.round((v.completed / v.rides) * 100) : 0,
+      }))
+      .sort((a, b) => b.rides - a.rides);
+
+    // Top drivers
+    const byDriver = new Map<
+      string,
+      { name: string; phone: string; rides: number; revenue: number }
+    >();
+    for (const r of rides) {
+      if (!r.driver) continue;
+      const cur = byDriver.get(r.driver.id) ?? {
+        name: r.driver.name,
+        phone: r.driver.phone,
+        rides: 0,
+        revenue: 0,
+      };
+      cur.rides++;
+      if (r.status === "COMPLETED") cur.revenue += r.fareFinal ?? 0;
+      byDriver.set(r.driver.id, cur);
+    }
+    const topDrivers = Array.from(byDriver.values())
+      .sort((a, b) => b.rides - a.rides)
+      .slice(0, 10);
+
     return {
       totalRides,
       totalRevenue,
@@ -75,6 +125,8 @@ async function getReportData(days: number) {
       activeDrivers,
       days: dayPoints,
       channels,
+      cityStats,
+      topDrivers,
     };
   } catch {
     return {
@@ -84,6 +136,8 @@ async function getReportData(days: number) {
       activeDrivers: 0,
       days: [],
       channels: {},
+      cityStats: [],
+      topDrivers: [],
     };
   }
 }
@@ -93,9 +147,10 @@ export default async function ReportsPage({
 }: {
   searchParams: Promise<{ days?: string }>;
 }) {
+  const session = await requireAccess("reports");
   const { days: daysParam } = await searchParams;
   const days = parseDays(daysParam);
-  const data = await getReportData(days);
+  const data = await getReportData(days, session.cityId);
 
   return (
     <div>
@@ -160,6 +215,105 @@ export default async function ReportsPage({
       </div>
 
       <ReportsCharts days={data.days} channels={data.channels} />
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-5 py-4">
+            <h3 className="text-sm font-semibold text-slate-900">
+              By city
+            </h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th className="px-5 py-3 text-left">City</th>
+                  <th className="px-5 py-3 text-right">Rides</th>
+                  <th className="px-5 py-3 text-right">Completion</th>
+                  <th className="px-5 py-3 text-right">Revenue</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {data.cityStats.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="px-5 py-8 text-center text-sm text-slate-400"
+                    >
+                      No rides in this window
+                    </td>
+                  </tr>
+                ) : (
+                  data.cityStats.map((c) => (
+                    <tr key={c.name} className="hover:bg-slate-50">
+                      <td className="px-5 py-3 font-medium text-slate-900">
+                        {c.name}
+                      </td>
+                      <td className="px-5 py-3 text-right text-slate-700">
+                        {c.rides}
+                      </td>
+                      <td className="px-5 py-3 text-right text-slate-700">
+                        {c.completion}%
+                      </td>
+                      <td className="px-5 py-3 text-right font-medium text-slate-900">
+                        {formatCurrency(c.revenue)}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="border-b border-slate-200 px-5 py-4">
+            <h3 className="text-sm font-semibold text-slate-900">
+              Top drivers
+            </h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                <tr>
+                  <th className="px-5 py-3 text-left">Driver</th>
+                  <th className="px-5 py-3 text-right">Rides</th>
+                  <th className="px-5 py-3 text-right">Revenue</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {data.topDrivers.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={3}
+                      className="px-5 py-8 text-center text-sm text-slate-400"
+                    >
+                      No driver activity yet
+                    </td>
+                  </tr>
+                ) : (
+                  data.topDrivers.map((d) => (
+                    <tr key={d.phone} className="hover:bg-slate-50">
+                      <td className="px-5 py-3">
+                        <div className="font-medium text-slate-900">
+                          {d.name}
+                        </div>
+                        <div className="text-xs text-slate-500">{d.phone}</div>
+                      </td>
+                      <td className="px-5 py-3 text-right text-slate-700">
+                        {d.rides}
+                      </td>
+                      <td className="px-5 py-3 text-right font-medium text-slate-900">
+                        {formatCurrency(d.revenue)}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

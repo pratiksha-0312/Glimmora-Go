@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { requireWrite } from "@/lib/apiAuth";
 
 const schema = z.object({
   code: z.string().min(3).max(32),
@@ -13,8 +13,8 @@ const schema = z.object({
 });
 
 export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireWrite("coupons");
+  if (!auth.ok) return auth.response;
 
   const body = await req.json().catch(() => null);
   const parsed = schema.safeParse(body);

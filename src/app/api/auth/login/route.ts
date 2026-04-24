@@ -32,6 +32,7 @@ export async function POST(req: Request) {
     email: admin.email,
     name: admin.name,
     role: admin.role,
+    cityId: admin.cityId,
   });
   await setSessionCookie(token);
 

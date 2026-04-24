@@ -5,28 +5,41 @@ import { Badge } from "@/components/ui/Badge";
 import { Car, Users, Banknote, AlertTriangle } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { rideStatusVariant } from "@/lib/format";
+import { requireAccess } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-async function getStats() {
+async function getStats(cityId: string | null) {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
+  const cityFilter = cityId ? { cityId } : {};
 
   try {
     const [ridesToday, completedToday, activeDrivers, sosCount, recentRides] =
       await Promise.all([
-        prisma.ride.count({ where: { createdAt: { gte: startOfDay } } }),
+        prisma.ride.count({
+          where: { ...cityFilter, createdAt: { gte: startOfDay } },
+        }),
         prisma.ride.findMany({
-          where: { completedAt: { gte: startOfDay }, status: "COMPLETED" },
+          where: {
+            ...cityFilter,
+            completedAt: { gte: startOfDay },
+            status: "COMPLETED",
+          },
           select: { fareFinal: true },
         }),
         prisma.driver.count({
-          where: { online: true, status: "APPROVED" },
+          where: { ...cityFilter, online: true, status: "APPROVED" },
         }),
         prisma.ride.count({
-          where: { sosTriggered: true, createdAt: { gte: startOfDay } },
+          where: {
+            ...cityFilter,
+            sosTriggered: true,
+            createdAt: { gte: startOfDay },
+          },
         }),
         prisma.ride.findMany({
+          where: cityFilter,
           orderBy: { createdAt: "desc" },
           take: 8,
           include: {
@@ -56,7 +69,8 @@ async function getStats() {
 }
 
 export default async function DashboardPage() {
-  const stats = await getStats();
+  const session = await requireAccess("dashboard");
+  const stats = await getStats(session.cityId);
 
   return (
     <div>

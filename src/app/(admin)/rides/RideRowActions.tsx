@@ -22,8 +22,27 @@ export function RideRowActions({
   const [reassigning, setReassigning] = useState(false);
   const [driverId, setDriverId] = useState(currentDriverId ?? "");
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const terminal = status === "COMPLETED" || status === "CANCELLED";
+
+  async function share() {
+    setLoading("SHARE");
+    setError(null);
+    try {
+      const res = await fetch(`/api/rides/${id}/token`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed");
+      const url = `${window.location.origin}/track/${data.token}`;
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setLoading(null);
+    }
+  }
 
   async function send(action: "CANCEL" | "COMPLETE" | "REASSIGN") {
     setError(null);
@@ -54,7 +73,15 @@ export function RideRowActions({
   }
 
   if (terminal) {
-    return <span className="text-xs text-slate-400">—</span>;
+    return (
+      <button
+        onClick={share}
+        disabled={loading === "SHARE"}
+        className="text-xs font-medium text-slate-500 hover:text-slate-700 disabled:opacity-50"
+      >
+        {copied ? "Link copied ✓" : loading === "SHARE" ? "…" : "Share link"}
+      </button>
+    );
   }
 
   if (reassigning) {
@@ -97,6 +124,13 @@ export function RideRowActions({
 
   return (
     <div className="flex justify-end gap-3 text-xs font-medium">
+      <button
+        onClick={share}
+        disabled={loading === "SHARE"}
+        className="text-slate-500 hover:text-slate-700 disabled:opacity-50"
+      >
+        {copied ? "Copied ✓" : loading === "SHARE" ? "…" : "Share"}
+      </button>
       <button
         onClick={() => setReassigning(true)}
         className="text-slate-600 hover:text-slate-900"

@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  // react-leaflet@4 doesn't survive Strict Mode's double-mount in dev
+  // ("Map container is already initialized"). Prod builds don't double-mount.
+  reactStrictMode: false,
   eslint: {
     ignoreDuringBuilds: true,
   },

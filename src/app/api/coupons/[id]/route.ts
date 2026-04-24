@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { requireWrite } from "@/lib/apiAuth";
 
 const patchSchema = z.object({
   active: z.boolean().optional(),
@@ -11,8 +11,8 @@ export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireWrite("coupons");
+  if (!auth.ok) return auth.response;
 
   const { id } = await params;
   const body = await req.json().catch(() => null);
@@ -32,8 +32,8 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireWrite("coupons");
+  if (!auth.ok) return auth.response;
 
   const { id } = await params;
   await prisma.coupon.delete({ where: { id } });

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { requireWrite } from "@/lib/apiAuth";
 
 const schema = z.object({
   name: z.string().min(1),
@@ -10,8 +10,8 @@ const schema = z.object({
 });
 
 export async function POST(req: Request) {
-  const session = await getSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const auth = await requireWrite("cities");
+  if (!auth.ok) return auth.response;
 
   const body = await req.json().catch(() => null);
   const parsed = schema.safeParse(body);
@@ -20,9 +20,15 @@ export async function POST(req: Request) {
   }
 
   const { name, state, archetype } = parsed.data;
-  const defaults = archetype === "METRO"
-    ? { matchingRadiusKm: 3, surgeMultiplier: 1.2, paymentOptions: ["CASH", "UPI", "CARD"] }
-    : { matchingRadiusKm: 7, surgeMultiplier: 1.0, paymentOptions: ["CASH", "UPI"] };
+  const defaults = await prisma.archetypeDefaults.findUnique({
+    where: { archetype },
+  });
+  if (!defaults) {
+    return NextResponse.json(
+      { error: "Archetype defaults not configured" },
+      { status: 500 }
+    );
+  }
 
   try {
     const city = await prisma.city.create({
@@ -30,8 +36,17 @@ export async function POST(req: Request) {
         name,
         state,
         archetype,
-        ...defaults,
-        fareConfig: { create: {} },
+        matchingRadiusKm: defaults.matchingRadiusKm,
+        surgeMultiplier: defaults.surgeMultiplier,
+        paymentOptions: defaults.paymentOptions,
+        fareConfig: {
+          create: {
+            baseFare: defaults.baseFare,
+            perKm: defaults.perKm,
+            perMin: defaults.perMin,
+            minimumFare: defaults.minimumFare,
+          },
+        },
       },
     });
     return NextResponse.json({ ok: true, city });

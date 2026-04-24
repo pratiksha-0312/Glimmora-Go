@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ConcessionEditor } from "./ConcessionEditor";
+import { requireAccess } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ async function getCities() {
 }
 
 export default async function ConcessionsPage() {
+  await requireAccess("concessions");
   const cities = await getCities();
 
   return (

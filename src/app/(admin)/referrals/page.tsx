@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { Share2, UserPlus, Gift } from "lucide-react";
 import { ReferralRowActions } from "./ReferralRowActions";
+import { RecomputeButton } from "./RecomputeButton";
+import { requireAccess, sessionCanWrite } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -37,6 +39,8 @@ async function getData() {
 }
 
 export default async function ReferralsPage() {
+  const session = await requireAccess("referrals");
+  const canWrite = sessionCanWrite(session, "referrals");
   const { total, joined, rewarded, topReferrers, recent } = await getData();
 
   return (
@@ -44,6 +48,7 @@ export default async function ReferralsPage() {
       <PageHeader
         title="Referrals"
         description="Driver-to-driver referrals and reward tracking"
+        action={canWrite ? <RecomputeButton /> : undefined}
       />
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -122,14 +127,16 @@ export default async function ReferralsPage() {
                   <th className="px-5 py-3 text-left">Rides</th>
                   <th className="px-5 py-3 text-left">Status</th>
                   <th className="px-5 py-3 text-left">Date</th>
-                  <th className="px-5 py-3 text-right">Actions</th>
+                  {canWrite && (
+                    <th className="px-5 py-3 text-right">Actions</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {recent.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={canWrite ? 5 : 4}
                       className="px-5 py-8 text-center text-sm text-slate-400"
                     >
                       No referrals yet
@@ -156,13 +163,15 @@ export default async function ReferralsPage() {
                       <td className="px-5 py-3 text-xs text-slate-500">
                         {formatDate(r.createdAt)}
                       </td>
-                      <td className="px-5 py-3 text-right">
-                        <ReferralRowActions
-                          id={r.id}
-                          rewardIssued={r.rewardIssued}
-                          refereeJoined={r.refereeJoined}
-                        />
-                      </td>
+                      {canWrite && (
+                        <td className="px-5 py-3 text-right">
+                          <ReferralRowActions
+                            id={r.id}
+                            rewardIssued={r.rewardIssued}
+                            refereeJoined={r.refereeJoined}
+                          />
+                        </td>
+                      )}
                     </tr>
                   ))
                 )}

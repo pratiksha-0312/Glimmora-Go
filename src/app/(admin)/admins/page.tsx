@@ -1,35 +1,44 @@
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/auth";
+import { requireAccess } from "@/lib/auth";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { AdminForm } from "./AdminForm";
 import { AdminRowActions } from "./AdminRowActions";
+import { ROLE_LABELS } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
-async function getAdmins() {
+async function getData() {
   try {
-    return await prisma.admin.findMany({
-      orderBy: { createdAt: "asc" },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        active: true,
-        createdAt: true,
-      },
-    });
+    const [admins, cities] = await Promise.all([
+      prisma.admin.findMany({
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          active: true,
+          createdAt: true,
+          city: { select: { name: true } },
+        },
+      }),
+      prisma.city.findMany({
+        orderBy: { name: "asc" },
+        select: { id: true, name: true },
+      }),
+    ]);
+    return { admins, cities };
   } catch {
-    return [];
+    return { admins: [], cities: [] };
   }
 }
 
 export default async function AdminsPage() {
-  const session = await getSession();
-  const admins = await getAdmins();
-  const canManage = session?.role === "SUPER_ADMIN";
+  const session = await requireAccess("admins");
+  const { admins, cities } = await getData();
+  const canManage = session.role === "SUPER_ADMIN";
 
   return (
     <div>
@@ -48,7 +57,7 @@ export default async function AdminsPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {canManage && (
           <div className="lg:col-span-1">
-            <AdminForm />
+            <AdminForm cities={cities} />
           </div>
         )}
 
@@ -108,11 +117,18 @@ export default async function AdminsPage() {
                                   ? "info"
                                   : a.role === "ADMIN"
                                     ? "default"
-                                    : "warning"
+                                    : a.role === "VIEWER"
+                                      ? "warning"
+                                      : "default"
                               }
                             >
-                              {a.role}
+                              {ROLE_LABELS[a.role]}
                             </Badge>
+                            {a.city && (
+                              <div className="mt-1 text-[11px] text-slate-500">
+                                {a.city.name}
+                              </div>
+                            )}
                           </td>
                           <td className="px-5 py-3">
                             {a.active ? (
