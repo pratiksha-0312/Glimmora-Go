@@ -19,17 +19,14 @@ const FILTERS: (DriverStatus | "ALL")[] = [
 
 async function getDrivers(
   status: string | undefined,
-  role: AdminRole,
+  _role: AdminRole,
   cityId: string | null
 ) {
   const cityFilter = cityId ? { cityId } : {};
-  // Verifier only sees PENDING drivers
-  const verifierFilter = role === "VERIFIER" ? { status: "PENDING" as DriverStatus } : {};
   try {
     return await prisma.driver.findMany({
       where: {
         ...cityFilter,
-        ...verifierFilter,
         ...(status && status !== "ALL"
           ? { status: status as DriverStatus }
           : {}),

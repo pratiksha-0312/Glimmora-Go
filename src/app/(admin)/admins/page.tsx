@@ -5,59 +5,43 @@ import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { AdminForm } from "./AdminForm";
 import { AdminRowActions } from "./AdminRowActions";
-import { ROLE_LABELS } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
 async function getData() {
   try {
-    const [admins, cities] = await Promise.all([
-      prisma.admin.findMany({
-        orderBy: { createdAt: "asc" },
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          role: true,
-          active: true,
-          createdAt: true,
-          city: { select: { name: true } },
-        },
-      }),
-      prisma.city.findMany({
-        orderBy: { name: "asc" },
-        select: { id: true, name: true },
-      }),
-    ]);
-    return { admins, cities };
+    const admins = await prisma.admin.findMany({
+      orderBy: { createdAt: "asc" },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        active: true,
+        createdAt: true,
+      },
+    });
+    return { admins };
   } catch {
-    return { admins: [], cities: [] };
+    return { admins: [] };
   }
 }
 
 export default async function AdminsPage() {
   const session = await requireAccess("admins");
-  const { admins, cities } = await getData();
-  const canManage = session.role === "SUPER_ADMIN";
+  const { admins } = await getData();
+  const canManage = true;
 
   return (
     <div>
       <PageHeader
         title="Admins"
-        description="Manage admin users. Only Super Admins can create or modify accounts."
+        description="Manage admin users."
       />
-
-      {!canManage && (
-        <div className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200">
-          You are signed in as <b>{session?.role}</b>. Only SUPER_ADMIN can
-          create, disable, or delete admins.
-        </div>
-      )}
 
       <div className="grid gap-6 lg:grid-cols-3">
         {canManage && (
           <div className="lg:col-span-1">
-            <AdminForm cities={cities} />
+            <AdminForm />
           </div>
         )}
 
@@ -74,7 +58,6 @@ export default async function AdminsPage() {
                   <tr>
                     <th className="px-5 py-3 text-left">Name</th>
                     <th className="px-5 py-3 text-left">Email</th>
-                    <th className="px-5 py-3 text-left">Role</th>
                     <th className="px-5 py-3 text-left">Status</th>
                     <th className="px-5 py-3 text-left">Joined</th>
                     {canManage && (
@@ -86,7 +69,7 @@ export default async function AdminsPage() {
                   {admins.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={canManage ? 6 : 5}
+                        colSpan={canManage ? 5 : 4}
                         className="px-5 py-10 text-center text-sm text-slate-400"
                       >
                         No admins found
@@ -109,26 +92,6 @@ export default async function AdminsPage() {
                           </td>
                           <td className="px-5 py-3 text-slate-700">
                             {a.email}
-                          </td>
-                          <td className="px-5 py-3">
-                            <Badge
-                              variant={
-                                a.role === "SUPER_ADMIN"
-                                  ? "info"
-                                  : a.role === "ADMIN"
-                                    ? "default"
-                                    : a.role === "VIEWER"
-                                      ? "warning"
-                                      : "default"
-                              }
-                            >
-                              {ROLE_LABELS[a.role]}
-                            </Badge>
-                            {a.city && (
-                              <div className="mt-1 text-[11px] text-slate-500">
-                                {a.city.name}
-                              </div>
-                            )}
                           </td>
                           <td className="px-5 py-3">
                             {a.active ? (

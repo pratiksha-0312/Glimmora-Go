@@ -37,19 +37,19 @@ async function main() {
   });
   console.log("  archetype defaults: METRO + SMALL_TOWN");
 
-  // Admins — one per role
+  // Single admin (SOW defines "Admin" as the only admin-panel role)
   const pwd = await bcrypt.hash("admin123", 10);
-  const superAdmin = await prisma.admin.upsert({
+  const admin = await prisma.admin.upsert({
     where: { email: "admin@glimmora.ai" },
     update: {},
     create: {
       email: "admin@glimmora.ai",
       name: "Pratiksha",
       passwordHash: pwd,
-      role: "SUPER_ADMIN",
+      role: "ADMIN",
     },
   });
-  console.log(`  super_admin: ${superAdmin.email} / admin123`);
+  console.log(`  admin: ${admin.email} / admin123`);
 
   // Cities
   const cities = [
@@ -101,40 +101,6 @@ async function main() {
   // Drivers
   const rewa = await prisma.city.findUnique({ where: { name: "Rewa" } });
   const indore = await prisma.city.findUnique({ where: { name: "Indore" } });
-
-  // Remaining admin roles
-  const roleAccounts: {
-    email: string;
-    name: string;
-    role: "ADMIN" | "CITY_ADMIN" | "VERIFIER" | "SUPPORT" | "VIEWER";
-    cityId?: string;
-  }[] = [
-    { email: "admin2@glimmora.ai", name: "General Admin", role: "ADMIN" },
-    {
-      email: "rewa.admin@glimmora.ai",
-      name: "Rewa City Admin",
-      role: "CITY_ADMIN",
-      cityId: rewa?.id,
-    },
-    { email: "verifier@glimmora.ai", name: "Doc Verifier", role: "VERIFIER" },
-    { email: "support@glimmora.ai", name: "Support Agent", role: "SUPPORT" },
-    { email: "viewer@glimmora.ai", name: "Read-Only Viewer", role: "VIEWER" },
-  ];
-
-  for (const r of roleAccounts) {
-    const a = await prisma.admin.upsert({
-      where: { email: r.email },
-      update: {},
-      create: {
-        email: r.email,
-        name: r.name,
-        passwordHash: pwd,
-        role: r.role,
-        cityId: r.cityId ?? null,
-      },
-    });
-    console.log(`  ${r.role.toLowerCase()}: ${a.email} / admin123`);
-  }
 
   const drivers = [
     {

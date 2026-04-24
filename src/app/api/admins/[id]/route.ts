@@ -6,17 +6,6 @@ import { logAudit } from "@/lib/audit";
 
 const patchSchema = z.object({
   active: z.boolean().optional(),
-  role: z
-    .enum([
-      "SUPER_ADMIN",
-      "ADMIN",
-      "CITY_ADMIN",
-      "VERIFIER",
-      "SUPPORT",
-      "VIEWER",
-    ])
-    .optional(),
-  cityId: z.string().nullable().optional(),
   password: z.string().min(8).optional(),
 });
 
@@ -26,9 +15,6 @@ export async function PATCH(
 ) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
 
   const { id } = await params;
   const body = await req.json().catch(() => null);
@@ -46,8 +32,6 @@ export async function PATCH(
 
   const data: Record<string, unknown> = {};
   if (parsed.data.active !== undefined) data.active = parsed.data.active;
-  if (parsed.data.role !== undefined) data.role = parsed.data.role;
-  if (parsed.data.cityId !== undefined) data.cityId = parsed.data.cityId;
   if (parsed.data.password) data.passwordHash = await hashPassword(parsed.data.password);
 
   const admin = await prisma.admin.update({
@@ -73,9 +57,6 @@ export async function DELETE(
 ) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
 
   const { id } = await params;
   if (id === session.adminId) {

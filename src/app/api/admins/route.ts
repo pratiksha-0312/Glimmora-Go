@@ -4,32 +4,15 @@ import { prisma } from "@/lib/db";
 import { getSession, hashPassword } from "@/lib/auth";
 import { logAudit } from "@/lib/audit";
 
-const schema = z
-  .object({
-    email: z.string().email(),
-    name: z.string().min(1),
-    password: z.string().min(8),
-    role: z.enum([
-      "SUPER_ADMIN",
-      "ADMIN",
-      "CITY_ADMIN",
-      "VERIFIER",
-      "SUPPORT",
-      "VIEWER",
-    ]),
-    cityId: z.string().nullable().optional(),
-  })
-  .refine(
-    (v) => v.role !== "CITY_ADMIN" || (v.cityId && v.cityId.length > 0),
-    { message: "City Admin requires cityId", path: ["cityId"] }
-  );
+const schema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1),
+  password: z.string().min(8),
+});
 
 export async function POST(req: Request) {
   const session = await getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  if (session.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
 
   const body = await req.json().catch(() => null);
   const parsed = schema.safeParse(body);
@@ -37,15 +20,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
 
-  const { email, name, password, role, cityId } = parsed.data;
+  const { email, name, password } = parsed.data;
 
   try {
     const admin = await prisma.admin.create({
       data: {
         email,
         name,
-        role,
-        cityId: role === "CITY_ADMIN" ? cityId : null,
+        role: "ADMIN",
         passwordHash: await hashPassword(password),
       },
       select: {
@@ -62,7 +44,7 @@ export async function POST(req: Request) {
       action: "admin.create",
       entityType: "Admin",
       entityId: admin.id,
-      summary: `${admin.email} · ${admin.role}`,
+      summary: admin.email,
     });
 
     return NextResponse.json({ ok: true, admin });

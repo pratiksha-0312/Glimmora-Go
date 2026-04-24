@@ -31,12 +31,7 @@ model Admin {
 }
 
 enum AdminRole {
-  SUPER_ADMIN
   ADMIN
-  CITY_ADMIN
-  VERIFIER
-  SUPPORT
-  VIEWER
 }
 
 // ============ USERS ============

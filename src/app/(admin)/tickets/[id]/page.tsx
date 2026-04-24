@@ -51,10 +51,7 @@ export default async function TicketDetail({
 
   const admins = canWrite
     ? await prisma.admin.findMany({
-        where: {
-          active: true,
-          role: { in: ["SUPPORT", "ADMIN", "SUPER_ADMIN", "CITY_ADMIN"] },
-        },
+        where: { active: true },
         select: { id: true, name: true, email: true, role: true },
         orderBy: { name: "asc" },
       })
