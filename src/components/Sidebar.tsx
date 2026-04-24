@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   AlertTriangle,
   Store,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccess, ROLE_LABELS, type Surface } from "@/lib/rbac";
@@ -34,6 +35,7 @@ const NAV: { href: string; label: string; icon: typeof Car; surface: Surface }[]
   { href: "/coupons", label: "Coupons", icon: Ticket, surface: "coupons" },
   { href: "/cities", label: "Cities", icon: MapPin, surface: "cities" },
   { href: "/referrals", label: "Referrals", icon: Share2, surface: "referrals" },
+  { href: "/subscriptions", label: "Subscriptions", icon: Wallet, surface: "subscriptions" },
   { href: "/reports", label: "Reports", icon: BarChart3, surface: "reports" },
   { href: "/admins", label: "Admins", icon: ShieldCheck, surface: "admins" },
 ];

@@ -14,7 +14,8 @@ export type Surface =
   | "referrals"
   | "reports"
   | "admins"
-  | "partners";
+  | "partners"
+  | "subscriptions";
 
 type Perm = "read" | "write";
 
@@ -34,6 +35,7 @@ const MATRIX: Record<AdminRole, Partial<Record<Surface, Perm>>> = {
     reports: "read",
     admins: "write",
     partners: "write",
+    subscriptions: "write",
   },
   ADMIN: {
     dashboard: "write",
@@ -49,6 +51,7 @@ const MATRIX: Record<AdminRole, Partial<Record<Surface, Perm>>> = {
     referrals: "write",
     reports: "read",
     partners: "write",
+    subscriptions: "write",
   },
   CITY_ADMIN: {
     dashboard: "read",
@@ -85,6 +88,7 @@ const MATRIX: Record<AdminRole, Partial<Record<Surface, Perm>>> = {
     referrals: "read",
     reports: "read",
     partners: "read",
+    subscriptions: "read",
   },
 };
 

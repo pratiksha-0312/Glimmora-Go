@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline — Glimmora Go</title>
+    <meta name="theme-color" content="#f16c1e" />
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 24px;
+        font-family: Inter, system-ui, -apple-system, sans-serif;
+        color: #0f172a;
+        background: #f8fafc;
+        text-align: center;
+      }
+      .logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: #f16c1e;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 18px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0;
+      }
+      p {
+        color: #64748b;
+        font-size: 14px;
+        max-width: 320px;
+        margin: 0;
+      }
+      button {
+        margin-top: 8px;
+        padding: 8px 16px;
+        background: #e25313;
+        color: white;
+        border: 0;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo">GG</div>
+    <h1>You&rsquo;re offline</h1>
+    <p>
+      No internet right now. New bookings need a connection — your last-viewed
+      dashboard and bookings are still visible.
+    </p>
+    <button onclick="location.reload()">Try again</button>
+  </body>
+</html>

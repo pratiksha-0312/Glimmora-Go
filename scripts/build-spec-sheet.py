@@ -221,11 +221,12 @@ admin_rows = [
     (19, "/drivers/[id]", "Approve / Reject / Suspend / Pending", "PATCH with optional verification note", "SUPER/ADMIN/CITY", "Done", ""),
     (20, "/drivers/[id]", "Verification note banner", "Shown when driver.verificationNote set", "same", "Done", ""),
     (21, "/drivers/[id]", "Document list + per-doc review", "Type, uploaded date, View file link, approve/reject + reviewNote", "SUPER/ADMIN/CITY/VERIF", "Done", "VERIFIER can only write docs"),
-    ("—", "/drivers/[id]", "Document file upload", "Actually uploading files to storage", "SUPER/ADMIN/CITY/VERIF", "TODO", "fileUrl field exists but no upload UI"),
+    ("—", "/drivers/[id]", "Document file upload UI", "Pick type + file, POST /api/uploads/driver-doc, stored under public/uploads/drivers/", "SUPER/ADMIN/CITY/VERIF", "Done", ""),
 
     # Riders
     ("A", "RIDERS", "", "", "", "", "", True),
     (22, "/riders", "Rider search + list", "Phone/name search, language badge, ride count, lifetime spend, last ride, joined", "SUPER/ADMIN/SUPP/VIEW", "Done", ""),
+    ("—", "API", "Riders JSON API", "GET /api/riders (q/limit/offset), GET /api/riders/[id] with rides + stats", "riders:read", "Done", "For external clients and future rider app"),
 
     # Fares
     ("A", "FARES", "", "", "", "", "", True),
@@ -272,6 +273,12 @@ admin_rows = [
     (45, "/partners", "Partner list with status filter", "Shop, owner, phone, city, commission %, bookings count, status + review note", "SUPER/ADMIN/CITY (write) · VIEW (read)", "Done", ""),
     (46, "/partners", "Approve / Reject / Suspend", "PATCH status + optional reviewNote", "SUPER/ADMIN/CITY", "Done", ""),
     (47, "/partners", "Commission % editor", "Per-partner override (default 10%)", "same", "Done", ""),
+
+    # Subscriptions
+    ("A", "SUBSCRIPTIONS", "", "", "", "", "", True),
+    ("—", "/subscriptions", "Subscription list + stats", "All driver plans with active/expired/revoked status; active/total/revenue cards", "SUPER/ADMIN (write) · VIEW (read)", "Done", ""),
+    ("—", "/subscriptions", "Grant subscription", "Pick approved driver + plan (DAILY/WEEKLY/MONTHLY) + amount; stacks on existing expiry", "SUPER/ADMIN", "Done", ""),
+    ("—", "/subscriptions", "Revoke / Reinstate", "PATCH active flag; rolls back driver.subscriptionUntil if all plans inactive", "SUPER/ADMIN", "Done", ""),
 
     # Admins
     ("A", "ADMIN USER MGMT", "", "", "", "", "", True),
@@ -338,7 +345,7 @@ kirana_rows = [
 
     (12, "/k/book", "Customer section", "Rider phone (10-digit), optional name", "Approved partner", "Done", ""),
     (13, "/k/book", "Pickup section", "Address + lat + lng", "same", "Done", ""),
-    ("—", "/k/book", "Map-based pickup picker", "Click map / search to set pickup", "same", "TODO", "Requires Google Places or OSM Nominatim"),
+    ("—", "/k/book", "Map-based pickup/drop picker", "Leaflet + OSM Nominatim; click map or search address to set pickup and drop", "same", "Done", ""),
     (14, "/k/book", "Drop section", "Address + lat + lng", "same", "Done", ""),
     (15, "/k/book", "Concession selector", "None / Women / Senior / Children — applied to fare", "same", "Done", ""),
     (16, "/k/book", "Fare estimate", "PUT /api/kirana/bookings returns fare + distance + duration + your commission", "same", "Done", ""),
@@ -351,18 +358,24 @@ kirana_rows = [
 
     (20, "/k/profile", "Profile read-only", "Shop, owner, phone, city, commission %, joined, status badge", "Approved partner", "Done", ""),
     (21, "/k/profile", "Sign out button", "Same as dashboard logout", "same", "Done", ""),
-    ("—", "/k/profile", "KYC document upload", "Shop license, aadhaar, etc.", "same", "TODO", "PartnerDocument model exists, no upload UI"),
+    ("—", "/k/profile", "KYC document upload + status", "Pick type + file, upload to /api/kirana/documents; shows per-doc PENDING/APPROVED/REJECTED badge", "same", "Done", ""),
 
     ("K", "NAVIGATION + LAYOUT", "", "", "", "", "", True),
     (22, "layout", "Mobile-first shell", "Top header with shop name, bottom nav (Home/Book/History/Profile)", "Approved partner", "Done", ""),
     (23, "layout", "Session guard", "requireKirana() on every protected page", "all kirana routes", "Done", ""),
+
+    ("K", "PWA SHELL", "", "", "", "", "", True),
+    ("—", "manifest", "Web App Manifest", "public/manifest.webmanifest scoped to /k/ with name/icons/theme/start_url", "public", "Done", ""),
+    ("—", "icons", "App icons + apple-touch", "192/512 PNG + maskable 512 + 180 apple-touch, brand orange 'GG' monogram", "public", "Done", "Generated via scripts/build-pwa-icons.py"),
+    ("—", "service-worker", "Service worker (/sw.js, scope /k/)", "Cache-first static, network-first kirana APIs, offline fallback to /offline.html", "public", "Done", "Service-Worker-Allowed header set in next.config.js"),
+    ("—", "install", "Install prompt component", "Captures beforeinstallprompt, shows 'Add to home screen' banner with dismiss persistence", "Approved partner", "Done", ""),
+    ("—", "push", "Push notifications", "Driver matched / arrived / completed alerts", "system", "TODO", "SW ready; needs VAPID + backend trigger"),
 
     ("K", "CROSS-CUTTING", "", "", "", "", "", True),
     (24, "OTP", "6-digit, 5-min TTL", "OtpRequest table; single-use (usedAt timestamp)", "system", "Done", ""),
     (25, "OTP", "MSG91 send", "Actually send the code via SMS", "system", "TODO", "Stubbed; returns devCode in dev"),
     (26, "fare", "Haversine + concession", "src/lib/fare.ts shared with future rider/driver apps", "system", "Done", ""),
     (27, "commission", "Payout / settlement", "Actually paying partners their earned commission", "system", "TODO", "Tracks earned; no payout flow"),
-    (28, "push", "Booking status notifications", "Driver matched / arrived / completed alerts", "system", "TODO", ""),
     (29, "i18n", "Hindi + English toggle", "react-i18next across all kirana strings", "system", "TODO", "Low priority"),
 ]
 
@@ -400,7 +413,17 @@ apis = [
     ("PUT",  "/api/archetypes/[archetype]",     "Edit Metro/Small Town defaults",   "cities:write", "Done"),
     # Drivers
     ("PATCH","/api/drivers/[id]",               "Approve/reject/suspend driver + note", "drivers:write + city scope", "Done"),
+    ("GET",  "/api/drivers/[id]/documents/[docId]", "Fetch single driver document",     "documents:read + city scope", "Done"),
     ("PATCH","/api/drivers/[id]/documents/[docId]", "Approve/reject driver doc + review note", "documents:write + city scope", "Done"),
+    ("DELETE","/api/drivers/[id]/documents/[docId]","Delete driver doc + file",         "documents:write + city scope", "Done"),
+    ("POST", "/api/uploads/driver-doc",         "Upload driver doc file to storage",     "documents:write + city scope", "Done"),
+    # Riders (read-only API)
+    ("GET",  "/api/riders",                     "List riders (q/limit/offset)",         "riders:read", "Done"),
+    ("GET",  "/api/riders/[id]",                "Rider detail with recent rides + stats","riders:read", "Done"),
+    # Subscriptions
+    ("GET",  "/api/subscriptions",              "List subscriptions (optional driverId/active filters)","subscriptions:read", "Done"),
+    ("POST", "/api/subscriptions",              "Grant subscription (stacks on existing expiry)","subscriptions:write", "Done"),
+    ("PATCH","/api/subscriptions/[id]",         "Revoke / reinstate subscription",      "subscriptions:write", "Done"),
     # Rides
     ("PATCH","/api/rides/[id]",                 "Cancel / Complete / Reassign driver", "rides:write + city scope", "Done"),
     ("POST", "/api/rides/[id]/token",           "Generate or fetch public tracking token", "rides:write + city scope", "Done"),
@@ -449,7 +472,7 @@ schema = [
     ("Rider",              "Ride customers",              "phone (unique), name, language", "/riders, kirana signup auto-creates", "Done"),
     ("Driver",              "Fleet drivers",              "phone, name, cityId, status, online, lat/lng, referredById, referralRewardGranted", "/drivers", "Done"),
     ("DriverStatus (enum)","Driver KYC states",           "PENDING, APPROVED, REJECTED, SUSPENDED", "driver detail", "Done"),
-    ("DriverDocument",     "KYC docs per driver",         "driverId, type, fileUrl, status, reviewNote", "driver detail", "Done (no upload UI)"),
+    ("DriverDocument",     "KYC docs per driver",         "driverId, type, fileUrl, status, reviewNote", "driver detail + upload UI", "Done"),
     ("DocumentType (enum)","Doc categories",              "LICENSE, RC, INSURANCE, AADHAAR, PAN", "driver docs", "Done"),
     ("DocumentStatus (enum)","Doc review states",         "PENDING, APPROVED, REJECTED", "driver docs", "Done"),
     ("City",               "Cities served",               "name, state, archetype, matchingRadiusKm, surgeMultiplier, paymentOptions, active", "/cities, fare/concession, partner/driver scoping", "Done"),
@@ -463,11 +486,11 @@ schema = [
     ("Coupon",             "Promo codes",                 "code (unique), discountType, amount, usageLimit, usedCount, validUntil, active", "/coupons", "Done"),
     ("DiscountType",       "Coupon type",                 "FLAT, PERCENT", "coupons", "Done"),
     ("Referral",           "Driver-to-driver referrals",  "referrerDriverId, referrerRiderId, refereePhone, refereeJoined, ridesCompleted, rewardIssued", "/referrals manual controls", "Done"),
-    ("Subscription",       "Driver sachet packs",         "driverId, plan, amount, startedAt, expiresAt, active", "Referral reward extends this", "Schema only (no purchase UI)"),
+    ("Subscription",       "Driver sachet packs",         "driverId, plan, amount, startedAt, expiresAt, active", "/subscriptions admin + referral reward extends this", "Done (admin grant; no driver-side purchase UI)"),
     ("SubscriptionPlan",   "Sachet durations",            "DAILY, WEEKLY, MONTHLY", "", "Done"),
     ("KiranaPartner",      "Agent/kirana partners",       "phone (unique), shopName, ownerName, cityId, commissionPct, status, reviewNote", "/partners, Kirana PWA", "Done"),
     ("PartnerStatus",      "Partner KYC states",          "PENDING, APPROVED, REJECTED, SUSPENDED", "/partners", "Done"),
-    ("PartnerDocument",    "Partner KYC docs",            "partnerId, type, fileUrl, status", "Schema only (no UI)", "Partial"),
+    ("PartnerDocument",    "Partner KYC docs",            "partnerId, type, fileUrl, status", "Kirana /k/profile upload + /partners/[id] review", "Done"),
     ("OtpRequest",         "Phone OTP codes",             "phone, code, purpose, expiresAt, usedAt", "Kirana OTP flow", "Done"),
     ("OtpPurpose",         "OTP use cases",               "KIRANA_LOGIN, RIDER_LOGIN, DRIVER_LOGIN", "Kirana now; rider/driver later", "Done (only Kirana used)"),
 ]
@@ -501,14 +524,18 @@ gaps = [
     (15, "Driver demand heat map",                     "Driver PWA",    "App Dev", "Show clustering of rides to drivers", "P2", ""),
     (16, "Rider share-my-ride button",                 "Rider PWA",     "App Dev", "User-facing trigger for /track/:token", "P1", "Token API + page already exist"),
     (17, "Push notifications",                         "RN/Backend",    "App Dev + Backend", "Ride updates, promos", "P2", ""),
-    (18, "KYC document upload UI (drivers + partners)","Admin + PWA",   "Frontend + Backend", "Actually getting documents uploaded", "P1", "Need Vercel Blob or S3"),
+    (18, "KYC document upload UI (drivers + partners)","Admin + PWA",   "Frontend + Backend", "Actually getting documents uploaded", "Done", "Shipped — stored under public/uploads/ in dev; production should swap to Vercel Blob / S3"),
     (19, "i18n Hindi + English",                       "All frontends", "Frontend + App Dev", "Vernacular UX", "P3", "Low priority per tracker"),
     (20, "Complaints / tickets module",                "Admin",         "Frontend", "Support role has nothing to operate on", "P2", "Support role already scoped in RBAC"),
     (21, "Audit log",                                  "Admin",         "Frontend + Backend", "Compliance, who-changed-what", "P2", "Post-MVP per SOW"),
     (22, "Enterprise / corporate admin console",       "Admin",         "Frontend", "B2B customer fleets", "P3", "Post-MVP"),
     (23, "Commission payout flow",                     "Admin + PWA",   "Backend + Frontend", "Actually paying partners", "P2", "Earnings tracked; no payout"),
-    (24, "Map-based pickup/drop picker (Kirana)",      "Kirana PWA",    "Frontend", "Stop asking agents for lat/lng", "P1", "Google Places or Nominatim"),
+    (24, "Map-based pickup/drop picker (Kirana)",      "Kirana PWA",    "Frontend", "Stop asking agents for lat/lng", "Done", "Shipped — Leaflet + Nominatim"),
     (25, "IVR / missed-call booking",                  "Integrations",  "Backend", "Non-smartphone rider channel", "P3", "SOW explicitly deferred to Phase 2"),
+    (26, "Driver subscription purchase UI",             "Driver PWA",    "App Dev + Backend", "Drivers buying their own plan; admin grant exists", "P1", "Admin /subscriptions shipped; waits on payments + Driver app"),
+    (27, "VAPID push notifications",                    "RN/PWA + Backend","App Dev + Backend", "Booking status push to kirana partners", "P2", "PWA service worker ready; needs backend trigger + VAPID keys"),
+    (28, "Bookings detail + live track in Kirana PWA",  "Kirana PWA",    "Frontend", "Partner can't watch a ride they booked", "P1", "Token API + public /track page already exist"),
+    (29, "Per-document DELETE in partner docs review",  "Admin",         "Frontend", "Admins can approve/reject but not remove partner docs", "P3", ""),
 ]
 for i, g in enumerate(gaps, start=2):
     write_row(ws, i, g)
