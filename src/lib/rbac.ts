@@ -15,7 +15,10 @@ export type Surface =
   | "reports"
   | "admins"
   | "partners"
-  | "subscriptions";
+  | "subscriptions"
+  | "tickets"
+  | "audit"
+  | "corporates";
 
 type Perm = "read" | "write";
 
@@ -36,6 +39,9 @@ const MATRIX: Record<AdminRole, Partial<Record<Surface, Perm>>> = {
     admins: "write",
     partners: "write",
     subscriptions: "write",
+    tickets: "write",
+    audit: "read",
+    corporates: "write",
   },
   ADMIN: {
     dashboard: "write",
@@ -52,6 +58,9 @@ const MATRIX: Record<AdminRole, Partial<Record<Surface, Perm>>> = {
     reports: "read",
     partners: "write",
     subscriptions: "write",
+    tickets: "write",
+    audit: "read",
+    corporates: "write",
   },
   CITY_ADMIN: {
     dashboard: "read",
@@ -63,6 +72,7 @@ const MATRIX: Record<AdminRole, Partial<Record<Surface, Perm>>> = {
     fares: "write",
     reports: "read",
     partners: "write",
+    tickets: "write",
   },
   VERIFIER: {
     drivers: "read",
@@ -74,6 +84,7 @@ const MATRIX: Record<AdminRole, Partial<Record<Surface, Perm>>> = {
     sos: "read",
     riders: "read",
     reports: "read",
+    tickets: "write",
   },
   VIEWER: {
     dashboard: "read",
@@ -89,6 +100,9 @@ const MATRIX: Record<AdminRole, Partial<Record<Surface, Perm>>> = {
     reports: "read",
     partners: "read",
     subscriptions: "read",
+    tickets: "read",
+    audit: "read",
+    corporates: "read",
   },
 };
 

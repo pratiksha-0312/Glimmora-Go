@@ -296,6 +296,62 @@ async function main() {
     console.log("  kirana (pending):  Sharma General Stores / 9888800002");
   }
 
+  // Sample support ticket
+  if (rider1 && approvedDrivers[0] && rewa) {
+    const existing = await prisma.ticket.findFirst({
+      where: { subject: "AC not working" },
+    });
+    if (!existing) {
+      await prisma.ticket.create({
+        data: {
+          category: "RIDE_ISSUE",
+          priority: "NORMAL",
+          subject: "AC not working",
+          description:
+            "Rider reports that the car AC was off during a 20-minute ride in Rewa. Asks for fare adjustment.",
+          riderId: rider1.id,
+          driverId: approvedDrivers[0].id,
+          cityId: rewa.id,
+          status: "OPEN",
+        },
+      });
+      console.log("  ticket: sample RIDE_ISSUE");
+    }
+  }
+
+  // Sample corporate account
+  if (indore) {
+    const corp = await prisma.corporate.upsert({
+      where: { contactEmail: "ops@acmecabs.in" },
+      update: {},
+      create: {
+        name: "Acme Logistics Pvt Ltd",
+        gstin: "23AABCU9603R1ZM",
+        contactName: "Priya Mehta",
+        contactEmail: "ops@acmecabs.in",
+        contactPhone: "9999000111",
+        cityId: indore.id,
+        walletBalance: 5000,
+        status: "APPROVED",
+      },
+    });
+    await prisma.corporateMember.upsert({
+      where: {
+        corporateId_riderId: {
+          corporateId: corp.id,
+          riderId: rider2.id,
+        },
+      },
+      update: {},
+      create: {
+        corporateId: corp.id,
+        riderId: rider2.id,
+        employeeId: "ACM-104",
+      },
+    });
+    console.log(`  corporate: ${corp.name} (approved, 1 member)`);
+  }
+
   console.log("\n✅ Seed complete.");
   console.log("\nLogin: admin@glimmora.ai / admin123");
 }

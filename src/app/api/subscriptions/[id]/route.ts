@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireWrite } from "@/lib/apiAuth";
+import { logAudit } from "@/lib/audit";
 
 const patchSchema = z.object({
   active: z.boolean(),
@@ -45,6 +46,14 @@ export async function PATCH(
       data: { subscriptionUntil: stillActive?.expiresAt ?? null },
     });
   }
+
+  await logAudit({
+    session: auth.session,
+    action: parsed.data.active ? "subscription.reinstate" : "subscription.revoke",
+    entityType: "Subscription",
+    entityId: id,
+    summary: `Plan ${sub.plan} · driver ${sub.driverId.slice(-6)}`,
+  });
 
   return NextResponse.json({ ok: true, subscription: updated });
 }

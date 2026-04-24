@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireWrite, requireRead } from "@/lib/apiAuth";
+import { logAudit } from "@/lib/audit";
 
 const PLAN_DAYS: Record<"DAILY" | "WEEKLY" | "MONTHLY", number> = {
   DAILY: 1,
@@ -88,6 +89,14 @@ export async function POST(req: Request) {
       data: { subscriptionUntil: expiresAt },
     }),
   ]);
+
+  await logAudit({
+    session: auth.session,
+    action: "subscription.grant",
+    entityType: "Subscription",
+    entityId: subscription.id,
+    summary: `${driver.name}: ${plan} · ₹${amount} · until ${expiresAt.toISOString().slice(0, 10)}`,
+  });
 
   return NextResponse.json({ ok: true, subscription });
 }

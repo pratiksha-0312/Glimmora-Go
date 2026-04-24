@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireWrite } from "@/lib/apiAuth";
+import { logAudit } from "@/lib/audit";
 
 const patchSchema = z.object({
   active: z.boolean().optional(),
@@ -25,6 +26,15 @@ export async function PATCH(
     where: { id },
     data: parsed.data,
   });
+
+  await logAudit({
+    session: auth.session,
+    action: parsed.data.active === false ? "coupon.disable" : "coupon.enable",
+    entityType: "Coupon",
+    entityId: id,
+    summary: `${coupon.code} → ${coupon.active ? "active" : "disabled"}`,
+  });
+
   return NextResponse.json({ ok: true, coupon });
 }
 
@@ -36,6 +46,16 @@ export async function DELETE(
   if (!auth.ok) return auth.response;
 
   const { id } = await params;
+  const coupon = await prisma.coupon.findUnique({ where: { id } });
   await prisma.coupon.delete({ where: { id } });
+
+  await logAudit({
+    session: auth.session,
+    action: "coupon.delete",
+    entityType: "Coupon",
+    entityId: id,
+    summary: coupon?.code ?? id,
+  });
+
   return NextResponse.json({ ok: true });
 }

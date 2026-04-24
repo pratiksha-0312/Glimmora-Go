@@ -18,6 +18,9 @@ import {
   AlertTriangle,
   Store,
   Wallet,
+  LifeBuoy,
+  FileSearch,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccess, ROLE_LABELS, type Surface } from "@/lib/rbac";
@@ -27,9 +30,11 @@ const NAV: { href: string; label: string; icon: typeof Car; surface: Surface }[]
   { href: "/", label: "Dashboard", icon: LayoutDashboard, surface: "dashboard" },
   { href: "/rides", label: "Rides", icon: Car, surface: "rides" },
   { href: "/sos", label: "SOS Alerts", icon: AlertTriangle, surface: "sos" },
+  { href: "/tickets", label: "Tickets", icon: LifeBuoy, surface: "tickets" },
   { href: "/drivers", label: "Drivers", icon: Users, surface: "drivers" },
   { href: "/riders", label: "Riders", icon: User, surface: "riders" },
   { href: "/partners", label: "Kirana Partners", icon: Store, surface: "partners" },
+  { href: "/corporates", label: "Enterprise", icon: Building2, surface: "corporates" },
   { href: "/fares", label: "Fares", icon: Banknote, surface: "fares" },
   { href: "/concessions", label: "Concessions", icon: Percent, surface: "concessions" },
   { href: "/coupons", label: "Coupons", icon: Ticket, surface: "coupons" },
@@ -37,6 +42,7 @@ const NAV: { href: string; label: string; icon: typeof Car; surface: Surface }[]
   { href: "/referrals", label: "Referrals", icon: Share2, surface: "referrals" },
   { href: "/subscriptions", label: "Subscriptions", icon: Wallet, surface: "subscriptions" },
   { href: "/reports", label: "Reports", icon: BarChart3, surface: "reports" },
+  { href: "/audit", label: "Audit", icon: FileSearch, surface: "audit" },
   { href: "/admins", label: "Admins", icon: ShieldCheck, surface: "admins" },
 ];
 

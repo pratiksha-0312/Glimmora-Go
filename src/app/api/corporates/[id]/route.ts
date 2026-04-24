@@ -5,16 +5,18 @@ import { requireWrite, cityMismatch } from "@/lib/apiAuth";
 import { logAudit } from "@/lib/audit";
 
 const patchSchema = z.object({
-  status: z.enum(["PENDING", "APPROVED", "REJECTED", "SUSPENDED"]).optional(),
-  commissionPct: z.number().min(0).max(50).optional(),
+  status: z.enum(["PENDING", "APPROVED", "SUSPENDED"]).optional(),
   reviewNote: z.string().optional(),
+  contactName: z.string().optional(),
+  contactPhone: z.string().optional(),
+  gstin: z.string().nullable().optional(),
 });
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const auth = await requireWrite("partners");
+  const auth = await requireWrite("corporates");
   if (!auth.ok) return auth.response;
 
   const { id } = await params;
@@ -24,17 +26,14 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
 
-  const partner = await prisma.kiranaPartner.findUnique({
-    where: { id },
-    select: { cityId: true },
-  });
-  if (!partner) {
-    return NextResponse.json({ error: "Partner not found" }, { status: 404 });
+  const existing = await prisma.corporate.findUnique({ where: { id } });
+  if (!existing) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  const scope = cityMismatch(auth.session, partner.cityId);
+  const scope = cityMismatch(auth.session, existing.cityId);
   if (scope) return scope;
 
-  const updated = await prisma.kiranaPartner.update({
+  const updated = await prisma.corporate.update({
     where: { id },
     data: parsed.data,
   });
@@ -42,12 +41,12 @@ export async function PATCH(
   await logAudit({
     session: auth.session,
     action: parsed.data.status
-      ? `partner.${parsed.data.status.toLowerCase()}`
-      : "partner.update",
-    entityType: "KiranaPartner",
+      ? `corporate.${parsed.data.status.toLowerCase()}`
+      : "corporate.update",
+    entityType: "Corporate",
     entityId: id,
-    summary: `${updated.shopName}${parsed.data.status ? ` → ${parsed.data.status}` : ""}`,
+    summary: `${updated.name}${parsed.data.status ? ` → ${parsed.data.status}` : ""}`,
   });
 
-  return NextResponse.json({ ok: true, partner: updated });
+  return NextResponse.json({ ok: true, corporate: updated });
 }

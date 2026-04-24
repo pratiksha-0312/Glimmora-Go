@@ -25,6 +25,9 @@ model Admin {
   active       Boolean   @default(true)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  assignedTickets Ticket[]         @relation("TicketAssignee")
+  auditEvents     AuditEvent[]     @relation("AuditActor")
+  corporateTopUps CorporateTopUp[] @relation("TopUpCreatedBy")
 }
 
 enum AdminRole {
@@ -46,6 +49,8 @@ model Rider {
   createdAt   DateTime @default(now())
   rides       Ride[]
   referralsMade Referral[] @relation("RiderReferrer")
+  tickets     Ticket[]
+  corporateMemberships CorporateMember[]
 }
 
 model Driver {
@@ -70,6 +75,7 @@ model Driver {
   documents        DriverDocument[]
   rides            Ride[]
   subscriptions    Subscription[]
+  tickets          Ticket[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 }
@@ -122,6 +128,8 @@ model City {
   rides          Ride[]
   admins         Admin[]
   kiranaPartners KiranaPartner[]
+  tickets        Ticket[]
+  corporates     Corporate[]
   createdAt      DateTime      @default(now())
 }
 
@@ -190,6 +198,9 @@ model Ride {
   sosTriggered    Boolean      @default(false)
   rating          Int?
   review          String?
+  corporateId     String?
+  corporate       Corporate?   @relation("CorporateRides", fields: [corporateId], references: [id])
+  tickets         Ticket[]
   createdAt       DateTime     @default(now())
   completedAt     DateTime?
 }
@@ -329,4 +340,133 @@ enum OtpPurpose {
   KIRANA_LOGIN
   RIDER_LOGIN
   DRIVER_LOGIN
+}
+
+// ============ TICKETS / COMPLAINTS ============
+
+model Ticket {
+  id            String         @id @default(cuid())
+  category      TicketCategory
+  subject       String
+  description   String
+  status        TicketStatus   @default(OPEN)
+  priority      TicketPriority @default(NORMAL)
+  riderId       String?
+  rider         Rider?         @relation(fields: [riderId], references: [id])
+  driverId      String?
+  driver        Driver?        @relation(fields: [driverId], references: [id])
+  rideId        String?
+  ride          Ride?          @relation(fields: [rideId], references: [id])
+  cityId        String?
+  city          City?          @relation(fields: [cityId], references: [id])
+  assignedToId  String?
+  assignedTo    Admin?         @relation("TicketAssignee", fields: [assignedToId], references: [id])
+  resolution    String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  resolvedAt    DateTime?
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([cityId, status])
+}
+
+enum TicketCategory {
+  RIDE_ISSUE
+  SAFETY
+  PAYMENT
+  DRIVER_BEHAVIOR
+  APP
+  OTHER
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+// ============ AUDIT LOG ============
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  adminId    String?
+  admin      Admin?   @relation("AuditActor", fields: [adminId], references: [id])
+  adminEmail String
+  adminName  String
+  adminRole  String
+  action     String   // e.g. "driver.approve", "coupon.create"
+  entityType String   // "Driver", "Coupon", etc.
+  entityId   String
+  summary    String?  // human-readable one-liner
+  changes    Json?    // { before, after } for diffs where relevant
+  ip         String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([entityType, entityId])
+  @@index([adminId])
+  @@index([action])
+}
+
+// ============ ENTERPRISE / CORPORATE ACCOUNTS ============
+
+model Corporate {
+  id            String            @id @default(cuid())
+  name          String
+  gstin         String?
+  contactName   String
+  contactEmail  String            @unique
+  contactPhone  String
+  cityId        String?
+  city          City?             @relation(fields: [cityId], references: [id])
+  walletBalance Float             @default(0)
+  status        CorporateStatus   @default(PENDING)
+  reviewNote    String?
+  members       CorporateMember[]
+  rides         Ride[]            @relation("CorporateRides")
+  topUps        CorporateTopUp[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@index([status])
+}
+
+enum CorporateStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+}
+
+model CorporateMember {
+  id          String    @id @default(cuid())
+  corporateId String
+  corporate   Corporate @relation(fields: [corporateId], references: [id], onDelete: Cascade)
+  riderId     String
+  rider       Rider     @relation(fields: [riderId], references: [id])
+  employeeId  String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  @@unique([corporateId, riderId])
+}
+
+model CorporateTopUp {
+  id               String    @id @default(cuid())
+  corporateId      String
+  corporate        Corporate @relation(fields: [corporateId], references: [id], onDelete: Cascade)
+  amount           Float
+  note             String?
+  createdByAdminId String
+  createdByAdmin   Admin     @relation("TopUpCreatedBy", fields: [createdByAdminId], references: [id])
+  createdAt        DateTime  @default(now())
 }

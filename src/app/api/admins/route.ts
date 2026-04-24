@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getSession, hashPassword } from "@/lib/auth";
+import { logAudit } from "@/lib/audit";
 
 const schema = z
   .object({
@@ -56,6 +57,14 @@ export async function POST(req: Request) {
         cityId: true,
       },
     });
+    await logAudit({
+      session,
+      action: "admin.create",
+      entityType: "Admin",
+      entityId: admin.id,
+      summary: `${admin.email} · ${admin.role}`,
+    });
+
     return NextResponse.json({ ok: true, admin });
   } catch {
     return NextResponse.json(

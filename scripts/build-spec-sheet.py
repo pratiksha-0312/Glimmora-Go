@@ -126,9 +126,9 @@ roles = [
     (4, "Verifier", "Admin Panel (drivers + docs only)", "verifier@glimmora.ai / admin123",
      "Approve/reject driver KYC documents. Sees only PENDING drivers. No access to other modules.",
      "All cities, PENDING drivers only", "Done"),
-    (5, "Support / QA", "Admin Panel (read-only + complaints)", "support@glimmora.ai / admin123",
-     "Monitor live rides, riders, reports, SOS alerts. (Ticketing module TODO.)",
-     "Read-only global", "Done (no tickets module yet)"),
+    (5, "Support / QA", "Admin Panel (read + tickets write)", "support@glimmora.ai / admin123",
+     "Monitor live rides, riders, reports, SOS; triage and resolve support tickets",
+     "Read-only global; write on tickets", "Done"),
     (6, "Viewer", "Admin Panel (read-only)", "viewer@glimmora.ai / admin123",
      "Observer across all modules. Cannot write.",
      "Read-only global", "Done"),
@@ -169,6 +169,9 @@ perm = [
     ("Reports",          "R", "R", "R (own city)", "—", "R", "R", "Includes CSV export + city breakdown"),
     ("Kirana Partners",  "W", "W", "W (own city)", "—", "—", "R", "Approve/reject + commission"),
     ("Admins",           "W", "—", "—", "—", "—", "—", "Super Admin only"),
+    ("Tickets",          "W", "W", "W (own city)", "—", "W", "R", "SUPPORT role can triage"),
+    ("Audit / Compliance","R", "R", "—", "—", "—", "R", "Read-only log; fraud signals panel"),
+    ("Enterprise (B2B)", "W", "W", "W (own city)", "—", "—", "R", "Corporate accounts + wallet"),
     ("Track public",     "—", "—", "—", "—", "—", "—", "Public, opaque token"),
     ("Kirana PWA",       "—", "—", "—", "—", "—", "—", "Separate auth; agents only"),
 ]
@@ -280,6 +283,27 @@ admin_rows = [
     ("—", "/subscriptions", "Grant subscription", "Pick approved driver + plan (DAILY/WEEKLY/MONTHLY) + amount; stacks on existing expiry", "SUPER/ADMIN", "Done", ""),
     ("—", "/subscriptions", "Revoke / Reinstate", "PATCH active flag; rolls back driver.subscriptionUntil if all plans inactive", "SUPER/ADMIN", "Done", ""),
 
+    # Tickets / complaints
+    ("A", "TICKETS / COMPLAINTS", "", "", "", "", "", True),
+    ("—", "/tickets", "Tickets list + counters", "Open / In-progress / Total cards; status filter pills; city-scoped for CITY_ADMIN", "SUPER/ADMIN/CITY/SUPPORT (write) · VIEW (read)", "Done", ""),
+    ("—", "/tickets", "Create ticket", "Subject, category, priority, description, optional rider/ride links", "SUPER/ADMIN/CITY/SUPPORT", "Done", ""),
+    ("—", "/tickets/[id]", "Ticket detail + triage", "Status + priority + assignee + resolution note; linked rider/driver/ride", "SUPER/ADMIN/CITY/SUPPORT", "Done", ""),
+
+    # Audit / Compliance
+    ("A", "AUDIT & COMPLIANCE", "", "", "", "", "", True),
+    ("—", "/audit", "Audit event log", "Filter by entity / admin / range (24h/7d/30d/90d); shows who + what + summary + IP", "SUPER/ADMIN/VIEW (read)", "Done", "Hooked into drivers/coupons/partners/admins/subscriptions/tickets/corporates APIs"),
+    ("—", "/audit", "Fraud & compliance signals", "Stale PENDING drivers, doc rejection repeats, unresolved SOS >24h, duplicate rider accounts, high-cancellation drivers", "same", "Done", ""),
+    ("—", "/api/audit/export", "CSV export", "Download audit events over N-day range", "same", "Done", ""),
+
+    # Enterprise / Corporates
+    ("A", "ENTERPRISE (CORPORATES)", "", "", "", "", "", True),
+    ("—", "/corporates", "Corporate accounts list", "Name, contact, city, members/rides count, wallet, status", "SUPER/ADMIN/CITY (write) · VIEW (read)", "Done", ""),
+    ("—", "/corporates", "Create corporate account", "Name, GSTIN, contact (name/email/phone), city", "SUPER/ADMIN/CITY", "Done", ""),
+    ("—", "/corporates/[id]", "Corporate detail", "Status + wallet + members + recent rides + wallet history", "SUPER/ADMIN/CITY", "Done", ""),
+    ("—", "/corporates/[id]", "Approve / Suspend / Review note", "PATCH status + reviewNote", "SUPER/ADMIN/CITY", "Done", ""),
+    ("—", "/corporates/[id]", "Members management", "Add rider by phone (auto-creates rider), set employee ID, remove", "SUPER/ADMIN/CITY", "Done", ""),
+    ("—", "/corporates/[id]", "Wallet top-up / debit", "Manual ledger entries with note; affects walletBalance transactionally", "SUPER/ADMIN/CITY", "Done", "Ride-fare deduction not wired yet — depends on payments"),
+
     # Admins
     ("A", "ADMIN USER MGMT", "", "", "", "", "", True),
     (48, "/admins", "Create admin form", "Email, name, password (8+), role, city picker (if CITY_ADMIN)", "Super Admin only", "Done", ""),
@@ -292,8 +316,8 @@ admin_rows = [
     (52, "layout", "Session enforcement", "requireAccess(surface) on every page; redirects unauthorized to /", "all", "Done", ""),
     (53, "API", "requireWrite + cityMismatch", "Centralized guards on every API mutation", "all", "Done", ""),
     (54, "global", "i18n Hindi + English toggle", "next-intl across all admin strings", "all", "TODO", "Tracker #20, Low priority"),
-    (55, "global", "Audit log / compliance module", "Track who changed what, when", "SUPER/ADMIN", "TODO", "Post-MVP per SOW"),
-    (56, "global", "Enterprise admin console", "Corporate/fleet accounts", "—", "N/A", "Post-MVP"),
+    (55, "global", "Audit log / compliance module", "Track who changed what, when + fraud signals", "SUPER/ADMIN", "Done", "Shipped in /audit + /api/audit"),
+    (56, "global", "Enterprise admin console", "Corporate/fleet accounts with wallet + members", "—", "Done", "Shipped in /corporates; ride-fare deduction waits on payments"),
     (57, "global", "Socket.io realtime rides", "Replace polling with live push", "—", "TODO", "Backend dependency"),
 ]
 
@@ -424,6 +448,20 @@ apis = [
     ("GET",  "/api/subscriptions",              "List subscriptions (optional driverId/active filters)","subscriptions:read", "Done"),
     ("POST", "/api/subscriptions",              "Grant subscription (stacks on existing expiry)","subscriptions:write", "Done"),
     ("PATCH","/api/subscriptions/[id]",         "Revoke / reinstate subscription",      "subscriptions:write", "Done"),
+    # Tickets
+    ("GET",  "/api/tickets",                    "List tickets (status/category/q filters, city-scoped)", "tickets:read", "Done"),
+    ("POST", "/api/tickets",                    "Create ticket",                        "tickets:write", "Done"),
+    ("PATCH","/api/tickets/[id]",               "Update status/priority/assignee/resolution", "tickets:write + city scope", "Done"),
+    # Audit
+    ("GET",  "/api/audit",                      "List audit events (entityType/admin/since filters)", "audit:read", "Done"),
+    ("GET",  "/api/audit/export",               "CSV export of audit events",           "audit:read", "Done"),
+    # Corporates
+    ("GET",  "/api/corporates",                 "List corporates (status filter, city-scoped)", "corporates:read", "Done"),
+    ("POST", "/api/corporates",                 "Create corporate account",             "corporates:write", "Done"),
+    ("PATCH","/api/corporates/[id]",            "Update status / review note / contact", "corporates:write + city scope", "Done"),
+    ("POST", "/api/corporates/[id]/members",    "Add rider to corporate (auto-creates rider)", "corporates:write", "Done"),
+    ("DELETE","/api/corporates/[id]/members/[memberId]","Remove member",               "corporates:write", "Done"),
+    ("POST", "/api/corporates/[id]/top-up",     "Credit / debit corporate wallet (transactional)", "corporates:write", "Done"),
     # Rides
     ("PATCH","/api/rides/[id]",                 "Cancel / Complete / Reassign driver", "rides:write + city scope", "Done"),
     ("POST", "/api/rides/[id]/token",           "Generate or fetch public tracking token", "rides:write + city scope", "Done"),
@@ -493,6 +531,15 @@ schema = [
     ("PartnerDocument",    "Partner KYC docs",            "partnerId, type, fileUrl, status", "Kirana /k/profile upload + /partners/[id] review", "Done"),
     ("OtpRequest",         "Phone OTP codes",             "phone, code, purpose, expiresAt, usedAt", "Kirana OTP flow", "Done"),
     ("OtpPurpose",         "OTP use cases",               "KIRANA_LOGIN, RIDER_LOGIN, DRIVER_LOGIN", "Kirana now; rider/driver later", "Done (only Kirana used)"),
+    ("Ticket",             "Complaints / support tickets","category, priority, status, assignee, rider/driver/ride/city links, resolution", "/tickets + /tickets/[id] + audit hook", "Done"),
+    ("TicketCategory",     "Ticket category",             "RIDE_ISSUE, SAFETY, PAYMENT, DRIVER_BEHAVIOR, APP, OTHER", "ticket create form", "Done"),
+    ("TicketStatus",       "Ticket lifecycle",            "OPEN, IN_PROGRESS, RESOLVED, CLOSED", "/tickets pills", "Done"),
+    ("TicketPriority",     "Ticket priority",             "LOW, NORMAL, HIGH, URGENT", "/tickets priority badges", "Done"),
+    ("AuditEvent",         "Admin action log",            "adminId/email/role, action, entityType, entityId, summary, changes (Json), ip, userAgent, createdAt", "/audit + CSV export", "Done"),
+    ("Corporate",          "Enterprise/fleet accounts",   "name, gstin, contact, cityId, walletBalance, status, reviewNote", "/corporates", "Done"),
+    ("CorporateStatus",    "Corporate KYC",               "PENDING, APPROVED, SUSPENDED", "/corporates", "Done"),
+    ("CorporateMember",    "Rider ↔ corporate mapping",   "corporateId, riderId (unique pair), employeeId, active", "/corporates/[id] members tab", "Done"),
+    ("CorporateTopUp",     "Wallet ledger entries",       "corporateId, amount (+/-), note, createdByAdminId, createdAt", "/corporates/[id] wallet history", "Done"),
 ]
 for i, s in enumerate(schema, start=2):
     write_row(ws, i, s, status_col=5)
@@ -526,9 +573,9 @@ gaps = [
     (17, "Push notifications",                         "RN/Backend",    "App Dev + Backend", "Ride updates, promos", "P2", ""),
     (18, "KYC document upload UI (drivers + partners)","Admin + PWA",   "Frontend + Backend", "Actually getting documents uploaded", "Done", "Shipped — stored under public/uploads/ in dev; production should swap to Vercel Blob / S3"),
     (19, "i18n Hindi + English",                       "All frontends", "Frontend + App Dev", "Vernacular UX", "P3", "Low priority per tracker"),
-    (20, "Complaints / tickets module",                "Admin",         "Frontend", "Support role has nothing to operate on", "P2", "Support role already scoped in RBAC"),
-    (21, "Audit log",                                  "Admin",         "Frontend + Backend", "Compliance, who-changed-what", "P2", "Post-MVP per SOW"),
-    (22, "Enterprise / corporate admin console",       "Admin",         "Frontend", "B2B customer fleets", "P3", "Post-MVP"),
+    (20, "Complaints / tickets module",                "Admin",         "Frontend", "Support role has nothing to operate on", "Done", "Shipped — /tickets + /tickets/[id] with triage, priority, assignment, resolution"),
+    (21, "Audit log",                                  "Admin",         "Frontend + Backend", "Compliance, who-changed-what", "Done", "Shipped — /audit with filters + CSV export + fraud signals; hooked into 9 mutating APIs"),
+    (22, "Enterprise / corporate admin console",       "Admin",         "Frontend", "B2B customer fleets", "Done", "Shipped — /corporates with members + wallet ledger; ride-fare deduction waits on payments"),
     (23, "Commission payout flow",                     "Admin + PWA",   "Backend + Frontend", "Actually paying partners", "P2", "Earnings tracked; no payout"),
     (24, "Map-based pickup/drop picker (Kirana)",      "Kirana PWA",    "Frontend", "Stop asking agents for lat/lng", "Done", "Shipped — Leaflet + Nominatim"),
     (25, "IVR / missed-call booking",                  "Integrations",  "Backend", "Non-smartphone rider channel", "P3", "SOW explicitly deferred to Phase 2"),
