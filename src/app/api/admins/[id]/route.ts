@@ -7,6 +7,16 @@ import { logAudit } from "@/lib/audit";
 const patchSchema = z.object({
   active: z.boolean().optional(),
   password: z.string().min(8).optional(),
+  role: z
+    .enum([
+      "ADMIN",
+      "SUPER_ADMIN",
+      "OPERATIONS_MANAGER",
+      "FINANCE_ADMIN",
+      "SUPPORT_AGENT",
+      "PARTNER_MANAGER",
+    ])
+    .optional(),
 });
 
 export async function PATCH(
@@ -29,10 +39,22 @@ export async function PATCH(
       { status: 400 }
     );
   }
+  if (
+    id === session.adminId &&
+    parsed.data.role &&
+    parsed.data.role !== "SUPER_ADMIN" &&
+    parsed.data.role !== "ADMIN"
+  ) {
+    return NextResponse.json(
+      { error: "Cannot demote yourself from Super Admin" },
+      { status: 400 }
+    );
+  }
 
   const data: Record<string, unknown> = {};
   if (parsed.data.active !== undefined) data.active = parsed.data.active;
   if (parsed.data.password) data.passwordHash = await hashPassword(parsed.data.password);
+  if (parsed.data.role) data.role = parsed.data.role;
 
   const admin = await prisma.admin.update({
     where: { id },

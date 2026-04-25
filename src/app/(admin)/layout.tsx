@@ -12,10 +12,10 @@ export default async function AdminLayout({
   if (!session) redirect("/login");
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-[#fbf7f3] font-sans">
       <Sidebar role={session.role} />
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Header name={session.name} email={session.email} />
+        <Header name={session.name} email={session.email} role={session.role} />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>

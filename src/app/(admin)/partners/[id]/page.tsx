@@ -7,6 +7,8 @@ import { docStatusVariant } from "@/lib/format";
 import { requireAccess, sessionCanWrite } from "@/lib/auth";
 import { PartnerRowActions } from "../PartnerRowActions";
 import { PartnerDocActions } from "./PartnerDocActions";
+import { PayoutsSection } from "./PayoutsSection";
+import { accruedSince } from "@/lib/payouts";
 import type { PartnerStatus } from "../../../../../generated/prisma";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +47,38 @@ export default async function PartnerDetailPage({
     redirect("/partners");
 
   const canManage = sessionCanWrite(session, "partners");
+
+  const payouts = await prisma.payout.findMany({
+    where: { partnerId: partner.id },
+    orderBy: { periodEnd: "desc" },
+    include: { paidBy: { select: { name: true } } },
+  });
+  const lastEnd = payouts[0]?.periodEnd ?? null;
+  const accrued = await accruedSince(
+    partner.id,
+    lastEnd,
+    partner.commissionPct
+  );
+  const payoutsForClient = payouts.map((p) => ({
+    id: p.id,
+    periodStart: p.periodStart.toISOString(),
+    periodEnd: p.periodEnd.toISOString(),
+    rideCount: p.rideCount,
+    grossFare: p.grossFare,
+    commissionPct: p.commissionPct,
+    amount: p.amount,
+    status: p.status,
+    reference: p.reference,
+    note: p.note,
+    paidAt: p.paidAt ? p.paidAt.toISOString() : null,
+    paidBy: p.paidBy ? { name: p.paidBy.name } : null,
+  }));
+  const accruedForClient = {
+    rideCount: accrued.rideCount,
+    grossFare: accrued.grossFare,
+    amount: accrued.amount,
+    since: accrued.since ? accrued.since.toISOString() : null,
+  };
 
   return (
     <div>
@@ -91,7 +125,15 @@ export default async function PartnerDetailPage({
           )}
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="space-y-6 lg:col-span-2">
+          <PayoutsSection
+            partnerId={partner.id}
+            initialPayouts={payoutsForClient}
+            initialAccrued={accruedForClient}
+            commissionPct={partner.commissionPct}
+            canManage={canManage}
+          />
+
           <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-4">
               <h3 className="text-sm font-semibold text-slate-900">

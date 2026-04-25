@@ -6,7 +6,8 @@ import { rideStatusVariant } from "@/lib/format";
 import { RideRowActions } from "./RideRowActions";
 import { AutoRefresh } from "./AutoRefresh";
 import { requireAccess, sessionCanWrite } from "@/lib/auth";
-import type { RideStatus } from "../../../../generated/prisma";
+import { RideStatus } from "../../../../generated/prisma";
+import { Activity, Calendar, History, List } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -19,18 +20,56 @@ const STATUS_FILTERS: (RideStatus | "ALL")[] = [
   "CANCELLED",
 ];
 
-async function getData(status: string | undefined, cityId: string | null) {
+const LIVE_STATUSES: RideStatus[] = [
+  RideStatus.REQUESTED,
+  RideStatus.MATCHED,
+  RideStatus.EN_ROUTE,
+  RideStatus.ARRIVED,
+  RideStatus.IN_TRIP,
+];
+const HISTORY_STATUSES: RideStatus[] = [
+  RideStatus.COMPLETED,
+  RideStatus.CANCELLED,
+];
+
+type View = "all" | "live" | "scheduled" | "history";
+
+const VIEWS: { id: View; label: string; icon: typeof Activity }[] = [
+  { id: "all", label: "All Rides", icon: List },
+  { id: "live", label: "Live Rides", icon: Activity },
+  { id: "scheduled", label: "Scheduled", icon: Calendar },
+  { id: "history", label: "History", icon: History },
+];
+
+function whereForView(view: View, status: string | undefined) {
+  if (view === "live") {
+    return { status: { in: LIVE_STATUSES } };
+  }
+  if (view === "scheduled") {
+    return {
+      scheduledAt: { gt: new Date() },
+      status: { in: [RideStatus.REQUESTED, RideStatus.MATCHED] },
+    };
+  }
+  if (view === "history") {
+    return { status: { in: HISTORY_STATUSES } };
+  }
+  if (status && status !== "ALL") {
+    return { status: status as RideStatus };
+  }
+  return {};
+}
+
+async function getData(view: View, status: string | undefined, cityId: string | null) {
   const cityFilter = cityId ? { cityId } : {};
   try {
     const [rides, approvedDrivers] = await Promise.all([
       prisma.ride.findMany({
-        where: {
-          ...cityFilter,
-          ...(status && status !== "ALL"
-            ? { status: status as RideStatus }
-            : {}),
-        },
-        orderBy: { createdAt: "desc" },
+        where: { ...cityFilter, ...whereForView(view, status) },
+        orderBy:
+          view === "scheduled"
+            ? { scheduledAt: "asc" }
+            : { createdAt: "desc" },
         take: 100,
         include: {
           rider: { select: { name: true, phone: true } },
@@ -50,42 +89,81 @@ async function getData(status: string | undefined, cityId: string | null) {
   }
 }
 
+const VIEW_DESCRIPTION: Record<View, string> = {
+  all: "All rides across statuses",
+  live: "Rides currently in flight (REQUESTED → IN_TRIP)",
+  scheduled: "Upcoming rides booked for a future time",
+  history: "Completed and cancelled rides",
+};
+
 export default async function RidesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>;
+  searchParams: Promise<{ status?: string; view?: string }>;
 }) {
   const session = await requireAccess("rides");
-  const { status } = await searchParams;
-  const { rides, approvedDrivers } = await getData(status, session.cityId);
+  const sp = await searchParams;
+  const view: View = (() => {
+    if (sp.view === "live" || sp.view === "scheduled" || sp.view === "history")
+      return sp.view;
+    return "all";
+  })();
+  const { rides, approvedDrivers } = await getData(view, sp.status, session.cityId);
   const canWrite = sessionCanWrite(session, "rides");
+
+  const showStatusFilter = view === "all";
+  const showScheduledColumn = view === "scheduled";
 
   return (
     <div>
       <PageHeader
-        title="Rides"
-        description="Live ride monitoring with filters"
-        action={<AutoRefresh />}
+        title="Ride Operations"
+        description={VIEW_DESCRIPTION[view]}
+        action={view === "live" ? <AutoRefresh /> : undefined}
       />
 
       <div className="mb-4 flex flex-wrap gap-2">
-        {STATUS_FILTERS.map((s) => {
-          const active = (status ?? "ALL") === s;
+        {VIEWS.map((v) => {
+          const active = view === v.id;
+          const href = v.id === "all" ? "/rides" : `/rides?view=${v.id}`;
+          const Icon = v.icon;
           return (
             <a
-              key={s}
-              href={s === "ALL" ? "/rides" : `/rides?status=${s}`}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+              key={v.id}
+              href={href}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
                 active
                   ? "bg-brand-600 text-white"
                   : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
               }`}
             >
-              {s === "ALL" ? "All" : s}
+              <Icon className="h-3.5 w-3.5" />
+              {v.label}
             </a>
           );
         })}
       </div>
+
+      {showStatusFilter && (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {STATUS_FILTERS.map((s) => {
+            const active = (sp.status ?? "ALL") === s;
+            return (
+              <a
+                key={s}
+                href={s === "ALL" ? "/rides" : `/rides?status=${s}`}
+                className={`rounded-full px-3 py-1 text-[11px] font-medium transition ${
+                  active
+                    ? "bg-slate-800 text-white"
+                    : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                }`}
+              >
+                {s === "ALL" ? "All statuses" : s}
+              </a>
+            );
+          })}
+        </div>
+      )}
 
       <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
@@ -99,7 +177,9 @@ export default async function RidesPage({
                 <th className="px-5 py-3 text-left">Channel</th>
                 <th className="px-5 py-3 text-left">Fare</th>
                 <th className="px-5 py-3 text-left">Status</th>
-                <th className="px-5 py-3 text-left">Started</th>
+                <th className="px-5 py-3 text-left">
+                  {showScheduledColumn ? "Scheduled" : "Started"}
+                </th>
                 {canWrite && (
                   <th className="px-5 py-3 text-right">Actions</th>
                 )}
@@ -112,7 +192,13 @@ export default async function RidesPage({
                     colSpan={canWrite ? 9 : 8}
                     className="px-5 py-12 text-center text-sm text-slate-400"
                   >
-                    No rides found
+                    {view === "live"
+                      ? "No rides currently in flight"
+                      : view === "scheduled"
+                        ? "No scheduled rides"
+                        : view === "history"
+                          ? "No history yet"
+                          : "No rides found"}
                   </td>
                 </tr>
               ) : (
@@ -165,7 +251,9 @@ export default async function RidesPage({
                         </Badge>
                       </td>
                       <td className="px-5 py-3 text-xs text-slate-500">
-                        {formatDate(r.createdAt)}
+                        {showScheduledColumn && r.scheduledAt
+                          ? formatDate(r.scheduledAt)
+                          : formatDate(r.createdAt)}
                       </td>
                       {canWrite && (
                         <td className="px-5 py-3 text-right">

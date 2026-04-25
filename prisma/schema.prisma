@@ -28,10 +28,16 @@ model Admin {
   assignedTickets Ticket[]         @relation("TicketAssignee")
   auditEvents     AuditEvent[]     @relation("AuditActor")
   corporateTopUps CorporateTopUp[] @relation("TopUpCreatedBy")
+  payoutsMarkedPaid Payout[]       @relation("PayoutPaidBy")
 }
 
 enum AdminRole {
-  ADMIN
+  ADMIN              // legacy: treated as SUPER_ADMIN
+  SUPER_ADMIN
+  OPERATIONS_MANAGER
+  FINANCE_ADMIN
+  SUPPORT_AGENT
+  PARTNER_MANAGER
 }
 
 // ============ USERS ============
@@ -299,6 +305,7 @@ model Partner {
   reviewNote    String?
   documents     PartnerDocument[]
   bookings      Ride[]        @relation("PartnerBookings")
+  payouts       Payout[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
@@ -320,6 +327,35 @@ enum PartnerType {
   OTHER
 }
 
+model Payout {
+  id            String       @id @default(cuid())
+  partnerId     String
+  partner       Partner      @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  periodStart   DateTime
+  periodEnd     DateTime
+  rideCount     Int
+  grossFare     Float        // sum of fareFinal across the period
+  commissionPct Float        // snapshot of partner commission % at creation
+  amount        Float        // grossFare * commissionPct / 100
+  status        PayoutStatus @default(PENDING)
+  reference     String?      // UTR / bank transfer reference
+  note          String?
+  paidAt        DateTime?
+  paidById      String?
+  paidBy        Admin?       @relation("PayoutPaidBy", fields: [paidById], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([partnerId, periodStart])
+  @@index([status])
+}
+
+enum PayoutStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
 model PartnerDocument {
   id         String         @id @default(cuid())
   partnerId  String
@@ -328,6 +364,37 @@ model PartnerDocument {
   fileUrl    String
   status     DocumentStatus @default(PENDING)
   uploadedAt DateTime       @default(now())
+}
+
+// ============ NOTIFICATIONS (audit log of outbound messages) ============
+
+model Notification {
+  id        String              @id @default(cuid())
+  channel   NotificationChannel
+  recipient String              // phone or email
+  template  String              // template id / subject
+  body      String
+  status    NotificationStatus  @default(SENT)
+  context   String?             // free-form: "ride:abc123" / "driver:xyz"
+  error     String?
+  sentAt    DateTime            @default(now())
+
+  @@index([sentAt])
+  @@index([status])
+  @@index([channel])
+}
+
+enum NotificationChannel {
+  SMS
+  EMAIL
+  PUSH
+  WHATSAPP
+}
+
+enum NotificationStatus {
+  SENT
+  DELIVERED
+  FAILED
 }
 
 // ============ OTP (used by kirana + future rider/driver apps) ============

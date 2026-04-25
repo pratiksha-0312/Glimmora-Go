@@ -2,6 +2,7 @@ import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "./db";
+import { sendSms } from "./notify";
 
 const SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "glimmora-go-dev-secret-change-me"
@@ -71,7 +72,12 @@ export async function issueOtp(phone: string, purpose: "PARTNER_LOGIN") {
   await prisma.otpRequest.create({
     data: { phone, code, purpose, expiresAt },
   });
-  // TODO: send via MSG91 here in prod
+  await sendSms(
+    phone,
+    "partner_login_otp",
+    `Your Glimmora Go partner login code is ${code}. Expires in 5 minutes.`,
+    `otp:${purpose}`
+  );
   return { code, expiresAt };
 }
 

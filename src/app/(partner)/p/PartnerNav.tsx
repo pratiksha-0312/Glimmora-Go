@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Home, Plus, List, User } from "lucide-react";
+import { Home, Plus, List, User, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { href: "/p", label: "Home", icon: Home, exact: true },
   { href: "/p/book", label: "Book", icon: Plus },
   { href: "/p/bookings", label: "History", icon: List },
+  { href: "/p/statements", label: "Payouts", icon: Wallet },
   { href: "/p/profile", label: "Profile", icon: User },
 ];
 

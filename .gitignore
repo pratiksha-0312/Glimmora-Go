@@ -30,3 +30,7 @@ playwright-report/
 test-results/
 tests/e2e/screenshots/
 playwright/.auth/
+
+# Local scratch
+tmp/
+scripts/capture-verifai-*.mjs

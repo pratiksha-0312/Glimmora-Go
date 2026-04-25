@@ -3,8 +3,10 @@ import { requireAccess } from "@/lib/auth";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
+import { ROLE_LABELS } from "@/lib/rbac";
 import { AdminForm } from "./AdminForm";
 import { AdminRowActions } from "./AdminRowActions";
+import { AdminRoleSelect } from "./AdminRoleSelect";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +18,7 @@ async function getData() {
         id: true,
         email: true,
         name: true,
+        role: true,
         active: true,
         createdAt: true,
       },
@@ -58,6 +61,7 @@ export default async function AdminsPage() {
                   <tr>
                     <th className="px-5 py-3 text-left">Name</th>
                     <th className="px-5 py-3 text-left">Email</th>
+                    <th className="px-5 py-3 text-left">Role</th>
                     <th className="px-5 py-3 text-left">Status</th>
                     <th className="px-5 py-3 text-left">Joined</th>
                     {canManage && (
@@ -69,7 +73,7 @@ export default async function AdminsPage() {
                   {admins.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={canManage ? 5 : 4}
+                        colSpan={canManage ? 6 : 5}
                         className="px-5 py-10 text-center text-sm text-slate-400"
                       >
                         No admins found
@@ -92,6 +96,15 @@ export default async function AdminsPage() {
                           </td>
                           <td className="px-5 py-3 text-slate-700">
                             {a.email}
+                          </td>
+                          <td className="px-5 py-3">
+                            {canManage && !isSelf ? (
+                              <AdminRoleSelect id={a.id} role={a.role} />
+                            ) : (
+                              <span className="text-xs text-slate-700">
+                                {ROLE_LABELS[a.role]}
+                              </span>
+                            )}
                           </td>
                           <td className="px-5 py-3">
                             {a.active ? (
