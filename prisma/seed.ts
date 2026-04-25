@@ -37,7 +37,7 @@ async function main() {
   });
   console.log("  archetype defaults: METRO + SMALL_TOWN");
 
-  // Single admin (SOW defines "Admin" as the only admin-panel role)
+  // Seed Super Admin (the 5 named roles are defined in the RBAC matrix)
   const pwd = await bcrypt.hash("admin123", 10);
   const admin = await prisma.admin.upsert({
     where: { email: "admin@glimmora.ai" },
@@ -46,7 +46,7 @@ async function main() {
       email: "admin@glimmora.ai",
       name: "Pratiksha",
       passwordHash: pwd,
-      role: "ADMIN",
+      role: "SUPER_ADMIN",
     },
   });
   console.log(`  admin: ${admin.email} / admin123`);

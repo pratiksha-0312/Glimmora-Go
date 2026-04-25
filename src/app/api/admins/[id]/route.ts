@@ -9,7 +9,6 @@ const patchSchema = z.object({
   password: z.string().min(8).optional(),
   role: z
     .enum([
-      "ADMIN",
       "SUPER_ADMIN",
       "OPERATIONS_MANAGER",
       "FINANCE_ADMIN",
@@ -17,6 +16,11 @@ const patchSchema = z.object({
       "PARTNER_MANAGER",
     ])
     .optional(),
+  email: z.string().email().optional(),
+  username: z.string().min(3).optional().nullable(),
+  name: z.string().min(1).optional(),
+  firstName: z.string().optional().nullable(),
+  lastName: z.string().optional().nullable(),
 });
 
 export async function PATCH(
@@ -42,8 +46,7 @@ export async function PATCH(
   if (
     id === session.adminId &&
     parsed.data.role &&
-    parsed.data.role !== "SUPER_ADMIN" &&
-    parsed.data.role !== "ADMIN"
+    parsed.data.role !== "SUPER_ADMIN"
   ) {
     return NextResponse.json(
       { error: "Cannot demote yourself from Super Admin" },
@@ -55,12 +58,35 @@ export async function PATCH(
   if (parsed.data.active !== undefined) data.active = parsed.data.active;
   if (parsed.data.password) data.passwordHash = await hashPassword(parsed.data.password);
   if (parsed.data.role) data.role = parsed.data.role;
+  if (parsed.data.email !== undefined) data.email = parsed.data.email;
+  if (parsed.data.username !== undefined) data.username = parsed.data.username || null;
+  if (parsed.data.name !== undefined) data.name = parsed.data.name;
+  if (parsed.data.firstName !== undefined) data.firstName = parsed.data.firstName || null;
+  if (parsed.data.lastName !== undefined) data.lastName = parsed.data.lastName || null;
 
-  const admin = await prisma.admin.update({
-    where: { id },
-    data,
-    select: { id: true, email: true, name: true, role: true, active: true },
-  });
+  let admin;
+  try {
+    admin = await prisma.admin.update({
+      where: { id },
+      data,
+      select: { id: true, email: true, name: true, role: true, active: true },
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "";
+    if (msg.includes("Unique constraint") && msg.includes("username")) {
+      return NextResponse.json(
+        { error: "Username already in use" },
+        { status: 409 }
+      );
+    }
+    if (msg.includes("Unique constraint") && msg.includes("email")) {
+      return NextResponse.json(
+        { error: "Email already in use" },
+        { status: 409 }
+      );
+    }
+    throw e;
+  }
 
   await logAudit({
     session,

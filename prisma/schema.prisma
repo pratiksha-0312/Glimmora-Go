@@ -17,12 +17,16 @@ datasource db {
 model Admin {
   id           String    @id @default(cuid())
   email        String    @unique
+  username     String?   @unique
   name         String
+  firstName    String?
+  lastName     String?
   passwordHash String
-  role         AdminRole @default(ADMIN)
+  role         AdminRole @default(SUPER_ADMIN)
   cityId       String?
   city         City?     @relation(fields: [cityId], references: [id])
   active       Boolean   @default(true)
+  lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   assignedTickets Ticket[]         @relation("TicketAssignee")
@@ -32,7 +36,6 @@ model Admin {
 }
 
 enum AdminRole {
-  ADMIN              // legacy: treated as SUPER_ADMIN
   SUPER_ADMIN
   OPERATIONS_MANAGER
   FINANCE_ADMIN

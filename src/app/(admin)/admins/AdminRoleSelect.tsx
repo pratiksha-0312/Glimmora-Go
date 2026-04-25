@@ -23,9 +23,7 @@ export function AdminRoleSelect({
   disabled?: boolean;
 }) {
   const router = useRouter();
-  const [value, setValue] = useState<AdminRole>(
-    role === "ADMIN" ? "SUPER_ADMIN" : role
-  );
+  const [value, setValue] = useState<AdminRole>(role);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

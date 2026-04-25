@@ -35,6 +35,11 @@ export async function POST(req: Request) {
     cityId: admin.cityId,
   });
   await setSessionCookie(token);
+  await prisma.admin
+    .update({ where: { id: admin.id }, data: { lastLoginAt: new Date() } })
+    .catch(() => {
+      // non-critical; ignore
+    });
 
   return NextResponse.json({
     ok: true,

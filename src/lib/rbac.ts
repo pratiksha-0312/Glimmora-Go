@@ -3,7 +3,7 @@ import type { AdminRole } from "../../generated/prisma";
 // ============================================================================
 // SOURCE OF TRUTH: Excel matrix at d:\chrome_download\admin_panel_navigation_rbac.xlsx
 // Each FeatureKey corresponds to a row's "Sub Feature"; the role list is the
-// columns marked "Yes". ADMIN is treated as a legacy alias for SUPER_ADMIN.
+// columns marked "Yes".
 // ============================================================================
 
 export type Surface =
@@ -63,7 +63,7 @@ export type FeatureKey =
   | "config.roles_permissions"
   | "config.notification_logs";
 
-const SUPER_SET: AdminRole[] = ["SUPER_ADMIN", "ADMIN"];
+const SUPER_SET: AdminRole[] = ["SUPER_ADMIN"];
 
 const FEATURES: Record<FeatureKey, AdminRole[]> = {
   // Dashboard
@@ -175,8 +175,7 @@ export function canWrite(role: AdminRole, surface: Surface): boolean {
       return true;
     }
   }
-  // Legacy ADMIN keeps full write — preserves existing seeded admin.
-  if (role === "ADMIN" || role === "SUPER_ADMIN") {
+  if (role === "SUPER_ADMIN") {
     // Super-admin writes to anything they can access
     return canAccess(role, surface);
   }
@@ -188,11 +187,10 @@ export function isCityScoped(_role: AdminRole): boolean {
 }
 
 export const ROLE_LABELS: Record<AdminRole, string> = {
-  ADMIN: "Admin",
   SUPER_ADMIN: "Super Admin",
-  OPERATIONS_MANAGER: "Ops Manager",
-  FINANCE_ADMIN: "Finance",
-  SUPPORT_AGENT: "Support",
+  OPERATIONS_MANAGER: "Operations Manager",
+  FINANCE_ADMIN: "Finance Admin",
+  SUPPORT_AGENT: "Support Agent",
   PARTNER_MANAGER: "Partner Manager",
 };
 

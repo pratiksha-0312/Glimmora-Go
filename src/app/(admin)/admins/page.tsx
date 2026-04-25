@@ -1,12 +1,7 @@
 import { prisma } from "@/lib/db";
 import { requireAccess } from "@/lib/auth";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { Badge } from "@/components/ui/Badge";
-import { formatDate } from "@/lib/utils";
-import { ROLE_LABELS } from "@/lib/rbac";
-import { AdminForm } from "./AdminForm";
-import { AdminRowActions } from "./AdminRowActions";
-import { AdminRoleSelect } from "./AdminRoleSelect";
+import { AdminManagementClient, type AdminRow } from "./AdminManagementClient";
 
 export const dynamic = "force-dynamic";
 
@@ -17,129 +12,59 @@ async function getData() {
       select: {
         id: true,
         email: true,
+        username: true,
         name: true,
+        firstName: true,
+        lastName: true,
         role: true,
         active: true,
+        lastLoginAt: true,
         createdAt: true,
       },
     });
-    return { admins };
+    return { admins, dbError: false };
   } catch {
-    return { admins: [] };
+    return { admins: [], dbError: true };
   }
 }
 
 export default async function AdminsPage() {
   const session = await requireAccess("admins");
-  const { admins } = await getData();
-  const canManage = true;
+  const { admins, dbError } = await getData();
+
+  const rows: AdminRow[] = admins.map((a) => ({
+    id: a.id,
+    email: a.email,
+    username: a.username,
+    name: a.name,
+    firstName: a.firstName,
+    lastName: a.lastName,
+    role: a.role,
+    active: a.active,
+    lastLoginAt: a.lastLoginAt ? a.lastLoginAt.toISOString() : null,
+    createdAt: a.createdAt.toISOString(),
+  }));
+
+  const nextUserId = `ADM${String(admins.length + 1).padStart(4, "0")}`;
 
   return (
     <div>
       <PageHeader
         title="Admins"
-        description="Manage admin users."
+        description="Manage admin users — accounts, roles, and access."
       />
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {canManage && (
-          <div className="lg:col-span-1">
-            <AdminForm />
-          </div>
-        )}
-
-        <div className={canManage ? "lg:col-span-2" : "lg:col-span-3"}>
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-            <div className="border-b border-slate-200 px-5 py-4">
-              <h3 className="text-sm font-semibold text-slate-900">
-                All Admins
-              </h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
-                  <tr>
-                    <th className="px-5 py-3 text-left">Name</th>
-                    <th className="px-5 py-3 text-left">Email</th>
-                    <th className="px-5 py-3 text-left">Role</th>
-                    <th className="px-5 py-3 text-left">Status</th>
-                    <th className="px-5 py-3 text-left">Joined</th>
-                    {canManage && (
-                      <th className="px-5 py-3 text-right">Actions</th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {admins.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={canManage ? 6 : 5}
-                        className="px-5 py-10 text-center text-sm text-slate-400"
-                      >
-                        No admins found
-                      </td>
-                    </tr>
-                  ) : (
-                    admins.map((a) => {
-                      const isSelf = a.id === session?.adminId;
-                      return (
-                        <tr key={a.id} className="hover:bg-slate-50">
-                          <td className="px-5 py-3">
-                            <div className="font-medium text-slate-900">
-                              {a.name}
-                              {isSelf && (
-                                <span className="ml-2 text-xs font-normal text-slate-400">
-                                  (you)
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-5 py-3 text-slate-700">
-                            {a.email}
-                          </td>
-                          <td className="px-5 py-3">
-                            {canManage && !isSelf ? (
-                              <AdminRoleSelect id={a.id} role={a.role} />
-                            ) : (
-                              <span className="text-xs text-slate-700">
-                                {ROLE_LABELS[a.role]}
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-5 py-3">
-                            {a.active ? (
-                              <Badge variant="success">Active</Badge>
-                            ) : (
-                              <Badge variant="default">Disabled</Badge>
-                            )}
-                          </td>
-                          <td className="px-5 py-3 text-xs text-slate-500">
-                            {formatDate(a.createdAt)}
-                          </td>
-                          {canManage && (
-                            <td className="px-5 py-3 text-right">
-                              {isSelf ? (
-                                <span className="text-xs text-slate-400">
-                                  —
-                                </span>
-                              ) : (
-                                <AdminRowActions
-                                  id={a.id}
-                                  active={a.active}
-                                />
-                              )}
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+      {dbError && (
+        <div className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200">
+          Database not reachable.
         </div>
-      </div>
+      )}
+
+      <AdminManagementClient
+        admins={rows}
+        currentAdminId={session.adminId}
+        nextUserId={nextUserId}
+      />
     </div>
   );
 }

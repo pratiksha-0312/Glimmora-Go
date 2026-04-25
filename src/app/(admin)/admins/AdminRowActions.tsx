@@ -2,52 +2,63 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Pencil, Trash2 } from "lucide-react";
+import { EditAdminModal, type EditableAdmin } from "./EditAdminModal";
 
-export function AdminRowActions({
-  id,
-  active,
-}: {
-  id: string;
-  active: boolean;
-}) {
+export function AdminRowActions({ admin }: { admin: EditableAdmin }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  async function toggle() {
-    setLoading(true);
-    await fetch(`/api/admins/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ active: !active }),
-    });
-    router.refresh();
-    setLoading(false);
-  }
+  const [busy, setBusy] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   async function remove() {
-    if (!confirm("Delete this admin? This cannot be undone.")) return;
-    setLoading(true);
-    await fetch(`/api/admins/${id}`, { method: "DELETE" });
-    router.refresh();
-    setLoading(false);
+    if (
+      !confirm(
+        `Delete ${admin.name} (${admin.email})? This cannot be undone.`
+      )
+    )
+      return;
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/admins/${admin.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error ?? "Failed to delete");
+        return;
+      }
+      router.refresh();
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <div className="flex justify-end gap-3 text-xs font-medium">
-      <button
-        onClick={toggle}
-        disabled={loading}
-        className="text-slate-600 hover:text-slate-900 disabled:opacity-50"
-      >
-        {active ? "Disable" : "Enable"}
-      </button>
-      <button
-        onClick={remove}
-        disabled={loading}
-        className="text-red-600 hover:text-red-700 disabled:opacity-50"
-      >
-        Delete
-      </button>
-    </div>
+    <>
+      <div className="flex justify-end gap-2 text-xs">
+        <button
+          type="button"
+          onClick={() => setEditOpen(true)}
+          disabled={busy}
+          className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+        >
+          <Pencil className="h-3 w-3" />
+          Edit
+        </button>
+        <button
+          type="button"
+          onClick={remove}
+          disabled={busy}
+          className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-white px-2 py-1 font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+        >
+          <Trash2 className="h-3 w-3" />
+          Delete
+        </button>
+      </div>
+
+      <EditAdminModal
+        open={editOpen}
+        onClose={() => setEditOpen(false)}
+        admin={admin}
+      />
+    </>
   );
 }

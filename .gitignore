@@ -33,4 +33,4 @@ playwright/.auth/
 
 # Local scratch
 tmp/
-scripts/capture-verifai-*.mjs
+scripts/capture-*.mjs
