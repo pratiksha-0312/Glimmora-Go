@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils";
 import { requireAccess, sessionCanWrite } from "@/lib/auth";
-import { TicketForm } from "./TicketForm";
+import { NewTicketButton } from "./NewTicketButton";
 
 export const dynamic = "force-dynamic";
 
@@ -72,6 +72,7 @@ export default async function TicketsPage({
         ]}
         title="Tickets"
         description="Rider / driver complaints and support issues"
+        action={canWrite ? <NewTicketButton /> : undefined}
       />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
@@ -99,14 +100,7 @@ export default async function TicketsPage({
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {canWrite && (
-          <div className="lg:col-span-1">
-            <TicketForm />
-          </div>
-        )}
-
-        <div className={canWrite ? "lg:col-span-2" : "lg:col-span-3"}>
+      <div>
           <div className="mb-3 flex flex-wrap gap-2">
             {STATUS_PILLS.map((p) => {
               const active = (status ?? "") === p.value;
@@ -117,7 +111,7 @@ export default async function TicketsPage({
                   href={href}
                   className={
                     active
-                      ? "rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white"
+                      ? "rounded-full bg-[#a57865] px-3 py-1 text-xs font-semibold text-white"
                       : "rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
                   }
                 >
@@ -191,7 +185,6 @@ export default async function TicketsPage({
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 }

@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 
 type City = { id: string; name: string };
 
-export function CorporateForm({ cities }: { cities: City[] }) {
+export function CorporateForm({
+  cities,
+  onSuccess,
+}: {
+  cities: City[];
+  onSuccess?: () => void;
+}) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [gstin, setGstin] = useState("");
@@ -42,6 +48,7 @@ export function CorporateForm({ cities }: { cities: City[] }) {
       setContactPhone("");
       setCityId("");
       router.refresh();
+      onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed");
     } finally {
@@ -50,12 +57,7 @@ export function CorporateForm({ cities }: { cities: City[] }) {
   }
 
   return (
-    <form
-      onSubmit={submit}
-      className="space-y-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-    >
-      <h3 className="text-sm font-semibold text-slate-900">New account</h3>
-
+    <form onSubmit={submit} className="space-y-4">
       <div>
         <label className="mb-1 block text-xs font-medium text-slate-600">
           Company name
@@ -142,13 +144,22 @@ export function CorporateForm({ cities }: { cities: City[] }) {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-full rounded-lg bg-brand-600 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
-      >
-        {saving ? "Creating…" : "Create account"}
-      </button>
+      <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
+        <button
+          type="button"
+          onClick={onSuccess}
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={saving}
+          className="rounded-lg bg-[#a57865] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#8e6253] disabled:opacity-60"
+        >
+          {saving ? "Creating…" : "Create account"}
+        </button>
+      </div>
     </form>
   );
 }

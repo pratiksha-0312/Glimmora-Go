@@ -11,7 +11,13 @@ const PLAN_PRESET_AMOUNT: Record<"DAILY" | "WEEKLY" | "MONTHLY", number> = {
   MONTHLY: 500,
 };
 
-export function SubscriptionForm({ drivers }: { drivers: Driver[] }) {
+export function SubscriptionForm({
+  drivers,
+  onSuccess,
+}: {
+  drivers: Driver[];
+  onSuccess?: () => void;
+}) {
   const router = useRouter();
   const [driverId, setDriverId] = useState("");
   const [plan, setPlan] = useState<"DAILY" | "WEEKLY" | "MONTHLY">("WEEKLY");
@@ -37,6 +43,7 @@ export function SubscriptionForm({ drivers }: { drivers: Driver[] }) {
       if (!res.ok) throw new Error(data.error || "Failed");
       setDriverId("");
       router.refresh();
+      onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed");
     } finally {
@@ -45,12 +52,7 @@ export function SubscriptionForm({ drivers }: { drivers: Driver[] }) {
   }
 
   return (
-    <form
-      onSubmit={submit}
-      className="space-y-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-    >
-      <h3 className="text-sm font-semibold text-slate-900">Grant subscription</h3>
-
+    <form onSubmit={submit} className="space-y-4">
       <div>
         <label className="mb-1 block text-xs font-medium text-slate-600">
           Driver
@@ -114,13 +116,22 @@ export function SubscriptionForm({ drivers }: { drivers: Driver[] }) {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-full rounded-lg bg-brand-600 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
-      >
-        {saving ? "Granting…" : "Grant subscription"}
-      </button>
+      <div className="flex justify-end gap-2 border-t border-slate-100 pt-4">
+        <button
+          type="button"
+          onClick={onSuccess}
+          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={saving}
+          className="rounded-lg bg-[#a57865] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#8e6253] disabled:opacity-60"
+        >
+          {saving ? "Granting…" : "Grant subscription"}
+        </button>
+      </div>
     </form>
   );
 }

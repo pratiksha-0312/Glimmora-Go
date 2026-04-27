@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { requireAccess, sessionCanWrite } from "@/lib/auth";
-import { CorporateForm } from "./CorporateForm";
+import { NewCorporateButton } from "./NewCorporateButton";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +57,7 @@ export default async function CorporatesPage() {
         ]}
         title="Enterprise Accounts"
         description="Corporate / fleet customers with wallet ledger and employee rider lists"
+        action={canWrite ? <NewCorporateButton cities={cities} /> : undefined}
       />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
@@ -86,14 +87,7 @@ export default async function CorporatesPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {canWrite && (
-          <div className="lg:col-span-1">
-            <CorporateForm cities={cities} />
-          </div>
-        )}
-
-        <div className={canWrite ? "lg:col-span-2" : "lg:col-span-3"}>
+      <div>
           <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-4">
               <h3 className="text-sm font-semibold text-slate-900">
@@ -171,7 +165,6 @@ export default async function CorporatesPage() {
               </table>
             </div>
           </div>
-        </div>
       </div>
     </div>
   );
