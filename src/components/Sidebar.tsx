@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
   Car,
@@ -28,6 +28,7 @@ import {
   Shield,
   Tag,
   KeyRound,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { canAccess, ROLE_LABELS, type Surface } from "@/lib/rbac";
@@ -185,6 +186,18 @@ export function Sidebar({ role }: { role: AdminRole }) {
   const searchParams = useSearchParams();
   const view = searchParams.get("view");
   const sosCount = useSosCount(canAccess(role, "sos"));
+  const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  async function logout() {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      router.push("/login");
+      router.refresh();
+    }
+  }
 
   const visibleGroups = GROUPS.map((g) => ({
     ...g,
@@ -339,6 +352,16 @@ export function Sidebar({ role }: { role: AdminRole }) {
             </div>
           );
         })}
+
+        <button
+          type="button"
+          onClick={logout}
+          disabled={loggingOut}
+          className="mt-4 flex w-full items-center gap-3 rounded-lg border-t border-[#f0e4d6] px-3 py-2 pt-4 text-sm font-semibold text-[#3a2d28] transition hover:bg-[#fbf5ef] disabled:opacity-60"
+        >
+          <LogOut className="h-4 w-4 text-[#6b5349]" />
+          {loggingOut ? "Logging out…" : "Log Out"}
+        </button>
       </nav>
 
       <div className="flex items-center justify-between border-t border-[#f0e4d6] px-4 py-3">
