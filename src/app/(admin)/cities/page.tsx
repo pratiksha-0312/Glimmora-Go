@@ -2,61 +2,39 @@ import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { NewCityButton } from "./NewCityButton";
 import { CityRow } from "./CityRow";
-import { ArchetypeCard } from "./ArchetypeCard";
 import { requireAccess, sessionCanWrite } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
-async function getData() {
+async function getCities() {
   try {
-    const [cities, defaults] = await Promise.all([
-      prisma.city.findMany({
-        orderBy: { name: "asc" },
-        include: {
-          _count: { select: { drivers: true, rides: true } },
-        },
-      }),
-      prisma.archetypeDefaults.findMany({ orderBy: { archetype: "asc" } }),
-    ]);
-    return { cities, defaults };
+    return await prisma.city.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        _count: { select: { drivers: true, rides: true } },
+      },
+    });
   } catch {
-    return { cities: [], defaults: [] };
+    return [];
   }
 }
 
 export default async function CitiesPage() {
   const session = await requireAccess("cities");
   const canWrite = sessionCanWrite(session, "cities");
-  const { cities, defaults } = await getData();
+  const cities = await getCities();
 
   return (
     <div>
       <PageHeader
         breadcrumbs={[
-          { label: "Configuration" },
-          { label: "City Archetype" },
+          { label: "Pricing & Promotions" },
+          { label: "City Pricing Rules" },
         ]}
-        title="Cities"
-        description="Archetype (Metro vs Small Town) drives matching radius, surge, and payment options"
+        title="City Pricing Rules"
+        description="Per-city archetype assignment, matching radius, surge multiplier and payment options"
         action={canWrite ? <NewCityButton /> : undefined}
       />
-
-      {defaults.length > 0 && (
-        <div className="mb-6">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Archetype defaults
-          </h3>
-          <div className="grid gap-4 lg:grid-cols-2">
-            {defaults.map((d) => (
-              <ArchetypeCard
-                key={d.archetype}
-                defaults={d}
-                canWrite={canWrite}
-              />
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <div className="border-b border-[#f0e4d6] px-5 py-4">

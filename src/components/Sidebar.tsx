@@ -86,7 +86,7 @@ const GROUPS: NavGroup[] = [
       { href: "/fares", label: "Fare Configuration", icon: Banknote, surface: "fares" },
       { href: "/concessions", label: "Concession Pricing", icon: Percent, surface: "concessions" },
       { href: "/coupons", label: "Coupons", icon: Ticket, surface: "coupons" },
-      { href: "/cities", label: "City Pricing Rules", icon: MapPin, surface: "cities" },
+      { href: "/cities", label: "City Pricing Rules", icon: MapPin, surface: "cities", exact: true },
     ],
   },
   {
@@ -120,7 +120,7 @@ const GROUPS: NavGroup[] = [
     label: "Configuration",
     icon: Settings,
     items: [
-      { href: "/cities", label: "City Archetype", icon: Tag, surface: "cities" },
+      { href: "/cities/archetype", label: "City Archetype", icon: Tag, surface: "cities", exact: true },
       { href: "/admins", label: "Admin Users", icon: ShieldCheck, surface: "admins", exact: true },
       { href: "/admins/roles", label: "Roles & Permissions", icon: KeyRound, surface: "admins" },
       { href: "/notifications", label: "Notification Logs", icon: Bell, surface: "notifications" },
