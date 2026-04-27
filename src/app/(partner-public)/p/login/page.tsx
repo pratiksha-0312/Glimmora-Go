@@ -2,7 +2,7 @@
 
 export default function PartnerLoginPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-brand-50 via-white to-brand-100 p-4">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-brand-50 via-white to-orange-50 p-4">
       <div className="mx-auto w-full max-w-md">
         <div className="mb-6 mt-8 text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-xl font-black text-white">

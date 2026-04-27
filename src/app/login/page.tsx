@@ -81,11 +81,16 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 via-white to-brand-100 p-4">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl ring-1 ring-slate-200">
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-xl font-black text-white">
-            GG
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#fdf8f4] via-white to-[#f3e8db] p-4 font-sans">
+      <div className="w-full max-w-md rounded-xl border border-[#f0e4d6] bg-white p-8 shadow-lg">
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/icons/icon-192.png"
+              alt="Glimmora Go"
+              className="h-12 w-12 rounded-lg object-contain"
+            />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Glimmora Go Admin</h1>
           <p className="mt-1 text-sm text-slate-500">Sign in to continue</p>

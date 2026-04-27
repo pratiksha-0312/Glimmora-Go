@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function CouponForm({ onSuccess }: { onSuccess?: () => void }) {
+export function CouponForm() {
   const router = useRouter();
   const [code, setCode] = useState("");
   const [description, setDescription] = useState("");
@@ -41,7 +41,6 @@ export function CouponForm({ onSuccess }: { onSuccess?: () => void }) {
       setDescription("");
       setAmount(50);
       router.refresh();
-      onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed");
     } finally {
@@ -49,17 +48,15 @@ export function CouponForm({ onSuccess }: { onSuccess?: () => void }) {
     }
   }
 
-  const inputCls =
-    "w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-brand-500 dark:focus:ring-brand-900/30";
-
   return (
-    <form onSubmit={submit} className="space-y-4 p-6">
-      <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-        New Coupon
-      </h3>
+    <form
+      onSubmit={submit}
+      className="space-y-3 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+    >
+      <h3 className="text-sm font-semibold text-slate-900">New Coupon</h3>
 
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400">
+        <label className="mb-1 block text-xs font-medium text-slate-600">
           Code
         </label>
         <input
@@ -67,38 +64,40 @@ export function CouponForm({ onSuccess }: { onSuccess?: () => void }) {
           value={code}
           onChange={(e) => setCode(e.target.value.toUpperCase())}
           placeholder="FIRSTRIDE"
-          className={`${inputCls} font-mono uppercase tracking-widest`}
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm uppercase outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
         />
       </div>
 
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400">
+        <label className="mb-1 block text-xs font-medium text-slate-600">
           Description
         </label>
         <input
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="First ride free"
-          className={inputCls}
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400">
+          <label className="mb-1 block text-xs font-medium text-slate-600">
             Type
           </label>
           <select
             value={discountType}
-            onChange={(e) => setDiscountType(e.target.value as "FLAT" | "PERCENT")}
-            className={inputCls}
+            onChange={(e) =>
+              setDiscountType(e.target.value as "FLAT" | "PERCENT")
+            }
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
           >
             <option value="FLAT">Flat (₹)</option>
             <option value="PERCENT">Percent (%)</option>
           </select>
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400">
+          <label className="mb-1 block text-xs font-medium text-slate-600">
             {discountType === "FLAT" ? "Amount (₹)" : "Percent"}
           </label>
           <input
@@ -106,14 +105,14 @@ export function CouponForm({ onSuccess }: { onSuccess?: () => void }) {
             min={0}
             value={amount}
             onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-            className={inputCls}
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
           />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400">
+          <label className="mb-1 block text-xs font-medium text-slate-600">
             Usage limit
           </label>
           <input
@@ -123,12 +122,12 @@ export function CouponForm({ onSuccess }: { onSuccess?: () => void }) {
             onChange={(e) =>
               setUsageLimit(e.target.value === "" ? "" : Number(e.target.value))
             }
-            placeholder="∞ unlimited"
-            className={inputCls}
+            placeholder="∞"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
           />
         </div>
         <div>
-          <label className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400">
+          <label className="mb-1 block text-xs font-medium text-slate-600">
             Expires
           </label>
           <input
@@ -136,13 +135,13 @@ export function CouponForm({ onSuccess }: { onSuccess?: () => void }) {
             required
             value={validUntil}
             onChange={(e) => setValidUntil(e.target.value)}
-            className={`${inputCls} dark:[color-scheme:dark]`}
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
           />
         </div>
       </div>
 
       {error && (
-        <div className="rounded-xl bg-red-50 px-3 py-2.5 text-xs text-red-700 ring-1 ring-red-200 dark:bg-red-950/30 dark:text-red-400 dark:ring-red-800">
+        <div className="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 ring-1 ring-red-200">
           {error}
         </div>
       )}
@@ -150,9 +149,9 @@ export function CouponForm({ onSuccess }: { onSuccess?: () => void }) {
       <button
         type="submit"
         disabled={saving}
-        className="w-full rounded-xl bg-brand-600 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:opacity-60 active:scale-[0.98]"
+        className="w-full rounded-lg bg-brand-600 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
       >
-        {saving ? "Creating…" : "Create Coupon"}
+        {saving ? "Creating..." : "Create coupon"}
       </button>
     </form>
   );
