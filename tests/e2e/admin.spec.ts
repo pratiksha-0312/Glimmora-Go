@@ -39,7 +39,7 @@ test.describe("Admin panel — browser flows", () => {
     // clickable. If count > 0 the badge shows, but we can't guarantee count.
     await expect(page.getByRole("link", { name: /SOS Alerts/ })).toBeVisible();
     await page.getByRole("link", { name: /SOS Alerts/ }).click();
-    await expect(page).toHaveURL("/sos");
+    await expect(page).toHaveURL("/safety/sos");
     await expect(
       page.getByRole("heading", { name: "SOS Alerts" })
     ).toBeVisible();
@@ -47,7 +47,7 @@ test.describe("Admin panel — browser flows", () => {
 
   test("rides page auto-refresh toggle increments counter", async ({ page }) => {
     await login(page);
-    await page.goto("/rides");
+    await page.goto("/ride-operations");
     await expect(
       page.getByRole("heading", { name: "Rides" })
     ).toBeVisible();
@@ -69,7 +69,7 @@ test.describe("Admin panel — browser flows", () => {
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await login(page);
-    await page.goto("/rides");
+    await page.goto("/ride-operations");
 
     // Listen for the token POST request that fires on Share click
     const tokenReqPromise = page.waitForResponse(
@@ -104,15 +104,15 @@ test.describe("Admin panel — browser flows", () => {
     expect(loginRes.ok()).toBeTruthy();
 
     // Scrape a ride id from the rides page
-    const ridesHtml = await (await request.get("/rides")).text();
-    const match = ridesHtml.match(/\/drivers\/|ride-id-([a-z0-9]+)/i);
+    const ridesHtml = await (await request.get("/ride-operations")).text();
+    const match = ridesHtml.match(/\/driver-operations\/drivers\/|ride-id-([a-z0-9]+)/i);
     // Fallback: extract first cuid-looking string from data attrs; simpler is
     // to use the token endpoint with a ride id scraped via the Prisma DB. We
     // instead use a second login via page and click Share to intercept.
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     await login(page);
-    await page.goto("/rides");
+    await page.goto("/ride-operations");
     const tokenReqPromise = page.waitForResponse(
       (res) =>
         res.url().includes("/api/rides/") &&
@@ -170,7 +170,7 @@ test.describe("Admin panel — browser flows", () => {
 
   test("Coupon create + disable + delete flow", async ({ page }) => {
     await login(page);
-    await page.goto("/coupons");
+    await page.goto("/pricing-promotions/coupons");
     const code = "PWTEST" + Date.now().toString().slice(-6);
     await page.fill('input[placeholder="FIRSTRIDE"]', code);
     await page.fill(
@@ -203,13 +203,13 @@ test.describe("Admin panel — browser flows", () => {
 
   test("Admins page: ADMIN sees create form", async ({ page }) => {
     await login(page);
-    await page.goto("/admins");
+    await page.goto("/configuration/admins");
     await expect(page.getByRole("heading", { name: "New Admin" })).toBeVisible();
   });
 
   test("Archetype defaults editor persists changes", async ({ page }) => {
     await login(page);
-    await page.goto("/cities");
+    await page.goto("/pricing-promotions/cities");
     await expect(page.getByText("Archetype defaults")).toBeVisible();
 
     // The Metro card is the closest ancestor of the "Metro" h4 with a Save button.

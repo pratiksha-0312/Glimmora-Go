@@ -22,7 +22,7 @@ test.describe("Admin panel — every button / interaction", () => {
 
   // --- DRIVERS ---
   test("/drivers — each status pill filters the list", async ({ page }) => {
-    await page.goto("/drivers");
+    await page.goto("/driver-operations/drivers");
     for (const pill of ["All", "PENDING", "APPROVED", "REJECTED", "SUSPENDED"]) {
       await page.getByRole("link", { name: pill, exact: true }).click();
       await expect(
@@ -34,11 +34,11 @@ test.describe("Admin panel — every button / interaction", () => {
   test("/drivers/[id] — approve fires PATCH and updates status", async ({
     page,
   }) => {
-    await page.goto("/drivers");
+    await page.goto("/driver-operations/drivers");
     // Pick the first row available regardless of status — robust to prior test runs
     const firstLink = page.locator("tbody tr a").first();
     await firstLink.click();
-    await expect(page).toHaveURL(/\/drivers\/[^/]+$/);
+    await expect(page).toHaveURL(/\/driver-operations\/drivers\/[^/]+$/);
 
     // Find any status button that is not disabled and click it
     const buttons = page.getByRole("button").filter({
@@ -76,7 +76,7 @@ test.describe("Admin panel — every button / interaction", () => {
     context,
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    await page.goto("/rides");
+    await page.goto("/ride-operations");
 
     for (const pill of [
       "All",
@@ -113,7 +113,7 @@ test.describe("Admin panel — every button / interaction", () => {
 
   // --- SOS ---
   test("/sos — page and LIVE-badge link render", async ({ page }) => {
-    await page.goto("/sos");
+    await page.goto("/safety/sos");
     await expect(page.getByRole("heading", { name: "SOS Alerts" })).toBeVisible();
   });
 
@@ -162,7 +162,7 @@ test.describe("Admin panel — every button / interaction", () => {
 
   // --- FARES ---
   test("/fares — Save button on first city card", async ({ page }) => {
-    await page.goto("/fares");
+    await page.goto("/pricing-promotions/fares");
     await expect(
       page.getByRole("heading", { name: "Fare Config" })
     ).toBeVisible();
@@ -187,7 +187,7 @@ test.describe("Admin panel — every button / interaction", () => {
 
   // --- CONCESSIONS ---
   test("/concessions — Save persists multipliers", async ({ page }) => {
-    await page.goto("/concessions");
+    await page.goto("/pricing-promotions/concessions");
     await expect(
       page.getByRole("heading", { name: "Concession Pricing" })
     ).toBeVisible();
@@ -207,7 +207,7 @@ test.describe("Admin panel — every button / interaction", () => {
 
   // --- COUPONS ---
   test("/coupons — create → disable → enable → delete", async ({ page }) => {
-    await page.goto("/coupons");
+    await page.goto("/pricing-promotions/coupons");
     const code = "UI" + Date.now().toString().slice(-6);
     await page.fill('input[placeholder="FIRSTRIDE"]', code);
     await page.fill('input[placeholder="First ride free"]', "UI smoke");
@@ -231,7 +231,7 @@ test.describe("Admin panel — every button / interaction", () => {
 
   // --- CITIES / ARCHETYPES ---
   test("/cities — Metro archetype Save persists", async ({ page }) => {
-    await page.goto("/cities");
+    await page.goto("/pricing-promotions/cities");
     const metroCard = page
       .locator("div.rounded-xl")
       .filter({ has: page.getByRole("heading", { level: 4, name: "Metro" }) });
@@ -255,7 +255,7 @@ test.describe("Admin panel — every button / interaction", () => {
   test("/referrals — Recompute button fires POST /api/referrals/recompute", async ({
     page,
   }) => {
-    await page.goto("/referrals");
+    await page.goto("/driver-operations/referrals");
     await expect(
       page.getByRole("heading", { level: 1, name: "Referrals" })
     ).toBeVisible();
@@ -269,7 +269,7 @@ test.describe("Admin panel — every button / interaction", () => {
   test("/subscriptions — grant + revoke (uses any approved driver)", async ({
     page,
   }) => {
-    await page.goto("/subscriptions");
+    await page.goto("/driver-operations/subscriptions");
     await expect(
       page.getByRole("heading", { level: 1, name: "Subscriptions" })
     ).toBeVisible();
@@ -341,7 +341,7 @@ test.describe("Admin panel — every button / interaction", () => {
   test("/corporates — top-up/debit + add/remove member + approve", async ({
     page,
   }) => {
-    await page.goto("/corporates");
+    await page.goto("/partners/enterprise");
     await page.getByRole("link", { name: /Acme Logistics/ }).click();
 
     const walletCard = page
@@ -390,7 +390,7 @@ test.describe("Admin panel — every button / interaction", () => {
   test("/audit — range pills + filter submit + CSV export + fraud signals", async ({
     page,
   }) => {
-    await page.goto("/audit");
+    await page.goto("/configuration/audit");
     await expect(
       page.getByRole("heading", { name: "Audit & Compliance" })
     ).toBeVisible();
@@ -410,7 +410,7 @@ test.describe("Admin panel — every button / interaction", () => {
     }
 
     await page.getByRole("button", { name: "Filter" }).click();
-    await expect(page).toHaveURL(/\/audit\?/);
+    await expect(page).toHaveURL(/\/configuration\/audit\?/);
 
     const dl = page.waitForEvent("download");
     await page.getByRole("link", { name: /Export CSV/ }).click();
@@ -420,7 +420,7 @@ test.describe("Admin panel — every button / interaction", () => {
 
   // --- ADMINS ---
   test("/admins — create → disable → enable → delete", async ({ page }) => {
-    await page.goto("/admins");
+    await page.goto("/configuration/admins");
     const email = `pw-${Date.now().toString().slice(-6)}@glimmora.ai`;
     await page.fill('input[type="email"]', email);
     await page.fill(
