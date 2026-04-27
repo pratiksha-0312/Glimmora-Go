@@ -166,11 +166,23 @@ async function getStats(cityId: string | null) {
     revenueToday,
     revenueYesterday,
     activeDriverCount,
-    activeDrivers,
+    activeDrivers: activeDrivers.map((d) => ({
+      ...d,
+      updatedAt: d.updatedAt.toISOString(),
+    })),
     sosCount,
-    liveRides,
-    sosFeed,
-    scheduled,
+    liveRides: liveRides.map((r) => ({
+      ...r,
+      createdAt: r.createdAt.toISOString(),
+    })),
+    sosFeed: sosFeed.map((r) => ({
+      ...r,
+      createdAt: r.createdAt.toISOString(),
+    })),
+    scheduled: scheduled.map((r) => ({
+      ...r,
+      scheduledAt: r.scheduledAt!.toISOString(),
+    })),
     todayHourly,
     yesterdayHourly,
   };
