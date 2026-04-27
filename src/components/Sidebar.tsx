@@ -86,6 +86,7 @@ const GROUPS: NavGroup[] = [
       { href: "/fares", label: "Fare Configuration", icon: Banknote, surface: "fares" },
       { href: "/concessions", label: "Concession Pricing", icon: Percent, surface: "concessions" },
       { href: "/coupons", label: "Coupons", icon: Ticket, surface: "coupons" },
+      { href: "/cities", label: "City Pricing Rules", icon: MapPin, surface: "cities" },
     ],
   },
   {
