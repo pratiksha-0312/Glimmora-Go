@@ -1,10 +1,15 @@
-﻿import { prisma } from "@/lib/db";
+import { Mail, Phone } from "lucide-react";
+import { prisma } from "@/lib/db";
 import { requirePartner } from "@/lib/partnerAuth";
 import { formatDate } from "@/lib/utils";
 import { LogoutButton } from "./LogoutButton";
 import { Documents } from "./Documents";
+import { BankDetails } from "./BankDetails";
 
 export const dynamic = "force-dynamic";
+
+const SUPPORT_PHONE = "+91 80 4567 8900";
+const SUPPORT_EMAIL = "partners@glimmora.ai";
 
 export default async function ProfilePage() {
   const session = await requirePartner();
@@ -38,6 +43,60 @@ export default async function ProfilePage() {
       </div>
 
       <Documents docs={partner.documents} />
+
+      <BankDetails
+        initial={{
+          bankAccountName: partner.bankAccountName,
+          bankAccountNumber: partner.bankAccountNumber,
+          bankIfsc: partner.bankIfsc,
+          bankName: partner.bankName,
+        }}
+      />
+
+      <div className="rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div className="border-b border-slate-100 px-4 py-3">
+          <h3 className="text-sm font-semibold text-slate-900">
+            Support contact
+          </h3>
+          <p className="mt-0.5 text-[11px] text-slate-500">
+            We&apos;re here Mon–Sat, 9 AM – 7 PM IST
+          </p>
+        </div>
+        <div className="divide-y divide-slate-100">
+          <a
+            href={`tel:${SUPPORT_PHONE.replace(/\s/g, "")}`}
+            className="flex items-center gap-3 px-4 py-3 transition hover:bg-slate-50"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+              <Phone className="h-4 w-4" />
+            </span>
+            <div className="flex-1">
+              <div className="text-xs uppercase tracking-wider text-slate-500">
+                Call us
+              </div>
+              <div className="text-sm font-medium text-slate-900">
+                {SUPPORT_PHONE}
+              </div>
+            </div>
+          </a>
+          <a
+            href={`mailto:${SUPPORT_EMAIL}`}
+            className="flex items-center gap-3 px-4 py-3 transition hover:bg-slate-50"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+              <Mail className="h-4 w-4" />
+            </span>
+            <div className="flex-1">
+              <div className="text-xs uppercase tracking-wider text-slate-500">
+                Email
+              </div>
+              <div className="text-sm font-medium text-slate-900">
+                {SUPPORT_EMAIL}
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
 
       <LogoutButton />
     </div>

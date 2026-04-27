@@ -1,10 +1,10 @@
-﻿import { NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { getPartnerSession } from "@/lib/partnerAuth";
 import { calcFare, haversineKm } from "@/lib/fare";
 
-const schema = z.object({
+const bookSchema = z.object({
   riderPhone: z.string().regex(/^\d{10}$/),
   riderName: z.string().optional(),
   pickupAddress: z.string().min(1),
@@ -13,8 +13,49 @@ const schema = z.object({
   dropAddress: z.string().min(1),
   dropLat: z.number(),
   dropLng: z.number(),
-  concession: z.enum(["NONE", "WOMEN", "SENIOR", "CHILDREN"]).default("NONE"),
+  couponCode: z.string().min(1).optional(),
 });
+
+const estimateSchema = z.object({
+  pickupLat: z.number(),
+  pickupLng: z.number(),
+  dropLat: z.number(),
+  dropLng: z.number(),
+  couponCode: z.string().min(1).optional(),
+});
+
+type CouponApplied = {
+  code: string;
+  couponId: string;
+  discount: number;
+};
+
+// Validate a coupon code and compute the discount in INR. Returns the
+// applied coupon info or an error string. Discount is capped so the fare
+// never goes below 0.
+async function applyCoupon(
+  rawCode: string,
+  fareBefore: number
+): Promise<{ ok: true; applied: CouponApplied } | { ok: false; error: string }> {
+  const code = rawCode.trim().toUpperCase();
+  const coupon = await prisma.coupon.findUnique({ where: { code } });
+  if (!coupon || !coupon.active) return { ok: false, error: "Invalid coupon" };
+  const now = new Date();
+  if (now < coupon.validFrom || now > coupon.validUntil)
+    return { ok: false, error: "Coupon is not currently valid" };
+  if (coupon.usageLimit != null && coupon.usedCount >= coupon.usageLimit)
+    return { ok: false, error: "Coupon usage limit reached" };
+
+  let discount =
+    coupon.discountType === "FLAT"
+      ? coupon.amount
+      : Math.round((fareBefore * coupon.amount) / 100);
+  if (coupon.maxDiscount != null) discount = Math.min(discount, coupon.maxDiscount);
+  discount = Math.min(discount, fareBefore);
+  discount = Math.max(0, Math.round(discount));
+
+  return { ok: true, applied: { code, couponId: coupon.id, discount } };
+}
 
 export async function POST(req: Request) {
   const session = await getPartnerSession();
@@ -31,7 +72,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Partner not approved" }, { status: 403 });
 
   const body = await req.json().catch(() => null);
-  const parsed = schema.safeParse(body);
+  const parsed = bookSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.issues[0]?.message ?? "Invalid input" },
@@ -52,18 +93,9 @@ export async function POST(req: Request) {
     { lat: d.pickupLat, lng: d.pickupLng },
     { lat: d.dropLat, lng: d.dropLng }
   );
-  const durationMin = Math.max(5, Math.round(distanceKm * 3)); // rough
+  const durationMin = Math.max(5, Math.round(distanceKm * 3));
 
-  const concessionMultiplier =
-    d.concession === "WOMEN"
-      ? fc.womenMultiplier
-      : d.concession === "SENIOR"
-        ? fc.seniorMultiplier
-        : d.concession === "CHILDREN"
-          ? fc.childrenMultiplier
-          : 1;
-
-  const fareEstimate = calcFare({
+  const fareBefore = calcFare({
     baseFare: fc.baseFare,
     perKm: fc.perKm,
     perMin: fc.perMin,
@@ -71,11 +103,17 @@ export async function POST(req: Request) {
     surgeMultiplier: partner.city.surgeMultiplier,
     distanceKm,
     durationMin,
-    concession:
-      d.concession === "NONE"
-        ? { type: "NONE" }
-        : { type: d.concession, multiplier: concessionMultiplier },
   });
+
+  let fareEstimate = fareBefore;
+  let coupon: CouponApplied | null = null;
+  if (d.couponCode) {
+    const result = await applyCoupon(d.couponCode, fareBefore);
+    if (!result.ok)
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    coupon = result.applied;
+    fareEstimate = Math.max(0, fareBefore - coupon.discount);
+  }
 
   // Find or create the rider
   const rider = await prisma.rider.upsert({
@@ -84,24 +122,34 @@ export async function POST(req: Request) {
     create: { phone: d.riderPhone, name: d.riderName },
   });
 
-  const ride = await prisma.ride.create({
-    data: {
-      riderId: rider.id,
-      cityId: partner.cityId,
-      pickupAddress: d.pickupAddress,
-      pickupLat: d.pickupLat,
-      pickupLng: d.pickupLng,
-      dropAddress: d.dropAddress,
-      dropLat: d.dropLat,
-      dropLng: d.dropLng,
-      distanceKm: Math.round(distanceKm * 10) / 10,
-      durationMin,
-      fareEstimate,
-      concessionType: d.concession,
-      status: "REQUESTED",
-      bookingChannel: "PARTNER",
-      bookedByPartnerId: partner.id,
-    },
+  const ride = await prisma.$transaction(async (tx) => {
+    const created = await tx.ride.create({
+      data: {
+        riderId: rider.id,
+        cityId: partner.cityId,
+        pickupAddress: d.pickupAddress,
+        pickupLat: d.pickupLat,
+        pickupLng: d.pickupLng,
+        dropAddress: d.dropAddress,
+        dropLat: d.dropLat,
+        dropLng: d.dropLng,
+        distanceKm: Math.round(distanceKm * 10) / 10,
+        durationMin,
+        fareEstimate,
+        couponCode: coupon?.code ?? null,
+        couponDiscount: coupon?.discount ?? null,
+        status: "REQUESTED",
+        bookingChannel: "PARTNER",
+        bookedByPartnerId: partner.id,
+      },
+    });
+    if (coupon) {
+      await tx.coupon.update({
+        where: { id: coupon.couponId },
+        data: { usedCount: { increment: 1 } },
+      });
+    }
+    return created;
   });
 
   return NextResponse.json({
@@ -134,14 +182,7 @@ export async function PUT(req: Request) {
   }
 
   const body = await req.json().catch(() => null);
-  const estSchema = z.object({
-    pickupLat: z.number(),
-    pickupLng: z.number(),
-    dropLat: z.number(),
-    dropLng: z.number(),
-    concession: z.enum(["NONE", "WOMEN", "SENIOR", "CHILDREN"]).default("NONE"),
-  });
-  const parsed = estSchema.safeParse(body);
+  const parsed = estimateSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
@@ -153,15 +194,7 @@ export async function PUT(req: Request) {
     { lat: d.dropLat, lng: d.dropLng }
   );
   const durationMin = Math.max(5, Math.round(distanceKm * 3));
-  const concessionMultiplier =
-    d.concession === "WOMEN"
-      ? fc.womenMultiplier
-      : d.concession === "SENIOR"
-        ? fc.seniorMultiplier
-        : d.concession === "CHILDREN"
-          ? fc.childrenMultiplier
-          : 1;
-  const fareEstimate = calcFare({
+  const fareBefore = calcFare({
     baseFare: fc.baseFare,
     perKm: fc.perKm,
     perMin: fc.perMin,
@@ -169,15 +202,26 @@ export async function PUT(req: Request) {
     surgeMultiplier: partner.city.surgeMultiplier,
     distanceKm,
     durationMin,
-    concession:
-      d.concession === "NONE"
-        ? { type: "NONE" }
-        : { type: d.concession, multiplier: concessionMultiplier },
   });
+
+  let fareEstimate = fareBefore;
+  let couponDiscount = 0;
+  let appliedCode: string | null = null;
+  if (d.couponCode) {
+    const result = await applyCoupon(d.couponCode, fareBefore);
+    if (!result.ok)
+      return NextResponse.json({ error: result.error }, { status: 400 });
+    couponDiscount = result.applied.discount;
+    appliedCode = result.applied.code;
+    fareEstimate = Math.max(0, fareBefore - couponDiscount);
+  }
 
   return NextResponse.json({
     ok: true,
     fareEstimate,
+    fareBeforeDiscount: fareBefore,
+    couponDiscount,
+    couponCode: appliedCode,
     distanceKm: Math.round(distanceKm * 10) / 10,
     durationMin,
     commissionEstimate: Math.round((fareEstimate * partner.commissionPct) / 100),

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,17 +6,13 @@ import { LocationPicker, type Location } from "./LocationPicker";
 
 type Estimate = {
   fareEstimate: number;
+  fareBeforeDiscount: number;
+  couponDiscount: number;
+  couponCode: string | null;
   distanceKm: number;
   durationMin: number;
   commissionEstimate: number;
 };
-
-const CONCESSIONS = [
-  { value: "NONE", label: "No concession" },
-  { value: "WOMEN", label: "Women" },
-  { value: "SENIOR", label: "Senior (60+)" },
-  { value: "CHILDREN", label: "With children" },
-] as const;
 
 export function BookForm({
   commissionPct,
@@ -30,9 +26,7 @@ export function BookForm({
   const [riderName, setRiderName] = useState("");
   const [pickup, setPickup] = useState<Location | null>(null);
   const [drop, setDrop] = useState<Location | null>(null);
-  const [concession, setConcession] = useState<
-    "NONE" | "WOMEN" | "SENIOR" | "CHILDREN"
-  >("NONE");
+  const [couponCode, setCouponCode] = useState("");
 
   const [est, setEst] = useState<Estimate | null>(null);
   const [estimating, setEstimating] = useState(false);
@@ -42,7 +36,7 @@ export function BookForm({
   // Estimate becomes stale whenever the inputs change
   useEffect(() => {
     setEst(null);
-  }, [pickup, drop, concession]);
+  }, [pickup, drop, couponCode]);
 
   const canEstimate = pickup && drop;
   const canConfirm =
@@ -61,7 +55,7 @@ export function BookForm({
           pickupLng: pickup.lng,
           dropLat: drop.lat,
           dropLng: drop.lng,
-          concession,
+          couponCode: couponCode.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -91,7 +85,7 @@ export function BookForm({
           dropAddress: drop.address,
           dropLat: drop.lat,
           dropLng: drop.lng,
-          concession,
+          couponCode: couponCode.trim() || undefined,
         }),
       });
       const data = await res.json();
@@ -166,19 +160,14 @@ export function BookForm({
       <section className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
         <label className="block">
           <span className="mb-1 block text-xs font-medium text-slate-600">
-            Concession
+            Coupon code (optional)
           </span>
-          <select
-            value={concession}
-            onChange={(e) => setConcession(e.target.value as typeof concession)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
-          >
-            {CONCESSIONS.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
+          <input
+            value={couponCode}
+            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+            placeholder="e.g. WELCOME50"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm uppercase outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+          />
         </label>
       </section>
 
@@ -202,6 +191,16 @@ export function BookForm({
               <div className="text-3xl font-bold text-slate-900">
                 ₹{est.fareEstimate}
               </div>
+              {est.couponDiscount > 0 && (
+                <div className="mt-1 text-xs">
+                  <span className="text-slate-400 line-through">
+                    ₹{est.fareBeforeDiscount}
+                  </span>{" "}
+                  <span className="font-medium text-green-600">
+                    {est.couponCode} saved ₹{est.couponDiscount}
+                  </span>
+                </div>
+              )}
             </div>
             <div className="text-right text-xs text-slate-500">
               <div>

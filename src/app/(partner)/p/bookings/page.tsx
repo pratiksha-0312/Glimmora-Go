@@ -1,10 +1,14 @@
-﻿import { prisma } from "@/lib/db";
+import Link from "next/link";
+import { prisma } from "@/lib/db";
 import { requirePartner } from "@/lib/partnerAuth";
 import { Badge } from "@/components/ui/Badge";
 import { rideStatusVariant } from "@/lib/format";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { CancelButton } from "./CancelButton";
 
 export const dynamic = "force-dynamic";
+
+const CANCELLABLE = new Set(["REQUESTED", "MATCHED", "EN_ROUTE", "ARRIVED"]);
 
 export default async function BookingsPage() {
   const session = await requirePartner();
@@ -50,6 +54,7 @@ export default async function BookingsPage() {
               r.status === "COMPLETED"
                 ? Math.round((fare * commissionPct) / 100)
                 : null;
+            const cancellable = CANCELLABLE.has(r.status);
             return (
               <div
                 key={r.id}
@@ -89,6 +94,15 @@ export default async function BookingsPage() {
                       </div>
                     )}
                   </div>
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2">
+                  <Link
+                    href={`/p/bookings/${r.id}`}
+                    className="text-[11px] font-medium text-brand-600 hover:text-brand-700"
+                  >
+                    View details →
+                  </Link>
+                  {cancellable && <CancelButton rideId={r.id} />}
                 </div>
               </div>
             );

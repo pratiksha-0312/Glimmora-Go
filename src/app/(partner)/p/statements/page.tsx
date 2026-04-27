@@ -1,10 +1,26 @@
 import { prisma } from "@/lib/db";
 import { requirePartner } from "@/lib/partnerAuth";
-import { accruedSince, formatPeriod } from "@/lib/payouts";
+import { accruedSince, formatPeriod, periodTotals } from "@/lib/payouts";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Badge } from "@/components/ui/Badge";
-import { Banknote, Wallet } from "lucide-react";
+import { Banknote, CalendarDays, CalendarRange, Wallet } from "lucide-react";
 import type { PayoutStatus } from "../../../../../generated/prisma";
+
+function startOfWeek(now: Date): Date {
+  const d = new Date(now);
+  d.setHours(0, 0, 0, 0);
+  // Treat Monday as first day of the week.
+  const day = (d.getDay() + 6) % 7;
+  d.setDate(d.getDate() - day);
+  return d;
+}
+
+function startOfMonth(now: Date): Date {
+  const d = new Date(now);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(1);
+  return d;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +54,24 @@ export default async function PartnerStatementsPage() {
   const lastEnd = payouts[0]?.periodEnd ?? null;
   const accrued = await accruedSince(session.partnerId, lastEnd, commissionPct);
 
+  const now = new Date();
+  const weekStart = startOfWeek(now);
+  const monthStart = startOfMonth(now);
+  const tomorrow = new Date(now);
+  tomorrow.setHours(0, 0, 0, 0);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const [weekTotals, monthTotals] = await Promise.all([
+    periodTotals(session.partnerId, weekStart, tomorrow),
+    periodTotals(session.partnerId, monthStart, tomorrow),
+  ]);
+  const weekCommission = Math.round(
+    (weekTotals.grossFare * commissionPct) / 100
+  );
+  const monthCommission = Math.round(
+    (monthTotals.grossFare * commissionPct) / 100
+  );
+
   const totalPaid = payouts
     .filter((p) => p.status === "PAID")
     .reduce((s, p) => s + p.amount, 0);
@@ -60,6 +94,35 @@ export default async function PartnerStatementsPage() {
           {" · "}
           {commissionPct}% commission
           {lastEnd ? ` · since ${formatDate(lastEnd)}` : " · all-time"}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+          <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-slate-500">
+            <CalendarDays className="h-3.5 w-3.5" />
+            This week
+          </div>
+          <div className="mt-1 text-lg font-bold text-slate-900">
+            {formatCurrency(weekCommission)}
+          </div>
+          <div className="mt-0.5 text-[11px] text-slate-400">
+            {weekTotals.rideCount} ride{weekTotals.rideCount === 1 ? "" : "s"} · since{" "}
+            {formatDate(weekStart)}
+          </div>
+        </div>
+        <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+          <div className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-slate-500">
+            <CalendarRange className="h-3.5 w-3.5" />
+            This month
+          </div>
+          <div className="mt-1 text-lg font-bold text-slate-900">
+            {formatCurrency(monthCommission)}
+          </div>
+          <div className="mt-0.5 text-[11px] text-slate-400">
+            {monthTotals.rideCount} ride{monthTotals.rideCount === 1 ? "" : "s"} · since{" "}
+            {formatDate(monthStart)}
+          </div>
         </div>
       </div>
 

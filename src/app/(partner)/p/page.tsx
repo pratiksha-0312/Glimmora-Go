@@ -1,18 +1,27 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { prisma } from "@/lib/db";
 import { requirePartner } from "@/lib/partnerAuth";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { rideStatusVariant } from "@/lib/format";
 import { Badge } from "@/components/ui/Badge";
-import { Plus, Car, Banknote } from "lucide-react";
+import { Plus, Car, Banknote, Activity } from "lucide-react";
+import { RideStatus } from "../../../../generated/prisma";
 
 export const dynamic = "force-dynamic";
+
+const ACTIVE_STATUSES: RideStatus[] = [
+  RideStatus.REQUESTED,
+  RideStatus.MATCHED,
+  RideStatus.EN_ROUTE,
+  RideStatus.ARRIVED,
+  RideStatus.IN_TRIP,
+];
 
 async function getStats(partnerId: string, commissionPct: number) {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
   try {
-    const [todayBookings, todayCompleted, recent, allTimeCompleted] =
+    const [todayBookings, todayCompleted, activeRides, recent] =
       await Promise.all([
         prisma.ride.count({
           where: {
@@ -28,6 +37,12 @@ async function getStats(partnerId: string, commissionPct: number) {
           },
           select: { fareFinal: true },
         }),
+        prisma.ride.count({
+          where: {
+            bookedByPartnerId: partnerId,
+            status: { in: ACTIVE_STATUSES },
+          },
+        }),
         prisma.ride.findMany({
           where: { bookedByPartnerId: partnerId },
           orderBy: { createdAt: "desc" },
@@ -42,28 +57,20 @@ async function getStats(partnerId: string, commissionPct: number) {
             createdAt: true,
           },
         }),
-        prisma.ride.findMany({
-          where: { bookedByPartnerId: partnerId, status: "COMPLETED" },
-          select: { fareFinal: true },
-        }),
       ]);
 
     const todayCommission =
       (todayCompleted.reduce((s, r) => s + (r.fareFinal ?? 0), 0) *
         commissionPct) /
       100;
-    const allTimeCommission =
-      (allTimeCompleted.reduce((s, r) => s + (r.fareFinal ?? 0), 0) *
-        commissionPct) /
-      100;
 
-    return { todayBookings, todayCommission, recent, allTimeCommission };
+    return { todayBookings, todayCommission, activeRides, recent };
   } catch {
     return {
       todayBookings: 0,
       todayCommission: 0,
+      activeRides: 0,
       recent: [],
-      allTimeCommission: 0,
     };
   }
 }
@@ -75,7 +82,7 @@ export default async function PartnerHomePage() {
     select: { commissionPct: true },
   });
   const commissionPct = partner?.commissionPct ?? 10;
-  const { todayBookings, todayCommission, recent, allTimeCommission } =
+  const { todayBookings, todayCommission, activeRides, recent } =
     await getStats(session.partnerId, commissionPct);
 
   return (
@@ -93,17 +100,12 @@ export default async function PartnerHomePage() {
           icon={Banknote}
           tint="green"
         />
-      </div>
-      <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-        <div className="text-xs uppercase tracking-wider text-slate-500">
-          Lifetime commission
-        </div>
-        <div className="mt-1 text-2xl font-bold text-slate-900">
-          {formatCurrency(allTimeCommission)}
-        </div>
-        <div className="mt-1 text-[11px] text-slate-400">
-          {commissionPct}% on completed bookings
-        </div>
+        <Stat
+          label="Active rides"
+          value={activeRides}
+          icon={Activity}
+          tint="amber"
+        />
       </div>
 
       <Link
@@ -127,7 +129,11 @@ export default async function PartnerHomePage() {
         ) : (
           <div className="divide-y divide-slate-100">
             {recent.map((r) => (
-              <div key={r.id} className="px-4 py-3">
+              <Link
+                key={r.id}
+                href={`/p/bookings/${r.id}`}
+                className="block px-4 py-3 transition hover:bg-slate-50"
+              >
                 <div className="flex items-center justify-between">
                   <div className="truncate">
                     <div className="truncate text-sm font-medium text-slate-900">
@@ -147,7 +153,7 @@ export default async function PartnerHomePage() {
                     {formatCurrency(r.fareFinal ?? r.fareEstimate)}
                   </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
@@ -165,12 +171,14 @@ function Stat({
   label: string;
   value: React.ReactNode;
   icon: React.ComponentType<{ className?: string }>;
-  tint: "brand" | "green";
+  tint: "brand" | "green" | "amber";
 }) {
   const tintClasses =
     tint === "green"
       ? "bg-green-50 text-green-600"
-      : "bg-brand-50 text-brand-600";
+      : tint === "amber"
+        ? "bg-amber-50 text-amber-600"
+        : "bg-brand-50 text-brand-600";
   return (
     <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
       <div className={`mb-2 inline-flex rounded-lg p-2 ${tintClasses}`}>

@@ -306,6 +306,11 @@ model Partner {
   commissionPct Float         @default(10) // % of fare paid to partner
   status        PartnerStatus @default(PENDING)
   reviewNote    String?
+  // Bank details for payouts (collected from partner via PWA)
+  bankAccountName   String?
+  bankAccountNumber String?
+  bankIfsc          String?
+  bankName          String?
   documents     PartnerDocument[]
   bookings      Ride[]        @relation("PartnerBookings")
   payouts       Payout[]
