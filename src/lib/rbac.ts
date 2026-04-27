@@ -1,11 +1,5 @@
 import type { AdminRole } from "../../generated/prisma";
 
-// ============================================================================
-// SOURCE OF TRUTH: Excel matrix at d:\chrome_download\admin_panel_navigation_rbac.xlsx
-// Each FeatureKey corresponds to a row's "Sub Feature"; the role list is the
-// columns marked "Yes".
-// ============================================================================
-
 export type Surface =
   | "dashboard"
   | "rides"
