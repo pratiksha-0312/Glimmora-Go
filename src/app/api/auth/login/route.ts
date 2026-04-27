@@ -8,10 +8,7 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
-export const dynamic = "force-dynamic";
-
 export async function POST(req: Request) {
-  console.log("[login] POST called, DB_URL set:", !!process.env.DATABASE_URL);
   const body = await req.json().catch(() => null);
   const parsed = loginSchema.safeParse(body);
   if (!parsed.success) {

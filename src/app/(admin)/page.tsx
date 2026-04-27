@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
-import { DashboardGreeting } from "@/components/dashboard/DashboardGreeting";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { StatCard } from "@/components/ui/StatCard";
-<<<<<<< HEAD
 import { Badge } from "@/components/ui/Badge";
 import {
   Car,
@@ -22,14 +21,6 @@ import { canFeature } from "@/lib/rbac";
 import { LiveRides } from "./LiveRides";
 import { RevenueChart } from "./RevenueChart";
 import { RideStatus } from "../../../generated/prisma";
-=======
-import { Car, Users, Banknote, AlertTriangle } from "lucide-react";
-import { formatCurrency } from "@/lib/utils";
-import { requireAccess } from "@/lib/auth";
-import { RevenueChart } from "@/components/ui/RevenueChart";
-import { LiveMetrics } from "@/components/dashboard/LiveMetrics";
-import { RecentRidesTable } from "@/components/dashboard/RecentRidesTable";
->>>>>>> fff2399 (Dashboard and coupons page UI enhancement)
 
 export const dynamic = "force-dynamic";
 
@@ -49,7 +40,6 @@ async function getDashboardData(cityId: string | null) {
   startOfYesterday.setDate(startOfYesterday.getDate() - 1);
   const cityFilter = cityId ? { cityId } : {};
 
-<<<<<<< HEAD
   const [
     ridesToday,
     completedToday,
@@ -158,47 +148,6 @@ async function getDashboardData(cityId: string | null) {
       select: { fareFinal: true, completedAt: true },
     }),
   ]);
-=======
-  try {
-    const [
-      ridesToday, completedToday, activeDrivers, sosCount, recentRides,
-      newSignups, referralSignups,
-    ] = await Promise.all([
-        prisma.ride.count({
-          where: { ...cityFilter, createdAt: { gte: startOfDay } },
-        }),
-        prisma.ride.findMany({
-          where: {
-            ...cityFilter,
-            completedAt: { gte: startOfDay },
-            status: "COMPLETED",
-          },
-          select: { fareFinal: true },
-        }),
-        prisma.driver.count({
-          where: { ...cityFilter, online: true, status: "APPROVED" },
-        }),
-        prisma.ride.count({
-          where: {
-            ...cityFilter,
-            sosTriggered: true,
-            createdAt: { gte: startOfDay },
-          },
-        }),
-        prisma.ride.findMany({
-          where: cityFilter,
-          orderBy: { createdAt: "desc" },
-          take: 30,
-          include: {
-            rider: { select: { phone: true, name: true } },
-            driver: { select: { name: true } },
-            city: { select: { name: true } },
-          },
-        }),
-        prisma.rider.count({ where: { createdAt: { gte: startOfDay } } }),
-        prisma.referral.count({ where: { createdAt: { gte: startOfDay } } }),
-      ]);
->>>>>>> fff2399 (Dashboard and coupons page UI enhancement)
 
   const revenueToday = completedToday.reduce(
     (s, r) => s + (r.fareFinal ?? 0),
@@ -209,29 +158,11 @@ async function getDashboardData(cityId: string | null) {
     0
   );
 
-<<<<<<< HEAD
   const todayHourly = Array(24).fill(0) as number[];
   for (const r of completedToday) {
     if (!r.completedAt) continue;
     const h = new Date(r.completedAt).getHours();
     todayHourly[h] += r.fareFinal ?? 0;
-=======
-    return {
-      ridesToday, revenueToday, activeDrivers, sosCount, recentRides,
-      newSignups, referralSignups,
-    };
-  } catch {
-    return {
-      ridesToday: 0,
-      revenueToday: 0,
-      activeDrivers: 0,
-      sosCount: 0,
-      recentRides: [],
-      newSignups: 0,
-      referralSignups: 0,
-      dbError: true as const,
-    };
->>>>>>> fff2399 (Dashboard and coupons page UI enhancement)
   }
   const yesterdayHourly = Array(24).fill(0) as number[];
   for (const r of completedYesterday) {
@@ -307,7 +238,6 @@ export default async function DashboardPage() {
 
   return (
     <div>
-<<<<<<< HEAD
       <PageHeader
         title="Operations"
         description="Live state of rides, drivers, alerts and revenue"
@@ -315,18 +245,12 @@ export default async function DashboardPage() {
 
       {dbError && (
         <div className="mb-6 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200">
-=======
-      <DashboardGreeting name={session.name} />
-
-      {"dbError" in stats && (
-        <div className="mb-6 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 ring-1 ring-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:ring-amber-800">
->>>>>>> fff2399 (Dashboard and coupons page UI enhancement)
           Database not reachable. Showing empty values. Run{" "}
-          <code className="rounded bg-amber-100 px-1.5 py-0.5 text-xs dark:bg-amber-900/50">
+          <code className="rounded bg-amber-100 px-1.5 py-0.5 text-xs">
             npm run db:push
           </code>{" "}
           and{" "}
-          <code className="rounded bg-amber-100 px-1.5 py-0.5 text-xs dark:bg-amber-900/50">
+          <code className="rounded bg-amber-100 px-1.5 py-0.5 text-xs">
             npm run db:seed
           </code>{" "}
           once your Postgres is running.
@@ -390,7 +314,6 @@ export default async function DashboardPage() {
         )}
       </div>
 
-<<<<<<< HEAD
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           {showLiveRides && <LiveRides initial={data.liveRides} />}
@@ -645,23 +568,6 @@ export default async function DashboardPage() {
           </div>
           )}
         </div>
-=======
-      <div className="mt-6">
-        <LiveMetrics
-          signups={stats.newSignups}
-          sosAlerts={stats.sosCount}
-          driversOnline={stats.activeDrivers}
-          referralSignups={stats.referralSignups}
-        />
-      </div>
-
-      <div className="mt-6">
-        <RevenueChart />
-      </div>
-
-      <div className="mt-6">
-        <RecentRidesTable rides={stats.recentRides} />
->>>>>>> fff2399 (Dashboard and coupons page UI enhancement)
       </div>
     </div>
   );
