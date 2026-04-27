@@ -20,7 +20,9 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   const parsed = schema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    const first = parsed.error.errors[0];
+    const msg = first ? `${first.path.join(".")}: ${first.message}` : "Invalid input";
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 
   const { code, description, discountType, amount, usageLimit, validUntil } =
@@ -37,6 +39,7 @@ export async function POST(req: Request) {
         validUntil: new Date(validUntil),
       },
     });
+<<<<<<< HEAD
 
     await logAudit({
       session: auth.session,
@@ -47,6 +50,9 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ ok: true, coupon });
+=======
+    return NextResponse.json(coupon);
+>>>>>>> fff2399 (Dashboard and coupons page UI enhancement)
   } catch (err) {
     return NextResponse.json(
       { error: "Code already exists" },

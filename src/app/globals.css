@@ -2,21 +2,159 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── CSS custom properties ──────────────────────────────────────── */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --bg:           #f8fafc;  /* page background   */
+  --fg:           #0f172a;  /* primary text      */
+  --surface:      #ffffff;  /* card / panel      */
+  --surface-alt:  #f1f5f9;  /* subtle background */
+  --border:       #e2e8f0;  /* borders           */
+  --muted:        #64748b;  /* secondary text    */
 }
 
-html, body {
-  height: 100%;
+.dark {
+  --bg:           #0d1117;
+  --fg:           #e6edf3;
+  --surface:      #161b27;
+  --surface-alt:  #0d1117;
+  --border:       #21262d;
+  --muted:        #8b929e;
 }
+
+/* ─── Base ───────────────────────────────────────────────────────── */
+html, body { height: 100%; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--bg);
+  color: var(--fg);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
 }
 
-* {
-  box-sizing: border-box;
+* { box-sizing: border-box; }
+
+/* ─── Smooth theme transitions ───────────────────────────────────── */
+*,
+*::before,
+*::after {
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Don't slow down interactive micro-animations */
+button:active,
+a:active,
+input:focus,
+select:focus,
+textarea:focus {
+  transition-duration: 0ms;
+}
+
+/* ─── Dark: surface overrides (covers pages without explicit dark: ) */
+/*
+   Specificity = 0-1-1  which beats bare Tailwind utilities (0-1-0).
+   Explicit dark:* on individual components will always win (0-2-0).
+*/
+
+/* Backgrounds */
+html.dark .bg-white      { background-color: #161b27; }
+html.dark .bg-slate-50   { background-color: #0d1117; }
+html.dark .bg-slate-100  { background-color: #161b27; }
+html.dark .bg-slate-200  { background-color: #21262d; }
+
+/* Borders */
+html.dark .border-slate-100 { border-color: #21262d; }
+html.dark .border-slate-200 { border-color: #21262d; }
+html.dark .border-slate-300 { border-color: #30363d; }
+
+/* Table dividers */
+html.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #21262d; }
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #21262d; }
+
+/* Text */
+html.dark .text-slate-900 { color: #e6edf3; }
+html.dark .text-slate-800 { color: #cdd9e5; }
+html.dark .text-slate-700 { color: #adbac7; }
+html.dark .text-slate-600 { color: #8b929e; }
+html.dark .text-slate-500 { color: #636e7b; }
+html.dark .text-slate-400 { color: #4d5566; }
+
+/* Hover */
+html.dark .hover\:bg-slate-50:hover  { background-color: #1c2230; }
+html.dark .hover\:bg-slate-100:hover { background-color: #21262d; }
+
+/* Shadows */
+html.dark .shadow-sm { box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.6); }
+html.dark .shadow    { box-shadow: 0 2px 8px 0 rgb(0 0 0 / 0.7); }
+html.dark .shadow-lg { box-shadow: 0 8px 24px 0 rgb(0 0 0 / 0.8); }
+
+/* ─── Dark: form elements ─────────────────────────────────────────── */
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark textarea,
+html.dark select {
+  background-color: #161b27;
+  border-color: #30363d;
+  color: #e6edf3;
+}
+html.dark input::placeholder,
+html.dark textarea::placeholder { color: #4d5566; }
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus  { border-color: #d97706; }
+html.dark input:disabled,
+html.dark textarea:disabled,
+html.dark select:disabled {
+  background-color: #0d1117;
+  color: #4d5566;
+  cursor: not-allowed;
+}
+
+/* ─── Dark: alert / callout boxes ────────────────────────────────── */
+html.dark .bg-amber-50   { background-color: rgb(120 53 15 / 0.15); }
+html.dark .text-amber-800 { color: #fbbf24; }
+html.dark .ring-amber-200 { --tw-ring-color: rgb(120 53 15 / 0.4); }
+html.dark .bg-amber-100  { background-color: rgb(120 53 15 / 0.25); }
+
+html.dark .bg-red-50    { background-color: rgb(127 29 29 / 0.2); }
+html.dark .text-red-700 { color: #f87171; }
+html.dark .ring-red-200 { --tw-ring-color: rgb(127 29 29 / 0.4); }
+
+html.dark .bg-green-50   { background-color: rgb(20 83 45 / 0.2); }
+html.dark .text-green-700 { color: #4ade80; }
+html.dark .ring-green-200 { --tw-ring-color: rgb(20 83 45 / 0.4); }
+
+html.dark .bg-blue-50   { background-color: rgb(30 58 138 / 0.2); }
+html.dark .text-blue-700 { color: #60a5fa; }
+html.dark .ring-blue-200 { --tw-ring-color: rgb(30 58 138 / 0.4); }
+
+/* ─── Date input — always keep in light color-scheme ─────────────── */
+/*
+   Browser-native date segments (dd/mm/yyyy) and the calendar icon do
+   not inherit CSS colour. Keeping every date input on a white/light
+   background with color-scheme:light is the only approach that works
+   consistently across all Chromium versions on Windows.
+   The white background is preserved in dark mode via the override below.
+*/
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="time"] {
+  color-scheme: light;
+}
+
+/* Override the global dark-input rule so white background is kept */
+html.dark input[type="date"],
+html.dark input[type="datetime-local"],
+html.dark input[type="month"],
+html.dark input[type="time"] {
+  background-color: #ffffff !important;
+  color: #1e293b !important;
+  color-scheme: light;
+}
+
+/* ─── Dark: inline code ──────────────────────────────────────────── */
+html.dark code {
+  background-color: #334155;
+  color: #e2e8f0;
 }

@@ -11,13 +11,14 @@ export function Badge({
   variant?: Variant;
   className?: string;
 }) {
-  const variants = {
-    default: "bg-slate-100 text-slate-700",
-    success: "bg-green-50 text-green-700 ring-green-200",
-    warning: "bg-amber-50 text-amber-700 ring-amber-200",
-    danger: "bg-red-50 text-red-700 ring-red-200",
-    info: "bg-blue-50 text-blue-700 ring-blue-200",
+  const variants: Record<Variant, string> = {
+    default: "bg-slate-100 text-slate-700 ring-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:ring-slate-600",
+    success: "bg-green-50 text-green-700 ring-green-200 dark:bg-green-950/60 dark:text-green-400 dark:ring-green-800",
+    warning: "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:ring-amber-800",
+    danger:  "bg-red-50 text-red-700 ring-red-200 dark:bg-red-950/60 dark:text-red-400 dark:ring-red-800",
+    info:    "bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-950/60 dark:text-blue-400 dark:ring-blue-800",
   };
+
   return (
     <span
       className={cn(

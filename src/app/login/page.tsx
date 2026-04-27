@@ -190,6 +190,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
+<<<<<<< HEAD
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#fdf8f4] via-white to-[#f3e8db] p-4 font-sans">
       <div className="w-full max-w-md rounded-xl border border-[#f0e4d6] bg-white p-8 shadow-lg">
         <div className="mb-6 text-center">
@@ -200,6 +201,13 @@ export default function LoginPage() {
               alt="Glimmora Go"
               className="h-12 w-12 rounded-lg object-contain"
             />
+=======
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-brand-50 via-white to-brand-100 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl ring-1 ring-slate-200">
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 text-xl font-black text-white">
+            GG
+>>>>>>> fff2399 (Dashboard and coupons page UI enhancement)
           </div>
           <h1 className="mb-2 text-2xl font-semibold text-[#3a2d28]">Welcome Back !</h1>
           <p className="text-sm text-[#6b5349]">Log into your account</p>

@@ -41,7 +41,7 @@ export function ReportsCharts({
       {
         label: "Rides",
         data: days.map((d) => d.rides),
-        backgroundColor: "#f16c1e",
+        backgroundColor: "#d97706",
         borderRadius: 4,
       },
     ],
@@ -68,7 +68,7 @@ export function ReportsCharts({
       {
         data: channelLabels.map((k) => channels[k]),
         backgroundColor: [
-          "#f16c1e",
+          "#d97706",
           "#2563eb",
           "#059669",
           "#d97706",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 
 export function CouponRowActions({
   id,
@@ -33,20 +34,25 @@ export function CouponRowActions({
   }
 
   return (
-    <div className="flex justify-end gap-2 text-xs font-medium">
+    <div className="flex items-center gap-2">
       <button
         onClick={toggle}
         disabled={loading}
-        className="text-slate-600 hover:text-slate-900 disabled:opacity-50"
+        className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition disabled:opacity-50 ${
+          active
+            ? "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700"
+            : "border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+        }`}
       >
         {active ? "Disable" : "Enable"}
       </button>
       <button
         onClick={remove}
         disabled={loading}
-        className="text-red-600 hover:text-red-700 disabled:opacity-50"
+        className="flex items-center justify-center rounded-lg border border-red-200 p-1.5 text-red-500 transition hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950/30"
+        title="Delete coupon"
       >
-        Delete
+        <Trash2 className="h-3.5 w-3.5" />
       </button>
     </div>
   );

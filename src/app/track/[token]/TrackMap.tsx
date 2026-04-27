@@ -43,7 +43,7 @@ const dropIcon = L.divIcon({
 
 const driverIcon = L.divIcon({
   className: "",
-  html: `<div style="width:20px;height:20px;border-radius:50%;background:#f16c1e;border:3px solid white;box-shadow:0 2px 6px rgba(241,108,30,0.5);animation:pulse 2s ease-in-out infinite"></div>`,
+  html: `<div style="width:20px;height:20px;border-radius:50%;background:#d97706;border:3px solid white;box-shadow:0 2px 6px rgba(217,119,6,0.5);animation:pulse 2s ease-in-out infinite"></div>`,
   iconSize: [20, 20],
   iconAnchor: [10, 10],
 });
@@ -130,7 +130,7 @@ export function TrackMap({ data }: { data: TrackData }) {
       <Polyline
         positions={routeLine}
         pathOptions={{
-          color: "#f16c1e",
+          color: "#d97706",
           weight: 4,
           opacity: 0.6,
           dashArray: driver ? "8 8" : undefined,
