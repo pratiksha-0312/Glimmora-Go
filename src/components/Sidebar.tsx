@@ -39,7 +39,6 @@ type NavItem = {
   label: string;
   icon: typeof Car;
   surface: Surface;
-  matchView?: string;
   exact?: boolean;
 };
 type NavGroup = {
@@ -63,9 +62,9 @@ const GROUPS: NavGroup[] = [
     label: "Ride Operations",
     icon: Car,
     items: [
-      { href: "/rides?view=live", label: "Live Rides", icon: Activity, surface: "rides", matchView: "live" },
-      { href: "/rides?view=scheduled", label: "Scheduled Rides", icon: Calendar, surface: "rides", matchView: "scheduled" },
-      { href: "/rides?view=history", label: "Ride History", icon: History, surface: "rides", matchView: "history" },
+      { href: "/rides?view=live", label: "Live Rides", icon: Activity, surface: "rides" },
+      { href: "/rides?view=scheduled", label: "Scheduled Rides", icon: Calendar, surface: "rides" },
+      { href: "/rides?view=history", label: "Ride History", icon: History, surface: "rides" },
     ],
   },
   {
@@ -155,36 +154,55 @@ function useSosCount(enabled: boolean) {
   return count;
 }
 
-function pathnameOf(href: string): string {
+function parseHref(href: string): { path: string; params: Record<string, string> } {
   const q = href.indexOf("?");
-  return q === -1 ? href : href.slice(0, q);
+  if (q === -1) return { path: href, params: {} };
+  const path = href.slice(0, q);
+  const params = Object.fromEntries(new URLSearchParams(href.slice(q + 1)));
+  return { path, params };
 }
 
+// An item is "active" when both its pathname and any query params it pins
+// match the URL. Items that share a pathname with siblings that pin a
+// different param value (e.g. Driver List vs Verification & Documents,
+// both at /drivers) deactivate when one of the siblings' params is set.
 function isItemActive(
   item: NavItem,
+  siblings: NavItem[],
   pathname: string,
-  view: string | null
+  searchParams: URLSearchParams
 ): boolean {
-  const target = pathnameOf(item.href);
-  if (target === "/") {
-    return pathname === "/";
+  const { path, params } = parseHref(item.href);
+  if (path === "/") return pathname === "/";
+
+  if (pathname !== path) {
+    if (item.exact) return false;
+    return pathname.startsWith(path + "/");
   }
-  if (item.matchView !== undefined) {
-    return pathname === "/rides" && view === item.matchView;
+
+  // Same pathname — disambiguate by query params.
+  const itemKeys = Object.keys(params);
+  if (itemKeys.length > 0) {
+    // This item pins specific params; require an exact match on each.
+    return itemKeys.every((k) => searchParams.get(k) === params[k]);
   }
-  if (target === "/rides") {
-    return pathname === "/rides" && !view;
+
+  // This item has no query params (the "default" sibling). It's active only
+  // if no sibling param is currently set on the URL.
+  for (const s of siblings) {
+    if (s.href === item.href) continue;
+    const sParsed = parseHref(s.href);
+    if (sParsed.path !== path) continue;
+    for (const [k, v] of Object.entries(sParsed.params)) {
+      if (searchParams.get(k) === v) return false;
+    }
   }
-  if (item.exact) {
-    return pathname === target;
-  }
-  return pathname === target || pathname.startsWith(target + "/");
+  return true;
 }
 
 export function Sidebar({ role }: { role: AdminRole }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const view = searchParams.get("view");
   const sosCount = useSosCount(canAccess(role, "sos"));
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -206,13 +224,14 @@ export function Sidebar({ role }: { role: AdminRole }) {
 
   const activeGroupId =
     visibleGroups.find((g) =>
-      g.items.some((it) => isItemActive(it, pathname, view))
+      g.items.some((it) => isItemActive(it, g.items, pathname, searchParams))
     )?.id ?? null;
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
+    const empty = new URLSearchParams();
     for (const g of GROUPS) {
-      if (g.items.some((it) => isItemActive(it, pathname, null))) {
+      if (g.items.some((it) => isItemActive(it, g.items, pathname, empty))) {
         init[g.id] = true;
       }
     }
@@ -239,7 +258,7 @@ export function Sidebar({ role }: { role: AdminRole }) {
         {visibleGroups.map((group) => {
           if (group.id === "ops-dashboard") {
             const item = group.items[0];
-            const active = isItemActive(item, pathname, view);
+            const active = isItemActive(item, group.items, pathname, searchParams);
             const Icon = group.icon;
             return (
               <Link
@@ -260,7 +279,7 @@ export function Sidebar({ role }: { role: AdminRole }) {
 
           if (group.items.length === 1) {
             const item = group.items[0];
-            const active = isItemActive(item, pathname, view);
+            const active = isItemActive(item, group.items, pathname, searchParams);
             const Icon = group.icon;
             return (
               <Link
@@ -311,7 +330,7 @@ export function Sidebar({ role }: { role: AdminRole }) {
               {isExpanded && (
                 <div className="mt-1 space-y-0.5 pl-3">
                   {group.items.map((it) => {
-                    const active = isItemActive(it, pathname, view);
+                    const active = isItemActive(it, group.items, pathname, searchParams);
                     const isSos = it.surface === "sos";
                     const showBadge = isSos && sosCount > 0;
                     const Icon = it.icon;
