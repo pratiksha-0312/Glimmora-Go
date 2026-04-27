@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireWrite } from "@/lib/apiAuth";
-import { logAudit } from "@/lib/audit";
 
 const schema = z.object({
   code: z.string().min(3).max(32),
@@ -39,20 +38,7 @@ export async function POST(req: Request) {
         validUntil: new Date(validUntil),
       },
     });
-<<<<<<< HEAD
-
-    await logAudit({
-      session: auth.session,
-      action: "coupon.create",
-      entityType: "Coupon",
-      entityId: coupon.id,
-      summary: `${coupon.code} · ${discountType} ${amount}`,
-    });
-
-    return NextResponse.json({ ok: true, coupon });
-=======
     return NextResponse.json(coupon);
->>>>>>> fff2399 (Dashboard and coupons page UI enhancement)
   } catch (err) {
     return NextResponse.json(
       { error: "Code already exists" },
