@@ -62,9 +62,9 @@ const GROUPS: NavGroup[] = [
     label: "Ride Operations",
     icon: Car,
     items: [
-      { href: "/rides?view=live", label: "Live Rides", icon: Activity, surface: "rides" },
-      { href: "/rides?view=scheduled", label: "Scheduled Rides", icon: Calendar, surface: "rides" },
-      { href: "/rides?view=history", label: "Ride History", icon: History, surface: "rides" },
+      { href: "/ride-operations/live", label: "Live Rides", icon: Activity, surface: "rides" },
+      { href: "/ride-operations/scheduled", label: "Scheduled Rides", icon: Calendar, surface: "rides" },
+      { href: "/ride-operations/history", label: "Ride History", icon: History, surface: "rides" },
     ],
   },
   {
@@ -72,10 +72,10 @@ const GROUPS: NavGroup[] = [
     label: "Driver Operations",
     icon: Users,
     items: [
-      { href: "/drivers", label: "Driver List", icon: Users, surface: "drivers" },
-      { href: "/drivers?status=PENDING", label: "Verification & Documents", icon: ShieldCheck, surface: "drivers" },
-      { href: "/subscriptions", label: "Subscriptions", icon: Wallet, surface: "subscriptions" },
-      { href: "/referrals", label: "Driver Referrals", icon: Share2, surface: "referrals" },
+      { href: "/driver-operations/drivers", label: "Driver List", icon: Users, surface: "drivers" },
+      { href: "/driver-operations/drivers?status=PENDING", label: "Verification & Documents", icon: ShieldCheck, surface: "drivers" },
+      { href: "/driver-operations/subscriptions", label: "Subscriptions", icon: Wallet, surface: "subscriptions" },
+      { href: "/driver-operations/referrals", label: "Driver Referrals", icon: Share2, surface: "referrals" },
     ],
   },
   {
@@ -83,10 +83,10 @@ const GROUPS: NavGroup[] = [
     label: "Pricing & Promotions",
     icon: Banknote,
     items: [
-      { href: "/fares", label: "Fare Configuration", icon: Banknote, surface: "fares" },
-      { href: "/concessions", label: "Concession Pricing", icon: Percent, surface: "concessions" },
-      { href: "/coupons", label: "Coupons", icon: Ticket, surface: "coupons" },
-      { href: "/cities", label: "City Pricing Rules", icon: MapPin, surface: "cities", exact: true },
+      { href: "/pricing-promotions/fares", label: "Fare Configuration", icon: Banknote, surface: "fares" },
+      { href: "/pricing-promotions/concessions", label: "Concession Pricing", icon: Percent, surface: "concessions" },
+      { href: "/pricing-promotions/coupons", label: "Coupons", icon: Ticket, surface: "coupons" },
+      { href: "/pricing-promotions/cities", label: "City Pricing Rules", icon: MapPin, surface: "cities", exact: true },
     ],
   },
   {
@@ -94,8 +94,8 @@ const GROUPS: NavGroup[] = [
     label: "Safety Monitoring",
     icon: Shield,
     items: [
-      { href: "/sos", label: "SOS Alerts", icon: AlertTriangle, surface: "sos" },
-      { href: "/tracking", label: "Ride Share Tracking", icon: MapPin, surface: "tracking" },
+      { href: "/safety/sos", label: "SOS Alerts", icon: AlertTriangle, surface: "sos" },
+      { href: "/safety/tracking", label: "Ride Share Tracking", icon: MapPin, surface: "tracking" },
     ],
   },
   {
@@ -104,7 +104,7 @@ const GROUPS: NavGroup[] = [
     icon: Store,
     items: [
       { href: "/partners", label: "Partner List", icon: Store, surface: "partners" },
-      { href: "/corporates", label: "Enterprise", icon: Building2, surface: "corporates" },
+      { href: "/partners/enterprise", label: "Enterprise", icon: Building2, surface: "corporates" },
     ],
   },
   {
@@ -120,11 +120,11 @@ const GROUPS: NavGroup[] = [
     label: "Configuration",
     icon: Settings,
     items: [
-      { href: "/cities/archetype", label: "City Archetype", icon: Tag, surface: "cities", exact: true },
-      { href: "/admins", label: "Admin Users", icon: ShieldCheck, surface: "admins", exact: true },
-      { href: "/admins/roles", label: "Roles & Permissions", icon: KeyRound, surface: "admins" },
-      { href: "/notifications", label: "Notification Logs", icon: Bell, surface: "notifications" },
-      { href: "/audit", label: "Audit Logs", icon: FileSearch, surface: "audit" },
+      { href: "/configuration/city-archetype", label: "City Archetype", icon: Tag, surface: "cities", exact: true },
+      { href: "/configuration/admins", label: "Admin Users", icon: ShieldCheck, surface: "admins", exact: true },
+      { href: "/configuration/admins/roles", label: "Roles & Permissions", icon: KeyRound, surface: "admins" },
+      { href: "/configuration/notifications", label: "Notification Logs", icon: Bell, surface: "notifications" },
+      { href: "/configuration/audit", label: "Audit Logs", icon: FileSearch, surface: "audit" },
     ],
   },
 ];

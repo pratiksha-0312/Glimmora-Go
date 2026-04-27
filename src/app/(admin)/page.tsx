@@ -410,7 +410,7 @@ export default async function DashboardPage() {
                   Active drivers
                 </h2>
                 <Link
-                  href="/drivers"
+                  href="/driver-operations/drivers"
                   className="text-xs font-medium text-brand-600 hover:text-brand-700"
                 >
                   All drivers →
@@ -441,7 +441,7 @@ export default async function DashboardPage() {
                           }
                         />
                         <Link
-                          href={`/drivers/${d.id}`}
+                          href={`/driver-operations/drivers/${d.id}`}
                           className="min-w-0 flex-1 truncate text-sm text-slate-900 hover:text-brand-700"
                         >
                           <span className="font-medium">{d.name}</span>
@@ -476,7 +476,7 @@ export default async function DashboardPage() {
                   SOS feed
                 </h2>
                 <Link
-                  href="/sos"
+                  href="/safety/sos"
                   className="text-xs font-medium text-brand-600 hover:text-brand-700"
                 >
                   All SOS →
@@ -509,7 +509,7 @@ export default async function DashboardPage() {
                               {r.status}
                             </Badge>
                             <Link
-                              href={`/rides?ride=${r.id}`}
+                              href={`/ride-operations?ride=${r.id}`}
                               className="text-[11px] font-medium text-brand-600 hover:text-brand-700"
                             >
                               Open

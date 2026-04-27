@@ -148,7 +148,7 @@ export default async function TicketDetail({
                   <dt className="text-xs text-slate-500">Driver</dt>
                   <dd>
                     <Link
-                      href={`/drivers/${ticket.driver.id}`}
+                      href={`/driver-operations/drivers/${ticket.driver.id}`}
                       className="font-medium text-slate-900 hover:text-brand-600"
                     >
                       {ticket.driver.name}
@@ -164,7 +164,7 @@ export default async function TicketDetail({
                   <dt className="text-xs text-slate-500">Ride</dt>
                   <dd>
                     <Link
-                      href={`/rides`}
+                      href={`/ride-operations`}
                       className="font-medium text-slate-900 hover:text-brand-600"
                     >
                       {ticket.ride.pickupAddress} → {ticket.ride.dropAddress}

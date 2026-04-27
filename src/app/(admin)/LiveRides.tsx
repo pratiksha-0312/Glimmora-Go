@@ -73,7 +73,7 @@ export function LiveRides({ initial }: { initial: LiveRide[] }) {
           )}
         </div>
         <Link
-          href="/rides"
+          href="/ride-operations"
           className="text-xs font-medium text-brand-600 hover:text-brand-700"
         >
           All rides →
