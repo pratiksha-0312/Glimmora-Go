@@ -74,7 +74,7 @@ export function TopUpForm({ corporateId }: { corporateId: string }) {
         <button
           disabled={loading || amount <= 0}
           onClick={() => submit(-Math.abs(amount))}
-          className="flex-1 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+          className="flex-1 rounded-lg border border-slate-200 py-2 text-xs font-semibold text-slate-700 hover:bg-[#fbf7f2] disabled:opacity-60"
         >
           − Debit
         </button>

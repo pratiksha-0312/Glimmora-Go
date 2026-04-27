@@ -66,6 +66,10 @@ export default async function PartnersPage({
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Partner Management" },
+          { label: "Partners" },
+        ]}
         title="Partners"
         description="Kirana, CSC, metro counter, hospital desk — agents that book rides on behalf of walk-in customers"
       />
@@ -79,8 +83,8 @@ export default async function PartnersPage({
               href={s === "ALL" ? "/partners" : `/partners?status=${s}`}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                 active
-                  ? "bg-brand-600 text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                  ? "bg-[#a57865] text-white"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
               }`}
             >
               {s === "ALL" ? "All" : s}
@@ -89,10 +93,10 @@ export default async function PartnersPage({
         })}
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Shop / counter</th>
                 <th className="px-5 py-3 text-left">Type</th>
@@ -120,7 +124,7 @@ export default async function PartnersPage({
                 </tr>
               ) : (
                 partners.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-50">
+                  <tr key={p.id} className="hover:bg-[#fbf7f2]">
                     <td className="px-5 py-3 font-medium">
                       <Link
                         href={`/partners/${p.id}`}

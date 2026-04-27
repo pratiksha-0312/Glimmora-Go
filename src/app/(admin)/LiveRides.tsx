@@ -57,7 +57,7 @@ export function LiveRides({ initial }: { initial: LiveRide[] }) {
   }, []);
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
@@ -88,7 +88,7 @@ export function LiveRides({ initial }: { initial: LiveRide[] }) {
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-2.5 text-left">Rider</th>
                 <th className="px-5 py-2.5 text-left">Driver</th>
@@ -106,7 +106,7 @@ export function LiveRides({ initial }: { initial: LiveRide[] }) {
                   <tr
                     key={r.id}
                     className={
-                      r.sosTriggered ? "bg-red-50/40" : "hover:bg-slate-50"
+                      r.sosTriggered ? "bg-red-50/40" : "hover:bg-[#fbf7f2]"
                     }
                   >
                     <td className="px-5 py-2.5">

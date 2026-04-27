@@ -130,7 +130,10 @@ export function EditAdminModal({
   const sectionTitle = "mb-3 text-sm font-semibold text-[#3a2d28]";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 px-4 py-10 text-left">
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-10 text-left"
+      style={{ background: "rgba(58, 45, 40, 0.32)" }}
+    >
       <div className="w-full max-w-2xl rounded-xl border border-[#f0e4d6] bg-white shadow-xl">
         <div className="flex items-center justify-between border-b border-[#f0e4d6] px-6 py-4">
           <h2 className="text-base font-semibold text-[#3a2d28]">Edit Admin</h2>

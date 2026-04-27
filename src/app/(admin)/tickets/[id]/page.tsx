@@ -60,6 +60,10 @@ export default async function TicketDetail({
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Tickets", href: "/tickets" },
+          { label: "Ticket" },
+        ]}
         title={ticket.subject}
         description={`${ticket.category.replace(/_/g, " ")} · ${ticket.city?.name ?? "Unassigned city"}`}
         action={

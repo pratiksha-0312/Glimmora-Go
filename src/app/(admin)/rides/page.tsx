@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { PageTabs } from "@/components/ui/Tabs";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { rideStatusVariant } from "@/lib/format";
@@ -7,7 +8,6 @@ import { RideRowActions } from "./RideRowActions";
 import { AutoRefresh } from "./AutoRefresh";
 import { requireAccess, sessionCanWrite } from "@/lib/auth";
 import { RideStatus } from "../../../../generated/prisma";
-import { Activity, Calendar, History, List } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -34,12 +34,19 @@ const HISTORY_STATUSES: RideStatus[] = [
 
 type View = "all" | "live" | "scheduled" | "history";
 
-const VIEWS: { id: View; label: string; icon: typeof Activity }[] = [
-  { id: "all", label: "All Rides", icon: List },
-  { id: "live", label: "Live Rides", icon: Activity },
-  { id: "scheduled", label: "Scheduled", icon: Calendar },
-  { id: "history", label: "History", icon: History },
-];
+const VIEW_LABEL: Record<View, string> = {
+  all: "All Rides",
+  live: "Live Rides",
+  scheduled: "Scheduled",
+  history: "History",
+};
+
+const VIEW_DESCRIPTION: Record<View, string> = {
+  all: "All rides across statuses",
+  live: "Rides currently in flight (REQUESTED → IN_TRIP)",
+  scheduled: "Upcoming rides booked for a future time",
+  history: "Completed and cancelled rides",
+};
 
 function whereForView(view: View, status: string | undefined) {
   if (view === "live") {
@@ -89,13 +96,6 @@ async function getData(view: View, status: string | undefined, cityId: string | 
   }
 }
 
-const VIEW_DESCRIPTION: Record<View, string> = {
-  all: "All rides across statuses",
-  live: "Rides currently in flight (REQUESTED → IN_TRIP)",
-  scheduled: "Upcoming rides booked for a future time",
-  history: "Completed and cancelled rides",
-};
-
 export default async function RidesPage({
   searchParams,
 }: {
@@ -114,35 +114,24 @@ export default async function RidesPage({
   const showStatusFilter = view === "all";
   const showScheduledColumn = view === "scheduled";
 
+  const tabs = (["all", "live", "scheduled", "history"] as View[]).map((v) => ({
+    label: VIEW_LABEL[v],
+    href: v === "all" ? "/rides" : `/rides?view=${v}`,
+    active: view === v,
+  }));
+
   return (
     <div>
       <PageHeader
-        title="Ride Operations"
+        breadcrumbs={[
+          { label: "Ride Operations" },
+          { label: VIEW_LABEL[view] },
+        ]}
+        title="Rides"
         description={VIEW_DESCRIPTION[view]}
         action={view === "live" ? <AutoRefresh /> : undefined}
+        tabs={<PageTabs tabs={tabs} />}
       />
-
-      <div className="mb-4 flex flex-wrap gap-2">
-        {VIEWS.map((v) => {
-          const active = view === v.id;
-          const href = v.id === "all" ? "/rides" : `/rides?view=${v.id}`;
-          const Icon = v.icon;
-          return (
-            <a
-              key={v.id}
-              href={href}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                active
-                  ? "bg-brand-600 text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              <Icon className="h-3.5 w-3.5" />
-              {v.label}
-            </a>
-          );
-        })}
-      </div>
 
       {showStatusFilter && (
         <div className="mb-4 flex flex-wrap gap-2">
@@ -154,7 +143,7 @@ export default async function RidesPage({
                 href={s === "ALL" ? "/rides" : `/rides?status=${s}`}
                 className={`rounded-full px-3 py-1 text-[11px] font-medium transition ${
                   active
-                    ? "bg-slate-800 text-white"
+                    ? "bg-[#a57865] text-white"
                     : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
                 }`}
               >
@@ -165,10 +154,10 @@ export default async function RidesPage({
         </div>
       )}
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Ride ID</th>
                 <th className="px-5 py-3 text-left">Rider</th>
@@ -207,12 +196,12 @@ export default async function RidesPage({
                     (d) => d.cityId === r.cityId
                   );
                   return (
-                    <tr key={r.id} className="hover:bg-slate-50">
+                    <tr key={r.id} className="hover:bg-[#fbf7f2]">
                       <td className="px-5 py-3 font-mono text-xs text-slate-500">
                         {r.id.slice(0, 8)}
                       </td>
                       <td className="px-5 py-3">
-                        <div className="font-medium text-slate-900">
+                        <div className="font-medium text-[#3a2d28]">
                           {r.rider.name ?? "—"}
                         </div>
                         <div className="text-xs text-slate-500">
@@ -222,7 +211,7 @@ export default async function RidesPage({
                       <td className="px-5 py-3">
                         {r.driver ? (
                           <>
-                            <div className="text-slate-900">{r.driver.name}</div>
+                            <div className="text-[#3a2d28]">{r.driver.name}</div>
                             <div className="text-xs text-slate-500">
                               {r.driver.phone}
                             </div>
@@ -242,7 +231,7 @@ export default async function RidesPage({
                       <td className="px-5 py-3">
                         <Badge variant="info">{r.bookingChannel}</Badge>
                       </td>
-                      <td className="px-5 py-3 font-medium text-slate-900">
+                      <td className="px-5 py-3 font-medium text-[#3a2d28]">
                         {formatCurrency(r.fareFinal ?? r.fareEstimate)}
                       </td>
                       <td className="px-5 py-3">

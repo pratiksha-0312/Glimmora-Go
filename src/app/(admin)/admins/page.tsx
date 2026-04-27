@@ -50,6 +50,10 @@ export default async function AdminsPage() {
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Configuration" },
+          { label: "Admin Users" },
+        ]}
         title="Admins"
         description="Manage admin users — accounts, roles, and access."
       />

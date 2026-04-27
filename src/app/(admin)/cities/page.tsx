@@ -32,6 +32,10 @@ export default async function CitiesPage() {
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Configuration" },
+          { label: "City Archetype" },
+        ]}
         title="Cities"
         description="Archetype (Metro vs Small Town) drives matching radius, surge, and payment options"
       />
@@ -61,7 +65,7 @@ export default async function CitiesPage() {
         )}
 
         <div className={canWrite ? "lg:col-span-2" : "lg:col-span-3"}>
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-4">
               <h3 className="text-sm font-semibold text-slate-900">
                 Configured Cities

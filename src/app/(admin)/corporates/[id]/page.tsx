@@ -63,6 +63,11 @@ export default async function CorporateDetail({
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Partner Management" },
+          { label: "Enterprise", href: "/corporates" },
+          { label: "Account" },
+        ]}
         title={corp.name}
         description={`${corp.contactName} · ${corp.contactEmail} · ${corp.city?.name ?? "No city"}`}
         action={
@@ -115,7 +120,7 @@ export default async function CorporateDetail({
             canWrite={canWrite}
           />
 
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-4">
               <h3 className="text-sm font-semibold text-slate-900">
                 Recent rides
@@ -123,7 +128,7 @@ export default async function CorporateDetail({
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
                   <tr>
                     <th className="px-5 py-3 text-left">Route</th>
                     <th className="px-5 py-3 text-left">Fare</th>
@@ -164,7 +169,7 @@ export default async function CorporateDetail({
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-4">
               <h3 className="text-sm font-semibold text-slate-900">
                 Wallet history
@@ -172,7 +177,7 @@ export default async function CorporateDetail({
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
                   <tr>
                     <th className="px-5 py-3 text-left">Amount</th>
                     <th className="px-5 py-3 text-left">Note</th>

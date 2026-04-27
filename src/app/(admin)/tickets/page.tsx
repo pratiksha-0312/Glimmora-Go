@@ -67,6 +67,9 @@ export default async function TicketsPage({
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Tickets" },
+        ]}
         title="Tickets"
         description="Rider / driver complaints and support issues"
       />
@@ -115,7 +118,7 @@ export default async function TicketsPage({
                   className={
                     active
                       ? "rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white"
-                      : "rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                      : "rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
                   }
                 >
                   {p.label}
@@ -124,10 +127,10 @@ export default async function TicketsPage({
             })}
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
                   <tr>
                     <th className="px-5 py-3 text-left">Subject</th>
                     <th className="px-5 py-3 text-left">Category</th>
@@ -150,7 +153,7 @@ export default async function TicketsPage({
                     </tr>
                   ) : (
                     tickets.map((t) => (
-                      <tr key={t.id} className="hover:bg-slate-50">
+                      <tr key={t.id} className="hover:bg-[#fbf7f2]">
                         <td className="px-5 py-3">
                           <Link
                             href={`/tickets/${t.id}`}

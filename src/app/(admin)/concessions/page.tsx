@@ -23,6 +23,10 @@ export default async function ConcessionsPage() {
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Pricing & Promotions" },
+          { label: "Concession Pricing" },
+        ]}
         title="Concession Pricing"
         description="Discount multipliers for women, senior citizens, and children — applied on top of fare"
       />

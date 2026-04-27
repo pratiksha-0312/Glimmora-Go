@@ -38,6 +38,11 @@ export default async function DriverDetailPage({
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Driver Operations" },
+          { label: "Drivers", href: "/drivers" },
+          { label: "Driver" },
+        ]}
         title={driver.name}
         description={`Driver · ${driver.phone}`}
       />
@@ -80,7 +85,7 @@ export default async function DriverDetailPage({
         </div>
 
         <div className="lg:col-span-2">
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-4">
               <h3 className="text-sm font-semibold text-slate-900">
                 Documents

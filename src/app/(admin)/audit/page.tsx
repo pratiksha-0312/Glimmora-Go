@@ -66,12 +66,16 @@ export default async function AuditPage({
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Configuration" },
+          { label: "Audit Logs" },
+        ]}
         title="Audit & Compliance"
         description="Every mutating admin action, plus fraud signals"
         action={
           <a
             href={`/api/audit/export?days=${days}`}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm hover:bg-[#fbf7f2]"
           >
             Export CSV
           </a>
@@ -95,7 +99,7 @@ export default async function AuditPage({
               className={
                 active
                   ? "rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white"
-                  : "rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                  : "rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
               }
             >
               {r.label}
@@ -129,16 +133,16 @@ export default async function AuditPage({
               </option>
             ))}
           </select>
-          <button className="rounded-lg bg-slate-800 px-3 py-1 text-xs font-medium text-white">
+          <button className="rounded-lg bg-[#a57865] px-3 py-1 text-xs font-medium text-white hover:bg-[#8e6253]">
             Filter
           </button>
         </form>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">When</th>
                 <th className="px-5 py-3 text-left">Admin</th>
@@ -160,7 +164,7 @@ export default async function AuditPage({
                 </tr>
               ) : (
                 events.map((e) => (
-                  <tr key={e.id} className="hover:bg-slate-50">
+                  <tr key={e.id} className="hover:bg-[#fbf7f2]">
                     <td className="px-5 py-3 text-xs text-slate-500">
                       {formatDate(e.createdAt)}
                     </td>

@@ -104,7 +104,7 @@ export function PartnerRowActions({
           <button
             onClick={updatePct}
             disabled={loading === "COMMISSION"}
-            className="rounded bg-slate-700 px-2 py-0.5 text-[11px] font-semibold text-white hover:bg-slate-800 disabled:opacity-50"
+            className="rounded bg-[#a57865] px-2 py-0.5 text-[11px] font-semibold text-white hover:bg-[#8e6253] disabled:opacity-50"
           >
             {loading === "COMMISSION" ? "…" : "Set"}
           </button>

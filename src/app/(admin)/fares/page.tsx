@@ -24,6 +24,10 @@ export default async function FaresPage() {
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Pricing & Promotions" },
+          { label: "Fare Configuration" },
+        ]}
         title="Fare Config"
         description="Base fare, per km, per min, and minimum fare per city"
       />

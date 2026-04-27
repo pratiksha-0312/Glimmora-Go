@@ -56,6 +56,10 @@ export default async function DriversPage({
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Driver Operations" },
+          { label: "Drivers" },
+        ]}
         title="Drivers"
         description="Driver onboarding, verification, and status"
       />
@@ -69,8 +73,8 @@ export default async function DriversPage({
               href={s === "ALL" ? "/drivers" : `/drivers?status=${s}`}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                 active
-                  ? "bg-brand-600 text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                  ? "bg-[#a57865] text-white"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
               }`}
             >
               {s === "ALL" ? "All" : s}
@@ -79,10 +83,10 @@ export default async function DriversPage({
         })}
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Driver</th>
                 <th className="px-5 py-3 text-left">City</th>
@@ -110,7 +114,7 @@ export default async function DriversPage({
                     (doc) => doc.status === "PENDING"
                   ).length;
                   return (
-                    <tr key={d.id} className="hover:bg-slate-50">
+                    <tr key={d.id} className="hover:bg-[#fbf7f2]">
                       <td className="px-5 py-3">
                         <div className="font-medium text-slate-900">
                           {d.name}

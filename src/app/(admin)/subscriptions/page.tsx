@@ -46,6 +46,10 @@ export default async function SubscriptionsPage() {
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Driver Operations" },
+          { label: "Subscriptions" },
+        ]}
         title="Subscriptions"
         description="Grant and track driver sachet plans (daily / weekly / monthly)"
       />
@@ -85,7 +89,7 @@ export default async function SubscriptionsPage() {
         )}
 
         <div className={canWrite ? "lg:col-span-2" : "lg:col-span-3"}>
-          <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-4">
               <h3 className="text-sm font-semibold text-slate-900">
                 All subscriptions
@@ -93,7 +97,7 @@ export default async function SubscriptionsPage() {
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+                <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
                   <tr>
                     <th className="px-5 py-3 text-left">Driver</th>
                     <th className="px-5 py-3 text-left">Plan</th>
@@ -121,7 +125,7 @@ export default async function SubscriptionsPage() {
                     subs.map((s) => {
                       const expired = s.expiresAt < now;
                       return (
-                        <tr key={s.id} className="hover:bg-slate-50">
+                        <tr key={s.id} className="hover:bg-[#fbf7f2]">
                           <td className="px-5 py-3">
                             <div className="font-medium text-slate-900">
                               {s.driver.name}

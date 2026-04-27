@@ -38,7 +38,7 @@ export function AdminRowActions({ admin }: { admin: EditableAdmin }) {
           type="button"
           onClick={() => setEditOpen(true)}
           disabled={busy}
-          className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+          className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-white px-2 py-1 font-medium text-slate-700 transition hover:bg-[#fbf7f2] disabled:opacity-50"
         >
           <Pencil className="h-3 w-3" />
           Edit

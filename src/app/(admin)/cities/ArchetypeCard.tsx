@@ -160,7 +160,7 @@ export function ArchetypeCard({
                 disabled={!canWrite}
                 className={`rounded-full px-3 py-1 text-xs font-medium ring-1 ${
                   on
-                    ? "bg-brand-600 text-white ring-brand-600"
+                    ? "bg-[#a57865] text-white ring-brand-600"
                     : "bg-white text-slate-600 ring-slate-200"
                 } ${!canWrite ? "cursor-not-allowed opacity-70" : ""}`}
               >

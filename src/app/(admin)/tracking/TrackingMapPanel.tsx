@@ -93,7 +93,7 @@ export function TrackingMapPanel({ rideId }: { rideId: string }) {
 
   return (
     <div className="space-y-3">
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
           <div className="flex items-center gap-2">
             {data.sosTriggered && (

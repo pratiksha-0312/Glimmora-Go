@@ -68,6 +68,10 @@ export default async function NotificationsPage({
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Configuration" },
+          { label: "Notification Logs" },
+        ]}
         title="Notification Logs"
         description="Outbound SMS, email, push and WhatsApp messages sent by the platform"
       />
@@ -98,8 +102,8 @@ export default async function NotificationsPage({
               href={href}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition ${
                 active
-                  ? "bg-brand-600 text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                  ? "bg-[#a57865] text-white"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
               }`}
             >
               {c === "ALL" ? "All" : c}
@@ -124,8 +128,8 @@ export default async function NotificationsPage({
               href={href}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition ${
                 active
-                  ? "bg-slate-800 text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
+                  ? "bg-[#a57865] text-white"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
               }`}
             >
               {s === "ALL" ? "All" : s}
@@ -134,10 +138,10 @@ export default async function NotificationsPage({
         })}
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Channel</th>
                 <th className="px-5 py-3 text-left">Recipient</th>
@@ -167,7 +171,7 @@ export default async function NotificationsPage({
                 notifications.map((n) => {
                   const Icon = CHANNEL_ICON[n.channel];
                   return (
-                    <tr key={n.id} className="hover:bg-slate-50">
+                    <tr key={n.id} className="hover:bg-[#fbf7f2]">
                       <td className="px-5 py-3">
                         <div className="inline-flex items-center gap-1.5 text-slate-700">
                           <Icon className="h-3.5 w-3.5 text-slate-400" />

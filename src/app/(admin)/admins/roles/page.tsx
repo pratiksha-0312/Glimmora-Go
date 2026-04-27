@@ -21,6 +21,11 @@ export default async function RolesPermissionsPage() {
     return (
       <div>
         <PageHeader
+          breadcrumbs={[
+          { label: "Configuration" },
+          { label: "Admin Users", href: "/admins" },
+          { label: "Roles & Permissions" },
+        ]}
           title="Roles & Permissions"
           description="Read-only RBAC matrix"
         />
@@ -57,9 +62,9 @@ export default async function RolesPermissionsPage() {
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-x-auto rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+          <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
             <tr>
               <th className="px-5 py-3 text-left">Feature</th>
               <th className="px-5 py-3 text-left">Sub-feature</th>
@@ -82,7 +87,7 @@ export default async function RolesPermissionsPage() {
                   </td>
                 </tr>
                 {g.rows.map((r) => (
-                  <tr key={r.key} className="hover:bg-slate-50">
+                  <tr key={r.key} className="hover:bg-[#fbf7f2]">
                     <td className="px-5 py-2.5 text-slate-700">{r.feature}</td>
                     <td className="px-5 py-2.5 font-medium text-slate-900">
                       {r.subFeature}

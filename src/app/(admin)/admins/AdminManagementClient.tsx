@@ -156,9 +156,9 @@ export function AdminManagementClient({
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+              <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
                 <tr>
                   <th className="px-5 py-3 text-left">User ID</th>
                   <th className="px-5 py-3 text-left">User Name</th>
@@ -184,7 +184,7 @@ export function AdminManagementClient({
                   filtered.map((a, i) => {
                     const isSelf = a.id === currentAdminId;
                     return (
-                      <tr key={a.id} className="hover:bg-slate-50">
+                      <tr key={a.id} className="hover:bg-[#fbf7f2]">
                         <td className="px-5 py-3 font-mono text-xs text-slate-500">
                           {userIdDisplay(admins.indexOf(a))}
                         </td>

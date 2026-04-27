@@ -43,6 +43,9 @@ export default async function RidersPage({
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Riders" },
+        ]}
         title="Riders"
         description="Registered riders with lifetime ride count and spend"
       />
@@ -56,10 +59,10 @@ export default async function RidersPage({
         />
       </form>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Rider</th>
                 <th className="px-5 py-3 text-left">Language</th>
@@ -94,7 +97,7 @@ export default async function RidersPage({
                     return acc;
                   }, null);
                   return (
-                    <tr key={r.id} className="hover:bg-slate-50">
+                    <tr key={r.id} className="hover:bg-[#fbf7f2]">
                       <td className="px-5 py-3">
                         <div className="font-medium text-slate-900">
                           {r.name ?? "—"}

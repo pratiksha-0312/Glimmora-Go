@@ -55,6 +55,10 @@ export default async function SosPage() {
   return (
     <div>
       <PageHeader
+        breadcrumbs={[
+          { label: "Safety Monitoring" },
+          { label: "SOS Alerts" },
+        ]}
         title="SOS Alerts"
         description="Rides where the rider or driver triggered an SOS signal"
       />
@@ -82,7 +86,7 @@ export default async function SosPage() {
         />
       </div>
 
-      <div className="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div className="mt-6 rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
         <div className="border-b border-slate-200 px-5 py-4">
           <h3 className="text-sm font-semibold text-slate-900">
             SOS Event Log
@@ -90,7 +94,7 @@ export default async function SosPage() {
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Ride ID</th>
                 <th className="px-5 py-3 text-left">Rider</th>
@@ -123,7 +127,7 @@ export default async function SosPage() {
                       className={
                         isActive
                           ? "bg-red-50/50 hover:bg-red-50"
-                          : "hover:bg-slate-50"
+                          : "hover:bg-[#fbf7f2]"
                       }
                     >
                       <td className="px-5 py-3 font-mono text-xs text-slate-500">
