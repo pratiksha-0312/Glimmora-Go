@@ -1,9 +1,16 @@
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { ArchetypeCard } from "../ArchetypeCard";
+import { Badge } from "@/components/ui/Badge";
+import { formatCurrency } from "@/lib/utils";
 import { requireAccess, sessionCanWrite } from "@/lib/auth";
+import { EditArchetypeButton } from "./EditArchetypeButton";
 
 export const dynamic = "force-dynamic";
+
+const LABEL = {
+  METRO: "Metro",
+  SMALL_TOWN: "Small Town",
+} as const;
 
 async function getDefaults() {
   try {
@@ -28,28 +35,118 @@ export default async function CityArchetypePage() {
           { label: "City Archetype" },
         ]}
         title="City Archetype"
-        description="Default matching radius, surge, payments and base fare applied when a new city is created in this archetype"
+        description="Templates that seed default matching radius, surge, payments and fares for new cities"
       />
 
-      {defaults.length === 0 ? (
-        <div className="rounded-xl border border-[#f0e4d6] bg-white px-5 py-12 text-center text-sm text-slate-400 shadow-sm">
-          No archetype defaults seeded yet. Run{" "}
-          <code className="rounded bg-[#fbf7f2] px-1.5 py-0.5 text-xs">
-            npm run db:seed
-          </code>
-          .
+      <div className="mb-6 grid gap-4 sm:grid-cols-3">
+        <div className="rounded-xl border border-[#f0e4d6] bg-white p-5 shadow-sm">
+          <div className="text-xs uppercase tracking-wider text-slate-500">
+            Templates configured
+          </div>
+          <div className="mt-1 text-2xl font-bold text-[#3a2d28]">
+            {defaults.length}
+          </div>
         </div>
-      ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
-          {defaults.map((d) => (
-            <ArchetypeCard
-              key={d.archetype}
-              defaults={d}
-              canWrite={canWrite}
-            />
-          ))}
+        <div className="rounded-xl border border-[#f0e4d6] bg-white p-5 shadow-sm">
+          <div className="text-xs uppercase tracking-wider text-slate-500">
+            Metro base fare
+          </div>
+          <div className="mt-1 text-2xl font-bold text-[#3a2d28]">
+            {formatCurrency(
+              defaults.find((d) => d.archetype === "METRO")?.baseFare ?? 0
+            )}
+          </div>
         </div>
-      )}
+        <div className="rounded-xl border border-[#f0e4d6] bg-white p-5 shadow-sm">
+          <div className="text-xs uppercase tracking-wider text-slate-500">
+            Small town base fare
+          </div>
+          <div className="mt-1 text-2xl font-bold text-[#3a2d28]">
+            {formatCurrency(
+              defaults.find((d) => d.archetype === "SMALL_TOWN")?.baseFare ?? 0
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+        <div className="border-b border-[#f0e4d6] px-5 py-4">
+          <h3 className="text-sm font-semibold text-[#3a2d28]">
+            Archetype templates
+          </h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+              <tr>
+                <th className="px-5 py-3 text-left">Archetype</th>
+                <th className="px-5 py-3 text-left">Match radius</th>
+                <th className="px-5 py-3 text-left">Surge</th>
+                <th className="px-5 py-3 text-left">Base fare</th>
+                <th className="px-5 py-3 text-left">Per km / min</th>
+                <th className="px-5 py-3 text-left">Min fare</th>
+                <th className="px-5 py-3 text-left">Payments</th>
+                {canWrite && (
+                  <th className="px-5 py-3 text-right">Actions</th>
+                )}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {defaults.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={canWrite ? 8 : 7}
+                    className="px-5 py-10 text-center text-sm text-slate-400"
+                  >
+                    No archetype defaults seeded yet. Run{" "}
+                    <code className="rounded bg-[#fbf7f2] px-1.5 py-0.5 text-xs">
+                      npm run db:seed
+                    </code>
+                    .
+                  </td>
+                </tr>
+              ) : (
+                defaults.map((d) => (
+                  <tr key={d.archetype} className="hover:bg-[#fbf7f2]">
+                    <td className="px-5 py-3 font-medium text-[#3a2d28]">
+                      {LABEL[d.archetype]}
+                    </td>
+                    <td className="px-5 py-3 text-slate-700">
+                      {d.matchingRadiusKm} km
+                    </td>
+                    <td className="px-5 py-3 text-slate-700">
+                      {d.surgeMultiplier.toFixed(1)}×
+                    </td>
+                    <td className="px-5 py-3 font-medium text-[#3a2d28]">
+                      {formatCurrency(d.baseFare)}
+                    </td>
+                    <td className="px-5 py-3 text-slate-700">
+                      ₹{d.perKm} / ₹{d.perMin}
+                    </td>
+                    <td className="px-5 py-3 text-slate-700">
+                      {formatCurrency(d.minimumFare)}
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex flex-wrap gap-1">
+                        {d.paymentOptions.map((p) => (
+                          <Badge key={p} variant="default">
+                            {p}
+                          </Badge>
+                        ))}
+                      </div>
+                    </td>
+                    {canWrite && (
+                      <td className="px-5 py-3 text-right">
+                        <EditArchetypeButton defaults={d} />
+                      </td>
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
