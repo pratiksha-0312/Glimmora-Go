@@ -239,16 +239,16 @@ export function Sidebar({ role }: { role: AdminRole }) {
   });
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-[#f0e4d6] bg-white font-sans">
+    <aside className="flex h-screen w-64 flex-col border-r border-[color:var(--brand-sand-border)] bg-white font-sans">
       <Link
         href="/"
-        className="flex h-16 items-center gap-3 border-b border-[#f0e4d6] px-5"
+        className="flex h-16 items-center gap-3 border-b border-[color:var(--brand-sand-border)] px-5"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/icons/icon-192.png" alt="Glimmora Go" className="h-8 w-8 rounded-md object-contain" />
         <div className="flex flex-col leading-tight">
-          <span className="text-base font-semibold text-[#3a2d28]">Glimmora Go</span>
-          <span className="text-[10px] uppercase tracking-wider text-[#a89485]">
+          <span className="text-base font-semibold text-[color:var(--brand-text)]">Glimmora Go</span>
+          <span className="text-[10px] uppercase tracking-wider text-[color:var(--brand-text-soft)]">
             {ROLE_LABELS[role]}
           </span>
         </div>
@@ -267,11 +267,11 @@ export function Sidebar({ role }: { role: AdminRole }) {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition",
                   active
-                    ? "bg-[#f3e8db] text-[#3a2d28]"
-                    : "text-[#3a2d28] hover:bg-[#fbf5ef]"
+                    ? "bg-[color:var(--brand-cream-active)] text-[color:var(--brand-text)]"
+                    : "text-[color:var(--brand-text)] hover:bg-[color:var(--brand-cream-hover)]"
                 )}
               >
-                <Icon className="h-4 w-4 text-[#6b5349]" />
+                <Icon className="h-4 w-4 text-[color:var(--brand-text-muted)]" />
                 {group.label}
               </Link>
             );
@@ -288,11 +288,11 @@ export function Sidebar({ role }: { role: AdminRole }) {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition",
                   active
-                    ? "bg-[#f3e8db] text-[#3a2d28]"
-                    : "text-[#3a2d28] hover:bg-[#fbf5ef]"
+                    ? "bg-[color:var(--brand-cream-active)] text-[color:var(--brand-text)]"
+                    : "text-[color:var(--brand-text)] hover:bg-[color:var(--brand-cream-hover)]"
                 )}
               >
-                <Icon className="h-4 w-4 text-[#6b5349]" />
+                <Icon className="h-4 w-4 text-[color:var(--brand-text-muted)]" />
                 {group.label}
               </Link>
             );
@@ -311,17 +311,17 @@ export function Sidebar({ role }: { role: AdminRole }) {
                 className={cn(
                   "flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition",
                   isActiveGroup
-                    ? "bg-[#f3e8db] text-[#3a2d28]"
-                    : "text-[#3a2d28] hover:bg-[#fbf5ef]"
+                    ? "bg-[color:var(--brand-cream-active)] text-[color:var(--brand-text)]"
+                    : "text-[color:var(--brand-text)] hover:bg-[color:var(--brand-cream-hover)]"
                 )}
               >
                 <span className="flex items-center gap-3">
-                  <GroupIcon className="h-4 w-4 text-[#6b5349]" />
+                  <GroupIcon className="h-4 w-4 text-[color:var(--brand-text-muted)]" />
                   {group.label}
                 </span>
                 <ChevronDown
                   className={cn(
-                    "h-4 w-4 text-[#a89485] transition-transform",
+                    "h-4 w-4 text-[color:var(--brand-text-soft)] transition-transform",
                     isExpanded ? "rotate-0" : "-rotate-90"
                   )}
                 />
@@ -341,8 +341,8 @@ export function Sidebar({ role }: { role: AdminRole }) {
                         className={cn(
                           "flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition",
                           active
-                            ? "bg-[#f0e4d6] font-medium text-[#3a2d28]"
-                            : "font-normal text-[#6b5349] hover:bg-[#fbf5ef] hover:text-[#3a2d28]"
+                            ? "bg-[color:var(--brand-sand-border)] font-medium text-[color:var(--brand-text)]"
+                            : "font-normal text-[color:var(--brand-text-muted)] hover:bg-[color:var(--brand-cream-hover)] hover:text-[color:var(--brand-text)]"
                         )}
                       >
                         <span className="flex items-center gap-3">
@@ -352,8 +352,8 @@ export function Sidebar({ role }: { role: AdminRole }) {
                               isSos && sosCount > 0
                                 ? "text-red-600"
                                 : active
-                                ? "text-[#a57865]"
-                                : "text-[#a89485]"
+                                ? "text-[color:var(--brand-500)]"
+                                : "text-[color:var(--brand-text-soft)]"
                             )}
                           />
                           {it.label}
@@ -376,18 +376,18 @@ export function Sidebar({ role }: { role: AdminRole }) {
           type="button"
           onClick={logout}
           disabled={loggingOut}
-          className="mt-4 flex w-full items-center gap-3 rounded-lg border-t border-[#f0e4d6] px-3 py-2 pt-4 text-sm font-semibold text-[#3a2d28] transition hover:bg-[#fbf5ef] disabled:opacity-60"
+          className="mt-4 flex w-full items-center gap-3 rounded-lg border-t border-[color:var(--brand-sand-border)] px-3 py-2 pt-4 text-sm font-semibold text-[color:var(--brand-text)] transition hover:bg-[color:var(--brand-cream-hover)] disabled:opacity-60"
         >
-          <LogOut className="h-4 w-4 text-[#6b5349]" />
+          <LogOut className="h-4 w-4 text-[color:var(--brand-text-muted)]" />
           {loggingOut ? "Logging out…" : "Log Out"}
         </button>
       </nav>
 
-      <div className="flex items-center justify-between border-t border-[#f0e4d6] px-4 py-3">
-        <span className="text-[11px] text-[#a89485]">
+      <div className="flex items-center justify-between border-t border-[color:var(--brand-sand-border)] px-4 py-3">
+        <span className="text-[11px] text-[color:var(--brand-text-soft)]">
           © {new Date().getFullYear()} Glimmora Go
         </span>
-        <span className="rounded-md border border-[#f0e4d6] bg-[#fbf5ef] px-1.5 py-0.5 text-[10px] font-medium text-[#a57865]">
+        <span className="rounded-md border border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream-hover)] px-1.5 py-0.5 text-[10px] font-medium text-[color:var(--brand-500)]">
           v1.0
         </span>
       </div>

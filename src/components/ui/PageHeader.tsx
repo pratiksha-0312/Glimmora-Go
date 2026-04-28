@@ -22,7 +22,7 @@ export function PageHeader({
       )}
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#3a2d28]">{title}</h1>
+          <h1 className="text-2xl font-bold text-[color:var(--brand-text)]">{title}</h1>
           {description && (
             <p className="mt-1 text-sm text-slate-500">{description}</p>
           )}

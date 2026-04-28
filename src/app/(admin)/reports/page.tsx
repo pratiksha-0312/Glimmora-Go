@@ -179,8 +179,8 @@ export default async function ReportsPage({
               href={`/reports?days=${r}`}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                 active
-                  ? "bg-[#a57865] text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
+                  ? "bg-[color:var(--brand-500)] text-white"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[color:var(--brand-cream)]"
               }`}
             >
               {r} days
@@ -220,7 +220,7 @@ export default async function ReportsPage({
       <ReportsCharts days={data.days} channels={data.channels} />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
           <div className="border-b border-slate-200 px-5 py-4">
             <h3 className="text-sm font-semibold text-slate-900">
               By city
@@ -228,7 +228,7 @@ export default async function ReportsPage({
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+              <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
                 <tr>
                   <th className="px-5 py-3 text-left">City</th>
                   <th className="px-5 py-3 text-right">Rides</th>
@@ -248,7 +248,7 @@ export default async function ReportsPage({
                   </tr>
                 ) : (
                   data.cityStats.map((c) => (
-                    <tr key={c.name} className="hover:bg-[#fbf7f2]">
+                    <tr key={c.name} className="hover:bg-[color:var(--brand-cream)]">
                       <td className="px-5 py-3 font-medium text-slate-900">
                         {c.name}
                       </td>
@@ -269,7 +269,7 @@ export default async function ReportsPage({
           </div>
         </div>
 
-        <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
           <div className="border-b border-slate-200 px-5 py-4">
             <h3 className="text-sm font-semibold text-slate-900">
               Top drivers
@@ -277,7 +277,7 @@ export default async function ReportsPage({
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+              <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
                 <tr>
                   <th className="px-5 py-3 text-left">Driver</th>
                   <th className="px-5 py-3 text-right">Rides</th>
@@ -296,7 +296,7 @@ export default async function ReportsPage({
                   </tr>
                 ) : (
                   data.topDrivers.map((d) => (
-                    <tr key={d.phone} className="hover:bg-[#fbf7f2]">
+                    <tr key={d.phone} className="hover:bg-[color:var(--brand-cream)]">
                       <td className="px-5 py-3">
                         <div className="font-medium text-slate-900">
                           {d.name}

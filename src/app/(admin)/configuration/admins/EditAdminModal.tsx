@@ -126,22 +126,22 @@ export function EditAdminModal({
   }
 
   const inputCls =
-    "w-full rounded-lg border border-[#e8d9ce] bg-white px-3 py-2 text-sm text-[#3a2d28] placeholder:text-[#b9a496] outline-none transition focus:border-[#a57865] focus:ring-2 focus:ring-[#a57865]/20";
-  const sectionTitle = "mb-3 text-sm font-semibold text-[#3a2d28]";
+    "w-full rounded-lg border border-[color:var(--brand-sand-border)] bg-white px-3 py-2 text-sm text-[color:var(--brand-text)] placeholder:text-[color:var(--brand-text-soft)] outline-none transition focus:border-[color:var(--brand-500)] focus:ring-2 focus:ring-[color:var(--brand-500)]/20";
+  const sectionTitle = "mb-3 text-sm font-semibold text-[color:var(--brand-text)]";
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-10 text-left"
       style={{ background: "rgba(58, 45, 40, 0.32)" }}
     >
-      <div className="w-full max-w-2xl rounded-xl border border-[#f0e4d6] bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-[#f0e4d6] px-6 py-4">
-          <h2 className="text-base font-semibold text-[#3a2d28]">Edit Admin</h2>
+      <div className="w-full max-w-2xl rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-xl">
+        <div className="flex items-center justify-between border-b border-[color:var(--brand-sand-border)] px-6 py-4">
+          <h2 className="text-base font-semibold text-[color:var(--brand-text)]">Edit Admin</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-md p-1 text-[#6b5349] hover:bg-[#fbf5ef]"
+            className="rounded-md p-1 text-[color:var(--brand-text-muted)] hover:bg-[color:var(--brand-cream-hover)]"
           >
             <X className="h-4 w-4" />
           </button>
@@ -152,20 +152,20 @@ export function EditAdminModal({
             <h3 className={sectionTitle}>Account Credentials</h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#3a2d28]">
+                <label className="mb-1 block text-xs font-medium text-[color:var(--brand-text)]">
                   User ID{" "}
-                  <span className="text-[10px] font-normal text-[#a89485]">
+                  <span className="text-[10px] font-normal text-[color:var(--brand-text-soft)]">
                     (Auto-generated)
                   </span>
                 </label>
                 <input
                   value={admin.userIdLabel}
                   disabled
-                  className={inputCls + " bg-[#fbf5ef] text-[#a89485]"}
+                  className={inputCls + " bg-[color:var(--brand-cream-hover)] text-[color:var(--brand-text-soft)]"}
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#3a2d28]">
+                <label className="mb-1 block text-xs font-medium text-[color:var(--brand-text)]">
                   Username
                 </label>
                 <input
@@ -179,7 +179,7 @@ export function EditAdminModal({
             </div>
 
             <div className="mt-4">
-              <label className="mb-1 block text-xs font-medium text-[#3a2d28]">
+              <label className="mb-1 block text-xs font-medium text-[color:var(--brand-text)]">
                 Email <span className="text-red-500">*</span>
               </label>
               <input
@@ -194,7 +194,7 @@ export function EditAdminModal({
 
             <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#3a2d28]">
+                <label className="mb-1 block text-xs font-medium text-[color:var(--brand-text)]">
                   Password <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -207,7 +207,7 @@ export function EditAdminModal({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#3a2d28]">
+                <label className="mb-1 block text-xs font-medium text-[color:var(--brand-text)]">
                   Confirm Password <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -226,7 +226,7 @@ export function EditAdminModal({
             <h3 className={sectionTitle}>Personal Information</h3>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#3a2d28]">
+                <label className="mb-1 block text-xs font-medium text-[color:var(--brand-text)]">
                   First Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -238,7 +238,7 @@ export function EditAdminModal({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-[#3a2d28]">
+                <label className="mb-1 block text-xs font-medium text-[color:var(--brand-text)]">
                   Last Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -251,7 +251,7 @@ export function EditAdminModal({
               </div>
             </div>
             <div className="mt-4">
-              <label className="mb-1 block text-xs font-medium text-[#3a2d28]">
+              <label className="mb-1 block text-xs font-medium text-[color:var(--brand-text)]">
                 Full Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -269,7 +269,7 @@ export function EditAdminModal({
 
           <section>
             <div>
-              <label className="mb-1 block text-xs font-medium text-[#3a2d28]">
+              <label className="mb-1 block text-xs font-medium text-[color:var(--brand-text)]">
                 Role <span className="text-red-500">*</span>
               </label>
               <select
@@ -293,19 +293,19 @@ export function EditAdminModal({
             </div>
           )}
 
-          <div className="flex items-center justify-end gap-3 border-t border-[#f0e4d6] pt-4">
+          <div className="flex items-center justify-end gap-3 border-t border-[color:var(--brand-sand-border)] pt-4">
             <button
               type="button"
               onClick={onClose}
               disabled={busy}
-              className="rounded-lg border border-[#d5bfb2] bg-white px-4 py-2 text-sm font-medium text-[#3a2d28] hover:bg-[#fbf5ef]"
+              className="rounded-lg border border-[color:var(--brand-sand-border-strong)] bg-white px-4 py-2 text-sm font-medium text-[color:var(--brand-text)] hover:bg-[color:var(--brand-cream-hover)]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={busy}
-              className="rounded-lg bg-[#a57865] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#8e6553] disabled:opacity-60"
+              className="rounded-lg bg-[color:var(--brand-500)] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[color:var(--brand-600)] disabled:opacity-60"
             >
               {busy ? "Saving..." : "Save"}
             </button>

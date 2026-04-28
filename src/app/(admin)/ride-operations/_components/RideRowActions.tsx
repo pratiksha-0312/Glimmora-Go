@@ -103,7 +103,7 @@ export function RideRowActions({
           <button
             onClick={() => send("REASSIGN")}
             disabled={loading === "REASSIGN"}
-            className="rounded bg-[#a57865] px-2 py-1 text-xs font-semibold text-white hover:bg-[#8e6253] disabled:opacity-50"
+            className="rounded bg-[color:var(--brand-500)] px-2 py-1 text-xs font-semibold text-white hover:bg-[color:var(--brand-600)] disabled:opacity-50"
           >
             {loading === "REASSIGN" ? "…" : "Save"}
           </button>

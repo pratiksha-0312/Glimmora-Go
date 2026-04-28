@@ -81,8 +81,8 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#fdf8f4] via-white to-[#f3e8db] p-4 font-sans">
-      <div className="w-full max-w-md rounded-xl border border-[#f0e4d6] bg-white p-8 shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[color:var(--brand-cream-soft)] via-white to-[color:var(--brand-cream-active)] p-4 font-sans">
+      <div className="w-full max-w-md rounded-xl border border-[color:var(--brand-sand-border)] bg-white p-8 shadow-lg">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}

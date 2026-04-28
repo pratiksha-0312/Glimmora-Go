@@ -111,8 +111,8 @@ export default async function TicketsPage({
                   href={href}
                   className={
                     active
-                      ? "rounded-full bg-[#a57865] px-3 py-1 text-xs font-semibold text-white"
-                      : "rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
+                      ? "rounded-full bg-[color:var(--brand-500)] px-3 py-1 text-xs font-semibold text-white"
+                      : "rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-600 ring-1 ring-slate-200 hover:bg-[color:var(--brand-cream)]"
                   }
                 >
                   {p.label}
@@ -121,10 +121,10 @@ export default async function TicketsPage({
             })}
           </div>
 
-          <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+          <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+                <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
                   <tr>
                     <th className="px-5 py-3 text-left">Subject</th>
                     <th className="px-5 py-3 text-left">Category</th>
@@ -147,7 +147,7 @@ export default async function TicketsPage({
                     </tr>
                   ) : (
                     tickets.map((t) => (
-                      <tr key={t.id} className="hover:bg-[#fbf7f2]">
+                      <tr key={t.id} className="hover:bg-[color:var(--brand-cream)]">
                         <td className="px-5 py-3">
                           <Link
                             href={`/tickets/${t.id}`}

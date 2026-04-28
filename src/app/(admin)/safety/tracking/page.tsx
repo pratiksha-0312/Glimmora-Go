@@ -88,7 +88,7 @@ export default async function TrackingPage({
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
         <aside className="lg:col-span-2">
-          <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+          <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-200 px-5 py-3">
               <h2 className="text-sm font-semibold text-slate-900">
                 In-flight rides
@@ -114,7 +114,7 @@ export default async function TrackingPage({
                             ? "bg-brand-50/70 ring-1 ring-inset ring-brand-200"
                             : r.sosTriggered
                               ? "bg-red-50/40 hover:bg-red-50"
-                              : "hover:bg-[#fbf7f2]")
+                              : "hover:bg-[color:var(--brand-cream)]")
                         }
                       >
                         <div className="flex items-center justify-between gap-2">

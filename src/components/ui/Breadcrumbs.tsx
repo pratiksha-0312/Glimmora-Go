@@ -18,7 +18,7 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
             {c.href && !last ? (
               <Link
                 href={c.href}
-                className="hover:text-[#a57865] hover:underline"
+                className="hover:text-[color:var(--brand-500)] hover:underline"
               >
                 {c.label}
               </Link>

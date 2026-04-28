@@ -127,7 +127,7 @@ export function SubscriptionForm({
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-[#a57865] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#8e6253] disabled:opacity-60"
+          className="rounded-lg bg-[color:var(--brand-500)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[color:var(--brand-600)] disabled:opacity-60"
         >
           {saving ? "Granting…" : "Grant subscription"}
         </button>

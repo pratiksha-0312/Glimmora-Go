@@ -102,8 +102,8 @@ export default async function NotificationsPage({
               href={href}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition ${
                 active
-                  ? "bg-[#a57865] text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
+                  ? "bg-[color:var(--brand-500)] text-white"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[color:var(--brand-cream)]"
               }`}
             >
               {c === "ALL" ? "All" : c}
@@ -128,8 +128,8 @@ export default async function NotificationsPage({
               href={href}
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition ${
                 active
-                  ? "bg-[#a57865] text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
+                  ? "bg-[color:var(--brand-500)] text-white"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[color:var(--brand-cream)]"
               }`}
             >
               {s === "ALL" ? "All" : s}
@@ -138,10 +138,10 @@ export default async function NotificationsPage({
         })}
       </div>
 
-      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+      <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Channel</th>
                 <th className="px-5 py-3 text-left">Recipient</th>
@@ -171,7 +171,7 @@ export default async function NotificationsPage({
                 notifications.map((n) => {
                   const Icon = CHANNEL_ICON[n.channel];
                   return (
-                    <tr key={n.id} className="hover:bg-[#fbf7f2]">
+                    <tr key={n.id} className="hover:bg-[color:var(--brand-cream)]">
                       <td className="px-5 py-3">
                         <div className="inline-flex items-center gap-1.5 text-slate-700">
                           <Icon className="h-3.5 w-3.5 text-slate-400" />

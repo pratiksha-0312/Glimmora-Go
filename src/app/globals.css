@@ -2,9 +2,339 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================================
+ * Theme tokens
+ * ----------------------------------------------------------------------------
+ * Default :root is the existing "Terracotta" palette (cream + warm brown).
+ * The [data-theme="..."] selectors below swap every token at once when the
+ * <html> element gets data-theme set by ColorThemePicker. Alt-theme values
+ * are lifted from verifai's color picker so they match 1:1.
+ * ========================================================================= */
+
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
+
+  /* Default: Terracotta */
+  --brand-50: #fbf5f2;
+  --brand-100: #f5e8e1;
+  --brand-200: #edd0c2;
+  --brand-300: #e0ae97;
+  --brand-400: #ce8a72;
+  --brand-500: #a57865;
+  --brand-600: #8a6050;
+  --brand-700: #6e4c3e;
+  --brand-800: #573c32;
+  --brand-900: #45302a;
+  --brand-950: #2a1c18;
+  --brand-cream: #fbf7f2;
+  --brand-cream-active: #f3e8db;
+  --brand-cream-hover: #fbf5ef;
+  --brand-cream-soft: #fdf8f4;
+  --brand-sand-border: #f0e4d6;
+  --brand-sand-border-strong: #d5bfb2;
+  --brand-text: #3a2d28;
+  --brand-text-muted: #6b5349;
+  --brand-text-soft: #a89485;
+}
+
+[data-theme="ocean-blue"] {
+  --brand-50: #f0f7fb;
+  --brand-100: #dceef7;
+  --brand-200: #b8dcef;
+  --brand-300: #89c4e2;
+  --brand-400: #5fa8d0;
+  --brand-500: #4a7fa8;
+  --brand-600: #3a6589;
+  --brand-700: #2e4f6b;
+  --brand-800: #243d53;
+  --brand-900: #1d3145;
+  --brand-950: #111e2b;
+  --brand-cream: #f1f5f9;
+  --brand-cream-active: #dceef7;
+  --brand-cream-hover: #f0f7fb;
+  --brand-cream-soft: #f8fafc;
+  --brand-sand-border: #e2e8f0;
+  --brand-sand-border-strong: #cbd5e1;
+  --brand-text: #1e293b;
+  --brand-text-muted: #475569;
+  --brand-text-soft: #94a3b8;
+}
+
+[data-theme="forest-green"] {
+  --brand-50: #f0f7f3;
+  --brand-100: #dcede2;
+  --brand-200: #b8dbc5;
+  --brand-300: #89c4a0;
+  --brand-400: #5fa87e;
+  --brand-500: #4a8f6a;
+  --brand-600: #3a7254;
+  --brand-700: #2e5a42;
+  --brand-800: #244534;
+  --brand-900: #1d382a;
+  --brand-950: #112119;
+  --brand-cream: #f1f9f3;
+  --brand-cream-active: #dcede2;
+  --brand-cream-hover: #f0f7f3;
+  --brand-cream-soft: #f8fcf9;
+  --brand-sand-border: #e2efe6;
+  --brand-sand-border-strong: #c5dccd;
+  --brand-text: #1e3b27;
+  --brand-text-muted: #476559;
+  --brand-text-soft: #94b8a3;
+}
+
+[data-theme="royal-purple"] {
+  --brand-50: #f6f3fb;
+  --brand-100: #e8e3f2;
+  --brand-200: #d4cce8;
+  --brand-300: #b8addb;
+  --brand-400: #9586c4;
+  --brand-500: #7b68a5;
+  --brand-600: #5e4d83;
+  --brand-700: #483a64;
+  --brand-800: #382e4f;
+  --brand-900: #312945;
+  --brand-950: #1c1730;
+  --brand-cream: #f3f1f9;
+  --brand-cream-active: #e8e3f2;
+  --brand-cream-hover: #f6f3fb;
+  --brand-cream-soft: #faf8fc;
+  --brand-sand-border: #e3def0;
+  --brand-sand-border-strong: #c8c0dd;
+  --brand-text: #251e3b;
+  --brand-text-muted: #4a3f65;
+  --brand-text-soft: #9588b8;
+}
+
+[data-theme="slate-gray"] {
+  --brand-50: #f5f7fa;
+  --brand-100: #e3e8ec;
+  --brand-200: #c7cfd8;
+  --brand-300: #9aa6b3;
+  --brand-400: #7d8b9a;
+  --brand-500: #6b7b8d;
+  --brand-600: #54616f;
+  --brand-700: #404a55;
+  --brand-800: #303841;
+  --brand-900: #2b3139;
+  --brand-950: #181d23;
+  --brand-cream: #eef1f5;
+  --brand-cream-active: #e3e8ec;
+  --brand-cream-hover: #f5f7fa;
+  --brand-cream-soft: #f9fafc;
+  --brand-sand-border: #dee3ea;
+  --brand-sand-border-strong: #c0c8d2;
+  --brand-text: #232830;
+  --brand-text-muted: #4a525c;
+  --brand-text-soft: #93a0ad;
+}
+
+[data-theme="crimson-red"] {
+  --brand-50: #fbf2f2;
+  --brand-100: #f5e1e1;
+  --brand-200: #ebc1c2;
+  --brand-300: #d99497;
+  --brand-400: #c46669;
+  --brand-500: #a5484a;
+  --brand-600: #84393b;
+  --brand-700: #622b2d;
+  --brand-800: #4a2122;
+  --brand-900: #451e20;
+  --brand-950: #2a1213;
+  --brand-cream: #faeded;
+  --brand-cream-active: #f5e1e1;
+  --brand-cream-hover: #fbf2f2;
+  --brand-cream-soft: #fcf6f6;
+  --brand-sand-border: #f0d8d8;
+  --brand-sand-border-strong: #dcb5b6;
+  --brand-text: #3a1c1d;
+  --brand-text-muted: #654043;
+  --brand-text-soft: #b88688;
+}
+
+[data-theme="teal"] {
+  --brand-50: #f0fdfa;
+  --brand-100: #ccfbf1;
+  --brand-200: #99f6e4;
+  --brand-300: #5eead4;
+  --brand-400: #2dd4bf;
+  --brand-500: #14b8a6;
+  --brand-600: #0d9488;
+  --brand-700: #0f766e;
+  --brand-800: #115e59;
+  --brand-900: #134e4a;
+  --brand-950: #042f2e;
+  --brand-cream: #ecfffb;
+  --brand-cream-active: #ccfbf1;
+  --brand-cream-hover: #f0fdfa;
+  --brand-cream-soft: #f5fefb;
+  --brand-sand-border: #cdf3eb;
+  --brand-sand-border-strong: #99e8d6;
+  --brand-text: #134e4a;
+  --brand-text-muted: #1e6b65;
+  --brand-text-soft: #5eaaa3;
+}
+
+[data-theme="amber-gold"] {
+  --brand-50: #fffbeb;
+  --brand-100: #fef3c7;
+  --brand-200: #fde68a;
+  --brand-300: #fcd34d;
+  --brand-400: #fbbf24;
+  --brand-500: #d97706;
+  --brand-600: #b45309;
+  --brand-700: #92400e;
+  --brand-800: #78350f;
+  --brand-900: #633112;
+  --brand-950: #2c1d0a;
+  --brand-cream: #fff8e6;
+  --brand-cream-active: #fef3c7;
+  --brand-cream-hover: #fffbeb;
+  --brand-cream-soft: #fffcf3;
+  --brand-sand-border: #f8eac7;
+  --brand-sand-border-strong: #f0d68d;
+  --brand-text: #3d2810;
+  --brand-text-muted: #66482a;
+  --brand-text-soft: #b89868;
+}
+
+[data-theme="indigo-navy"] {
+  --brand-50: #eef2ff;
+  --brand-100: #e0e7ff;
+  --brand-200: #c7d2fe;
+  --brand-300: #a5b4fc;
+  --brand-400: #818cf8;
+  --brand-500: #6366f1;
+  --brand-600: #4f46e5;
+  --brand-700: #4338ca;
+  --brand-800: #3730a3;
+  --brand-900: #312e81;
+  --brand-950: #1e1b4b;
+  --brand-cream: #ecedff;
+  --brand-cream-active: #e0e7ff;
+  --brand-cream-hover: #eef2ff;
+  --brand-cream-soft: #f3f4ff;
+  --brand-sand-border: #d8dcf8;
+  --brand-sand-border-strong: #b4baee;
+  --brand-text: #1c1b30;
+  --brand-text-muted: #3d3b62;
+  --brand-text-soft: #888bbe;
+}
+
+[data-theme="rose-pink"] {
+  --brand-50: #fff1f2;
+  --brand-100: #ffe4e6;
+  --brand-200: #fecdd3;
+  --brand-300: #fda4af;
+  --brand-400: #fb7185;
+  --brand-500: #e11d48;
+  --brand-600: #be123c;
+  --brand-700: #9f1239;
+  --brand-800: #7d1132;
+  --brand-900: #4c0519;
+  --brand-950: #2c0510;
+  --brand-cream: #fee9eb;
+  --brand-cream-active: #ffe4e6;
+  --brand-cream-hover: #fff1f2;
+  --brand-cream-soft: #fff5f6;
+  --brand-sand-border: #f8d7dc;
+  --brand-sand-border-strong: #ecaab4;
+  --brand-text: #3a0d18;
+  --brand-text-muted: #663043;
+  --brand-text-soft: #b8848e;
+}
+
+[data-theme="orange"] {
+  --brand-50: #fff7ed;
+  --brand-100: #ffedd5;
+  --brand-200: #fed7aa;
+  --brand-300: #fdba74;
+  --brand-400: #fb923c;
+  --brand-500: #ea580c;
+  --brand-600: #c2410c;
+  --brand-700: #9a3412;
+  --brand-800: #7c2d12;
+  --brand-900: #6c2710;
+  --brand-950: #2e1a0c;
+  --brand-cream: #fff2e1;
+  --brand-cream-active: #ffedd5;
+  --brand-cream-hover: #fff7ed;
+  --brand-cream-soft: #fffaf3;
+  --brand-sand-border: #f8dcb8;
+  --brand-sand-border-strong: #f0b67d;
+  --brand-text: #3d2010;
+  --brand-text-muted: #6e3e25;
+  --brand-text-soft: #b88a68;
+}
+
+[data-theme="emerald"] {
+  --brand-50: #ecfdf5;
+  --brand-100: #d1fae5;
+  --brand-200: #a7f3d0;
+  --brand-300: #6ee7b7;
+  --brand-400: #34d399;
+  --brand-500: #10b981;
+  --brand-600: #059669;
+  --brand-700: #047857;
+  --brand-800: #065f46;
+  --brand-900: #064e3b;
+  --brand-950: #022c22;
+  --brand-cream: #e8fef2;
+  --brand-cream-active: #d1fae5;
+  --brand-cream-hover: #ecfdf5;
+  --brand-cream-soft: #f3fef8;
+  --brand-sand-border: #c5f4dc;
+  --brand-sand-border-strong: #95e6bb;
+  --brand-text: #0e2820;
+  --brand-text-muted: #235946;
+  --brand-text-soft: #6ba893;
+}
+
+[data-theme="coffee-brown"] {
+  --brand-50: #faf6ee;
+  --brand-100: #f3eae2;
+  --brand-200: #e3d2b6;
+  --brand-300: #cdaf80;
+  --brand-400: #b48b51;
+  --brand-500: #8b6914;
+  --brand-600: #6f520f;
+  --brand-700: #563f0c;
+  --brand-800: #422f08;
+  --brand-900: #3b2c20;
+  --brand-950: #1f1810;
+  --brand-cream: #f6efe5;
+  --brand-cream-active: #f3eae2;
+  --brand-cream-hover: #faf6ee;
+  --brand-cream-soft: #fbf8f1;
+  --brand-sand-border: #ecdfca;
+  --brand-sand-border-strong: #d6bf95;
+  --brand-text: #2e2218;
+  --brand-text-muted: #5a4632;
+  --brand-text-soft: #b89868;
+}
+
+[data-theme="sky-blue"] {
+  --brand-50: #f0f9ff;
+  --brand-100: #e0f2fe;
+  --brand-200: #bae6fd;
+  --brand-300: #7dd3fc;
+  --brand-400: #38bdf8;
+  --brand-500: #0ea5e9;
+  --brand-600: #0284c7;
+  --brand-700: #0369a1;
+  --brand-800: #075985;
+  --brand-900: #0c4a6e;
+  --brand-950: #082f49;
+  --brand-cream: #ebf5fc;
+  --brand-cream-active: #e0f2fe;
+  --brand-cream-hover: #f0f9ff;
+  --brand-cream-soft: #f6fbfe;
+  --brand-sand-border: #c8e3f4;
+  --brand-sand-border-strong: #93c8e8;
+  --brand-text: #0c2d42;
+  --brand-text-muted: #285c80;
+  --brand-text-soft: #84b1cc;
 }
 
 html, body {

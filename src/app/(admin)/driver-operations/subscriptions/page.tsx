@@ -56,41 +56,41 @@ export default async function SubscriptionsPage() {
       />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-[#f0e4d6] bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-wider text-slate-500">
             Active now
           </div>
-          <div className="mt-1 text-2xl font-bold text-[#3a2d28]">
+          <div className="mt-1 text-2xl font-bold text-[color:var(--brand-text)]">
             {activeCount}
           </div>
         </div>
-        <div className="rounded-xl border border-[#f0e4d6] bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-wider text-slate-500">
             Total granted
           </div>
-          <div className="mt-1 text-2xl font-bold text-[#3a2d28]">
+          <div className="mt-1 text-2xl font-bold text-[color:var(--brand-text)]">
             {subs.length}
           </div>
         </div>
-        <div className="rounded-xl border border-[#f0e4d6] bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-wider text-slate-500">
             Lifetime revenue
           </div>
-          <div className="mt-1 text-2xl font-bold text-[#3a2d28]">
+          <div className="mt-1 text-2xl font-bold text-[color:var(--brand-text)]">
             {formatCurrency(revenue)}
           </div>
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
-        <div className="border-b border-[#f0e4d6] px-5 py-4">
-          <h3 className="text-sm font-semibold text-[#3a2d28]">
+      <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
+        <div className="border-b border-[color:var(--brand-sand-border)] px-5 py-4">
+          <h3 className="text-sm font-semibold text-[color:var(--brand-text)]">
             All subscriptions
           </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Driver</th>
                 <th className="px-5 py-3 text-left">Plan</th>
@@ -118,9 +118,9 @@ export default async function SubscriptionsPage() {
                 subs.map((s) => {
                   const expired = s.expiresAt < now;
                   return (
-                    <tr key={s.id} className="hover:bg-[#fbf7f2]">
+                    <tr key={s.id} className="hover:bg-[color:var(--brand-cream)]">
                       <td className="px-5 py-3">
-                        <div className="font-medium text-[#3a2d28]">
+                        <div className="font-medium text-[color:var(--brand-text)]">
                           {s.driver.name}
                         </div>
                         <div className="text-xs text-slate-500">
@@ -128,7 +128,7 @@ export default async function SubscriptionsPage() {
                         </div>
                       </td>
                       <td className="px-5 py-3 text-slate-700">{s.plan}</td>
-                      <td className="px-5 py-3 font-medium text-[#3a2d28]">
+                      <td className="px-5 py-3 font-medium text-[color:var(--brand-text)]">
                         {formatCurrency(s.amount)}
                       </td>
                       <td className="px-5 py-3 text-xs text-slate-500">

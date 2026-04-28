@@ -36,9 +36,9 @@ export default async function CitiesPage() {
         action={canWrite ? <NewCityButton /> : undefined}
       />
 
-      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
-        <div className="border-b border-[#f0e4d6] px-5 py-4">
-          <h3 className="text-sm font-semibold text-[#3a2d28]">
+      <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
+        <div className="border-b border-[color:var(--brand-sand-border)] px-5 py-4">
+          <h3 className="text-sm font-semibold text-[color:var(--brand-text)]">
             Configured Cities
           </h3>
         </div>

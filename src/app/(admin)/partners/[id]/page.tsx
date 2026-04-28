@@ -139,7 +139,7 @@ export default async function PartnerDetailPage({
             canManage={canManage}
           />
 
-          <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+          <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
             <div className="border-b border-slate-200 px-5 py-4">
               <h3 className="text-sm font-semibold text-slate-900">
                 KYC documents

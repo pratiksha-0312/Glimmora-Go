@@ -60,8 +60,8 @@ export default async function AllRidesPage({
               }
               className={`rounded-full px-3 py-1 text-[11px] font-medium transition ${
                 active
-                  ? "bg-[#a57865] text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[#fbf7f2]"
+                  ? "bg-[color:var(--brand-500)] text-white"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[color:var(--brand-cream)]"
               }`}
             >
               {s === "ALL" ? "All statuses" : s}

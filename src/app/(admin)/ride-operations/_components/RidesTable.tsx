@@ -38,10 +38,10 @@ export function RidesTable({
 }) {
   const colCount = canWrite ? 9 : 8;
   return (
-    <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+    <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+          <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
             <tr>
               <th className="px-5 py-3 text-left">Ride ID</th>
               <th className="px-5 py-3 text-left">Rider</th>
@@ -72,12 +72,12 @@ export function RidesTable({
                   (d) => d.cityId === r.cityId
                 );
                 return (
-                  <tr key={r.id} className="hover:bg-[#fbf7f2]">
+                  <tr key={r.id} className="hover:bg-[color:var(--brand-cream)]">
                     <td className="px-5 py-3 font-mono text-xs text-slate-500">
                       {r.id.slice(0, 8)}
                     </td>
                     <td className="px-5 py-3">
-                      <div className="font-medium text-[#3a2d28]">
+                      <div className="font-medium text-[color:var(--brand-text)]">
                         {r.rider.name ?? "—"}
                       </div>
                       <div className="text-xs text-slate-500">
@@ -87,7 +87,7 @@ export function RidesTable({
                     <td className="px-5 py-3">
                       {r.driver ? (
                         <>
-                          <div className="text-[#3a2d28]">{r.driver.name}</div>
+                          <div className="text-[color:var(--brand-text)]">{r.driver.name}</div>
                           <div className="text-xs text-slate-500">
                             {r.driver.phone}
                           </div>
@@ -107,7 +107,7 @@ export function RidesTable({
                     <td className="px-5 py-3">
                       <Badge variant="info">{r.bookingChannel}</Badge>
                     </td>
-                    <td className="px-5 py-3 font-medium text-[#3a2d28]">
+                    <td className="px-5 py-3 font-medium text-[color:var(--brand-text)]">
                       {formatCurrency(r.fareFinal ?? r.fareEstimate)}
                     </td>
                     <td className="px-5 py-3">

@@ -143,8 +143,8 @@ export function ArchetypeForm({
                 onClick={() => togglePayment(p)}
                 className={`rounded-full px-3 py-1 text-xs font-medium ring-1 transition ${
                   on
-                    ? "bg-[#a57865] text-white ring-[#8e6253]"
-                    : "bg-white text-slate-600 ring-slate-200 hover:bg-[#fbf7f2]"
+                    ? "bg-[color:var(--brand-500)] text-white ring-[color:var(--brand-600)]"
+                    : "bg-white text-slate-600 ring-slate-200 hover:bg-[color:var(--brand-cream)]"
                 }`}
               >
                 {p}
@@ -171,7 +171,7 @@ export function ArchetypeForm({
         <button
           type="submit"
           disabled={saving}
-          className="rounded-lg bg-[#a57865] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#8e6253] disabled:opacity-60"
+          className="rounded-lg bg-[color:var(--brand-500)] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[color:var(--brand-600)] disabled:opacity-60"
         >
           {saving ? "Saving…" : "Save changes"}
         </button>

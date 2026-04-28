@@ -162,7 +162,7 @@ export function PayoutsSection({
   }
 
   return (
-    <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+    <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
         <div>
           <h3 className="text-sm font-semibold text-slate-900">Payouts</h3>

@@ -59,10 +59,10 @@ export default async function RidersPage({
         />
       </form>
 
-      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+      <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Rider</th>
                 <th className="px-5 py-3 text-left">Language</th>
@@ -97,7 +97,7 @@ export default async function RidersPage({
                     return acc;
                   }, null);
                   return (
-                    <tr key={r.id} className="hover:bg-[#fbf7f2]">
+                    <tr key={r.id} className="hover:bg-[color:var(--brand-cream)]">
                       <td className="px-5 py-3">
                         <div className="font-medium text-slate-900">
                           {r.name ?? "—"}

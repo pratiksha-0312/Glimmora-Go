@@ -39,29 +39,29 @@ export default async function CityArchetypePage() {
       />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-[#f0e4d6] bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-wider text-slate-500">
             Templates configured
           </div>
-          <div className="mt-1 text-2xl font-bold text-[#3a2d28]">
+          <div className="mt-1 text-2xl font-bold text-[color:var(--brand-text)]">
             {defaults.length}
           </div>
         </div>
-        <div className="rounded-xl border border-[#f0e4d6] bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-wider text-slate-500">
             Metro base fare
           </div>
-          <div className="mt-1 text-2xl font-bold text-[#3a2d28]">
+          <div className="mt-1 text-2xl font-bold text-[color:var(--brand-text)]">
             {formatCurrency(
               defaults.find((d) => d.archetype === "METRO")?.baseFare ?? 0
             )}
           </div>
         </div>
-        <div className="rounded-xl border border-[#f0e4d6] bg-white p-5 shadow-sm">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white p-5 shadow-sm">
           <div className="text-xs uppercase tracking-wider text-slate-500">
             Small town base fare
           </div>
-          <div className="mt-1 text-2xl font-bold text-[#3a2d28]">
+          <div className="mt-1 text-2xl font-bold text-[color:var(--brand-text)]">
             {formatCurrency(
               defaults.find((d) => d.archetype === "SMALL_TOWN")?.baseFare ?? 0
             )}
@@ -69,15 +69,15 @@ export default async function CityArchetypePage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
-        <div className="border-b border-[#f0e4d6] px-5 py-4">
-          <h3 className="text-sm font-semibold text-[#3a2d28]">
+      <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
+        <div className="border-b border-[color:var(--brand-sand-border)] px-5 py-4">
+          <h3 className="text-sm font-semibold text-[color:var(--brand-text)]">
             Archetype templates
           </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+            <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
               <tr>
                 <th className="px-5 py-3 text-left">Archetype</th>
                 <th className="px-5 py-3 text-left">Match radius</th>
@@ -99,7 +99,7 @@ export default async function CityArchetypePage() {
                     className="px-5 py-10 text-center text-sm text-slate-400"
                   >
                     No archetype defaults seeded yet. Run{" "}
-                    <code className="rounded bg-[#fbf7f2] px-1.5 py-0.5 text-xs">
+                    <code className="rounded bg-[color:var(--brand-cream)] px-1.5 py-0.5 text-xs">
                       npm run db:seed
                     </code>
                     .
@@ -107,8 +107,8 @@ export default async function CityArchetypePage() {
                 </tr>
               ) : (
                 defaults.map((d) => (
-                  <tr key={d.archetype} className="hover:bg-[#fbf7f2]">
-                    <td className="px-5 py-3 font-medium text-[#3a2d28]">
+                  <tr key={d.archetype} className="hover:bg-[color:var(--brand-cream)]">
+                    <td className="px-5 py-3 font-medium text-[color:var(--brand-text)]">
                       {LABEL[d.archetype]}
                     </td>
                     <td className="px-5 py-3 text-slate-700">
@@ -117,7 +117,7 @@ export default async function CityArchetypePage() {
                     <td className="px-5 py-3 text-slate-700">
                       {d.surgeMultiplier.toFixed(1)}×
                     </td>
-                    <td className="px-5 py-3 font-medium text-[#3a2d28]">
+                    <td className="px-5 py-3 font-medium text-[color:var(--brand-text)]">
                       {formatCurrency(d.baseFare)}
                     </td>
                     <td className="px-5 py-3 text-slate-700">
