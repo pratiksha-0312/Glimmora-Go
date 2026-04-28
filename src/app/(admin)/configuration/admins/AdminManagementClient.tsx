@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/Badge";
 import { ROLE_LABELS } from "@/lib/rbac";
 import type { AdminRole } from "../../../../../generated/prisma";
 import { NewAdminModal } from "./NewAdminModal";
-import { AdminRoleSelect } from "./AdminRoleSelect";
 import { AdminRowActions } from "./AdminRowActions";
 
 export type AdminRow = {
@@ -108,7 +107,7 @@ export function AdminManagementClient({
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-[#a57865] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#8e6553]"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-[color:var(--brand-500)] px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[color:var(--brand-600)]"
         >
           <Plus className="h-3.5 w-3.5" />
           New Admin
@@ -123,14 +122,14 @@ export function AdminManagementClient({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search admin..."
-                className="h-8 w-full rounded-md border border-transparent bg-white pl-7 pr-2 text-sm text-slate-800 outline-none focus:border-[#a57865] focus:ring-2 focus:ring-[#a57865]/20"
+                className="h-8 w-full rounded-md border border-transparent bg-white pl-7 pr-2 text-sm text-slate-800 outline-none focus:border-[color:var(--brand-500)] focus:ring-2 focus:ring-[color:var(--brand-500)]/20"
               />
             </div>
             <div className="relative">
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value as "ALL" | AdminRole)}
-                className="h-8 appearance-none rounded-md border border-slate-200 bg-white pl-3 pr-8 text-xs font-medium text-slate-700 focus:border-[#a57865] focus:ring-2 focus:ring-[#a57865]/20"
+                className="h-8 appearance-none rounded-md border border-slate-200 bg-white pl-3 pr-8 text-xs font-medium text-slate-700 focus:border-[color:var(--brand-500)] focus:ring-2 focus:ring-[color:var(--brand-500)]/20"
               >
                 {ROLE_FILTERS.map((r) => (
                   <option key={r} value={r}>
@@ -146,7 +145,7 @@ export function AdminManagementClient({
                 onChange={(e) =>
                   setStatusFilter(e.target.value as "ALL" | "ACTIVE" | "DISABLED")
                 }
-                className="h-8 appearance-none rounded-md border border-slate-200 bg-white pl-3 pr-8 text-xs font-medium text-slate-700 focus:border-[#a57865] focus:ring-2 focus:ring-[#a57865]/20"
+                className="h-8 appearance-none rounded-md border border-slate-200 bg-white pl-3 pr-8 text-xs font-medium text-slate-700 focus:border-[color:var(--brand-500)] focus:ring-2 focus:ring-[color:var(--brand-500)]/20"
               >
                 <option value="ALL">All Statuses</option>
                 <option value="ACTIVE">Active</option>
@@ -156,9 +155,9 @@ export function AdminManagementClient({
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-[#f0e4d6] bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
             <table className="w-full text-sm">
-              <thead className="border-b border-[#f0e4d6] bg-[#fbf7f2] text-xs uppercase tracking-wider text-slate-500">
+              <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
                 <tr>
                   <th className="px-5 py-3 text-left">User ID</th>
                   <th className="px-5 py-3 text-left">User Name</th>
@@ -184,7 +183,7 @@ export function AdminManagementClient({
                   filtered.map((a, i) => {
                     const isSelf = a.id === currentAdminId;
                     return (
-                      <tr key={a.id} className="hover:bg-[#fbf7f2]">
+                      <tr key={a.id} className="hover:bg-[color:var(--brand-cream)]">
                         <td className="px-5 py-3 font-mono text-xs text-slate-500">
                           {userIdDisplay(admins.indexOf(a))}
                         </td>
@@ -203,13 +202,9 @@ export function AdminManagementClient({
                           {a.email}
                         </td>
                         <td className="px-5 py-3">
-                          {!isSelf ? (
-                            <AdminRoleSelect id={a.id} role={a.role} />
-                          ) : (
-                            <span className="text-xs text-slate-700">
-                              {ROLE_LABELS[a.role]}
-                            </span>
-                          )}
+                          <span className="text-xs text-slate-700">
+                            {ROLE_LABELS[a.role]}
+                          </span>
                         </td>
                         <td className="px-5 py-3">
                           {a.active ? (
