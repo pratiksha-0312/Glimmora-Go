@@ -337,6 +337,112 @@
   --brand-text-soft: #84b1cc;
 }
 
+/* ============================================================================
+ * Smooth theme transition — only active for the 350 ms the toggle fires.
+ * Using data-theme-transitioning avoids interfering with Tailwind's own
+ * transition utilities the rest of the time.
+ * ========================================================================= */
+[data-theme-switching],
+[data-theme-switching] *,
+[data-theme-switching] *::before,
+[data-theme-switching] *::after {
+  transition:
+    background-color 300ms ease,
+    border-color     300ms ease,
+    color            300ms ease,
+    fill             300ms ease,
+    stroke           300ms ease !important;
+}
+
+/* ============================================================================
+ * Dark mode — neutral dark palette matching the design screenshots.
+ * ========================================================================= */
+.dark {
+  color-scheme: dark;
+
+  --background: #111111;
+  --foreground: #f1f1f1;
+
+  /* CSS-var-driven surfaces (Sidebar, Header, pills, dropdowns) */
+  --brand-cream:              #111111;
+  --brand-cream-active:       #1e1e1e;
+  --brand-cream-hover:        #1a1a1a;
+  --brand-cream-soft:         #0d0d0d;
+  --brand-sand-border:        #2a2a2a;
+  --brand-sand-border-strong: #383838;
+  --brand-text:               #f1f1f1;
+  --brand-text-muted:         #c9c9c9;
+  --brand-text-soft:          #6b7280;
+}
+
+/* ── Surfaces ──────────────────────────────────────────────────────────── */
+.dark .bg-white          { background-color: #1c1c1c; }
+.dark .bg-slate-50       { background-color: #161616; }
+.dark .bg-slate-50\/70   { background-color: #161616; }
+.dark .bg-slate-50\/60   { background-color: #161616; }
+.dark .bg-slate-50\/50   { background-color: #161616; }
+.dark .bg-slate-100      { background-color: #252525; }
+.dark .bg-slate-200      { background-color: #2e2e2e; }
+
+/* ── Borders ───────────────────────────────────────────────────────────── */
+.dark .border-slate-50   { border-color: #1e1e1e; }
+.dark .border-slate-100  { border-color: #2a2a2a; }
+.dark .border-slate-200  { border-color: #333333; }
+
+/* ── Dividers ──────────────────────────────────────────────────────────── */
+.dark .divide-slate-50  > :not([hidden]) ~ :not([hidden]) { border-color: #1e1e1e; }
+.dark .divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: #2a2a2a; }
+
+/* ── Text ──────────────────────────────────────────────────────────────── */
+.dark .text-slate-900 { color: #f1f1f1; }
+.dark .text-slate-800 { color: #e5e5e5; }
+.dark .text-slate-700 { color: #d4d4d4; }
+.dark .text-slate-600 { color: #a3a3a3; }
+.dark .text-slate-500 { color: #737373; }
+.dark .text-slate-400 { color: #525252; }
+.dark .text-slate-300 { color: #404040; }
+
+/* ── Hover states ──────────────────────────────────────────────────────── */
+.dark .hover\:bg-white:hover       { background-color: #252525; }
+.dark .hover\:bg-slate-50:hover    { background-color: #1e1e1e; }
+.dark .hover\:bg-slate-100:hover   { background-color: #252525; }
+.dark .hover\:bg-slate-200:hover   { background-color: #2e2e2e; }
+.dark .hover\:text-slate-700:hover { color: #e5e5e5; }
+.dark .hover\:text-slate-600:hover { color: #d4d4d4; }
+
+/* ── Status badge tints ────────────────────────────────────────────────── */
+.dark .bg-green-50   { background-color: rgba(16,185,129,0.12); }
+.dark .bg-red-50     { background-color: rgba(239,68,68,0.12); }
+.dark .bg-amber-50   { background-color: rgba(245,158,11,0.12); }
+.dark .bg-amber-100  { background-color: rgba(245,158,11,0.18); }
+.dark .bg-orange-50  { background-color: rgba(249,115,22,0.12); }
+.dark .bg-blue-50    { background-color: rgba(59,130,246,0.12); }
+.dark .bg-purple-50  { background-color: rgba(147,51,234,0.12); }
+.dark .bg-rose-50    { background-color: rgba(244,63,94,0.12); }
+
+/* ── Rings / shadows ───────────────────────────────────────────────────── */
+.dark .ring-orange-100  { --tw-ring-color: rgba(249,115,22,0.25); }
+.dark .ring-orange-200  { --tw-ring-color: rgba(249,115,22,0.35); }
+.dark .ring-green-200   { --tw-ring-color: rgba(16,185,129,0.30); }
+.dark .ring-red-200     { --tw-ring-color: rgba(239,68,68,0.30); }
+.dark .ring-slate-100   { --tw-ring-color: rgba(255,255,255,0.06); }
+.dark .shadow-sm  { --tw-shadow: 0 1px 3px 0 rgba(0,0,0,0.5); }
+.dark .shadow-md  { --tw-shadow: 0 4px 6px -1px rgba(0,0,0,0.6); }
+.dark .shadow-xl  { --tw-shadow: 0 20px 25px -5px rgba(0,0,0,0.7); }
+
+/* ── Inputs / selects ──────────────────────────────────────────────────── */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.dark select,
+.dark textarea {
+  background-color: #1c1c1c;
+  border-color:     #2a2a2a;
+  color:            #f1f1f1;
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: #525252; }
+
+/* ── Layout ──────────────────────────────────────────────────────────── */
+
 html, body {
   height: 100%;
 }

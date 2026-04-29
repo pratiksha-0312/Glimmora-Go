@@ -32,7 +32,7 @@ function Avatar({ name }: { name: string | null }) {
     ? name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
     : "?";
   return (
-    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[11px] font-semibold text-slate-600">
+    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[11px] font-semibold text-slate-600 dark:bg-[#252525] dark:text-[#9ca3af]">
       {initials}
     </div>
   );
@@ -125,11 +125,11 @@ export function RecentRidesTable({
   const handleSearch = (v: string) => { setSearch(v); setPage(1); };
 
   return (
-    <div className="rounded-2xl border border-slate-100 bg-white shadow-sm">
+    <div className="rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-[#2a2a2a] dark:bg-[#1a1a1a]">
       {/* Header */}
-      <div className="flex flex-col gap-3 border-b border-slate-100 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3 flex-wrap">
-          <h2 className="text-base font-semibold text-slate-900">Recent Rides</h2>
+      <div className="flex flex-col gap-3 border-b border-slate-100 px-6 py-4 dark:border-[#2a2a2a] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="text-base font-semibold text-slate-900 dark:text-[#f9fafb]">Recent Rides</h2>
           {(["All", "Active", "Completed", "Cancelled"] as Tab[]).map((t) => (
             <button
               key={t}
@@ -137,17 +137,19 @@ export function RecentRidesTable({
               className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
                 tab === t
                   ? t === "Active"
-                    ? "bg-amber-100 text-amber-700"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-400"
                     : t === "Completed"
-                      ? "bg-green-100 text-green-700"
+                      ? "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-400"
                       : t === "Cancelled"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-slate-900 text-white"
-                  : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                        ? "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-400"
+                        : "bg-slate-900 text-white dark:bg-[#f9fafb] dark:text-[#111111]"
+                  : "bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-[#252525] dark:text-[#9ca3af] dark:hover:bg-[#2e2e2e]"
               }`}
             >
               {t}
-              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${tab === t ? "bg-white/25 text-inherit" : "bg-slate-200 text-slate-600"}`}>
+              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                tab === t ? "bg-white/25 text-inherit" : "bg-slate-200 text-slate-600 dark:bg-[#2e2e2e] dark:text-[#9ca3af]"
+              }`}>
                 {counts[t]}
               </span>
             </button>
@@ -155,19 +157,19 @@ export function RecentRidesTable({
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400 dark:text-[#6b7280]" />
             <input
               type="text"
               value={search}
               onChange={(e) => handleSearch(e.target.value)}
               placeholder="Search rider, driver..."
-              className="h-8 w-48 rounded-lg border border-slate-200 bg-white pl-8 pr-3 text-xs font-medium text-slate-700 shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-100 transition"
+              className="h-8 w-48 rounded-lg border border-slate-200 bg-white pl-8 pr-3 text-xs font-medium text-slate-700 shadow-sm outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 dark:border-[#333333] dark:bg-[#222222] dark:text-[#e5e7eb] dark:placeholder-[#6b7280] dark:focus:ring-orange-500/20"
             />
           </div>
           <select
             value={cityFilter}
             onChange={(e) => handleCityChange(e.target.value)}
-            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-300 dark:border-[#333333] dark:bg-[#222222] dark:text-[#e5e7eb]"
           >
             <option value="All Cities">All Cities</option>
             {cities.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -179,18 +181,18 @@ export function RecentRidesTable({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/60">
+            <tr className="border-b border-slate-100 bg-slate-50/60 dark:border-[#2a2a2a] dark:bg-[#141414]">
               {["Rider", "Driver", "City", "Fare", "Status", "Time", "Actions"].map((h) => (
-                <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                <th key={h} className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-[#6b7280]">
                   {h}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-50">
+          <tbody className="divide-y divide-slate-50 dark:divide-[#1e1e1e]">
             {paginated.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-5 py-12 text-center text-sm text-slate-400">
+                <td colSpan={7} className="px-5 py-12 text-center text-sm text-slate-400 dark:text-[#6b7280]">
                   No rides found
                 </td>
               </tr>
@@ -198,13 +200,13 @@ export function RecentRidesTable({
               paginated.map((r) => {
                 const fare = r.fareFinal ?? r.fareEstimate;
                 return (
-                  <tr key={r.id} className="hover:bg-slate-50/50 transition-colors">
+                  <tr key={r.id} className="transition-colors hover:bg-slate-50/50 dark:hover:bg-[#1e1e1e]">
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2.5">
                         <Avatar name={r.rider.name} />
                         <div>
-                          <div className="font-medium text-slate-900">{r.rider.name ?? "—"}</div>
-                          <div className="text-xs text-slate-400">{r.rider.phone}</div>
+                          <div className="font-medium text-slate-900 dark:text-[#f3f4f6]">{r.rider.name ?? "—"}</div>
+                          <div className="text-xs text-slate-400 dark:text-[#6b7280]">{r.rider.phone}</div>
                         </div>
                       </div>
                     </td>
@@ -212,26 +214,26 @@ export function RecentRidesTable({
                       {r.driver ? (
                         <div className="flex items-center gap-2.5">
                           <Avatar name={r.driver.name} />
-                          <div className="font-medium text-slate-900">{r.driver.name}</div>
+                          <div className="font-medium text-slate-900 dark:text-[#f3f4f6]">{r.driver.name}</div>
                         </div>
                       ) : (
-                        <span className="text-xs text-amber-600 font-medium">Unmatched</span>
+                        <span className="text-xs font-medium text-amber-600 dark:text-amber-400">Unmatched</span>
                       )}
                     </td>
-                    <td className="px-5 py-3 text-slate-600">{r.city.name}</td>
-                    <td className="px-5 py-3 font-semibold text-slate-900">
+                    <td className="px-5 py-3 text-slate-600 dark:text-[#d1d5db]">{r.city.name}</td>
+                    <td className="px-5 py-3 font-semibold text-slate-900 dark:text-[#f9fafb]">
                       {formatCurrency(fare)}
                     </td>
                     <td className="px-5 py-3">
                       <Badge variant={rideStatusVariant(r.status)}>{r.status}</Badge>
                     </td>
-                    <td className="px-5 py-3 text-xs text-slate-500 whitespace-nowrap">
+                    <td className="px-5 py-3 whitespace-nowrap text-xs text-slate-500 dark:text-[#9ca3af]">
                       {formatTime(r.createdAt)}
                     </td>
                     <td className="px-5 py-3">
                       <Link
                         href={`/rides?ride=${r.id}`}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                        className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:text-[#6b7280] dark:hover:bg-[#252525] dark:hover:text-[#d1d5db]"
                       >
                         <Eye className="h-3.5 w-3.5" />
                       </Link>
@@ -246,11 +248,11 @@ export function RecentRidesTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-1 border-t border-slate-100 px-6 py-3">
+        <div className="flex items-center justify-center gap-1 border-t border-slate-100 px-6 py-3 dark:border-[#2a2a2a]">
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={safePage === 1}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 disabled:opacity-30"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 disabled:opacity-30 dark:text-[#6b7280] dark:hover:bg-[#252525]"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
@@ -259,7 +261,9 @@ export function RecentRidesTable({
               key={p}
               onClick={() => setPage(p)}
               className={`flex h-7 w-7 items-center justify-center rounded-lg text-xs font-semibold transition-colors ${
-                p === safePage ? "bg-slate-900 text-white" : "text-slate-500 hover:bg-slate-100"
+                p === safePage
+                  ? "bg-slate-900 text-white dark:bg-[#f9fafb] dark:text-[#111111]"
+                  : "text-slate-500 hover:bg-slate-100 dark:text-[#9ca3af] dark:hover:bg-[#252525]"
               }`}
             >
               {p}
@@ -268,7 +272,7 @@ export function RecentRidesTable({
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={safePage === totalPages}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 disabled:opacity-30"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 disabled:opacity-30 dark:text-[#6b7280] dark:hover:bg-[#252525]"
           >
             <ChevronRight className="h-4 w-4" />
           </button>

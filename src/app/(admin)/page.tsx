@@ -437,18 +437,18 @@ export default async function DashboardPage() {
         ].map(({ icon: Icon, value, label, sub, bg, text }) => (
           <div
             key={label}
-            className="relative rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"
+            className="relative rounded-2xl border border-slate-100 bg-white p-5 shadow-sm dark:border-[#2a2a2a] dark:bg-[#1a1a1a]"
           >
-            <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-green-600">
+            <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-green-600 dark:bg-green-500/10 dark:text-green-400">
               <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
               Live
             </span>
             <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${bg} ${text}`}>
               <Icon className="h-5 w-5" />
             </div>
-            <div className="mt-3 text-2xl font-bold text-slate-900">{value}</div>
-            <div className="mt-0.5 text-sm font-semibold text-slate-700">{label}</div>
-            <div className="mt-0.5 text-xs text-slate-400">{sub}</div>
+            <div className="mt-3 text-2xl font-bold text-slate-900 dark:text-[#f9fafb]">{value}</div>
+            <div className="mt-0.5 text-sm font-semibold text-slate-700 dark:text-[#e5e7eb]">{label}</div>
+            <div className="mt-0.5 text-xs text-slate-400 dark:text-[#6b7280]">{sub}</div>
           </div>
         ))}
 
@@ -466,7 +466,7 @@ export default async function DashboardPage() {
             weeklyDelta={data.weeklyDelta}
           />
         ) : (
-          <div className="flex h-full items-center justify-center rounded-2xl border border-slate-100 bg-white p-10 text-sm text-slate-400 shadow-sm">
+          <div className="flex h-full items-center justify-center rounded-2xl border border-slate-100 bg-white p-10 text-sm text-slate-400 shadow-sm dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:text-[#6b7280]">
             Revenue data not available for your role
           </div>
         )}
@@ -487,7 +487,7 @@ export default async function DashboardPage() {
       {/* Hidden LiveRides (keeps live-polling alive for active rides) */}
       {showLiveRides && (
         <div className="hidden">
-          <LiveRides initial={data.liveRides.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))} />
+          <LiveRides initial={data.liveRides} />
         </div>
       )}
     </div>

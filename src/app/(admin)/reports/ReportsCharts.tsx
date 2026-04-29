@@ -89,8 +89,8 @@ export function ReportsCharts({
 
   return (
     <div className="mt-8 grid gap-6 lg:grid-cols-2">
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-4 text-sm font-semibold text-slate-900">
+      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-[#2a2a2a] dark:bg-[#1a1a1a]">
+        <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-[#f9fafb]">
           Rides per day
         </h3>
         <div className="h-64">
@@ -98,8 +98,8 @@ export function ReportsCharts({
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 className="mb-4 text-sm font-semibold text-slate-900">
+      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-[#2a2a2a] dark:bg-[#1a1a1a]">
+        <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-[#f9fafb]">
           Revenue trend
         </h3>
         <div className="h-64">
@@ -107,12 +107,12 @@ export function ReportsCharts({
         </div>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2">
-        <h3 className="mb-4 text-sm font-semibold text-slate-900">
+      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm lg:col-span-2 dark:border-[#2a2a2a] dark:bg-[#1a1a1a]">
+        <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-[#f9fafb]">
           Booking channels
         </h3>
         {channelLabels.length === 0 ? (
-          <div className="py-10 text-center text-sm text-slate-400">
+          <div className="py-10 text-center text-sm text-slate-400 dark:text-[#6b7280]">
             No rides yet
           </div>
         ) : (

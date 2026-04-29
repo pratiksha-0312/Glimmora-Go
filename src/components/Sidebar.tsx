@@ -239,7 +239,7 @@ export function Sidebar({ role }: { role: AdminRole }) {
   });
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-[color:var(--brand-sand-border)] bg-white font-sans">
+    <aside className="flex h-screen w-64 flex-col border-r border-[color:var(--brand-sand-border)] bg-white font-sans dark:border-[#2a2a2a] dark:bg-[#111111] dark:text-[#f1f1f1]">
       <Link
         href="/"
         className="flex h-16 items-center gap-3 border-b border-[color:var(--brand-sand-border)] px-5"

@@ -180,7 +180,7 @@ export default async function ReportsPage({
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                 active
                   ? "bg-[color:var(--brand-500)] text-white"
-                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[color:var(--brand-cream)]"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-[color:var(--brand-cream)] dark:bg-[#1a1a1a] dark:text-[#d1d5db] dark:ring-[#2a2a2a] dark:hover:bg-[#252525]"
               }`}
             >
               {r} days
@@ -220,15 +220,15 @@ export default async function ReportsPage({
       <ReportsCharts days={data.days} channels={data.channels} />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-5 py-4">
-            <h3 className="text-sm font-semibold text-slate-900">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm dark:border-[#2a2a2a] dark:bg-[#1a1a1a]">
+          <div className="border-b border-slate-200 px-5 py-4 dark:border-[#2a2a2a]">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-[#f9fafb]">
               By city
             </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
+              <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500 dark:border-[#2a2a2a] dark:text-[#6b7280]">
                 <tr>
                   <th className="px-5 py-3 text-left">City</th>
                   <th className="px-5 py-3 text-right">Rides</th>
@@ -236,29 +236,29 @@ export default async function ReportsPage({
                   <th className="px-5 py-3 text-right">Revenue</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-[#2a2a2a]">
                 {data.cityStats.length === 0 ? (
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-5 py-8 text-center text-sm text-slate-400"
+                      className="px-5 py-8 text-center text-sm text-slate-400 dark:text-[#6b7280]"
                     >
                       No rides in this window
                     </td>
                   </tr>
                 ) : (
                   data.cityStats.map((c) => (
-                    <tr key={c.name} className="hover:bg-[color:var(--brand-cream)]">
-                      <td className="px-5 py-3 font-medium text-slate-900">
+                    <tr key={c.name} className="hover:bg-[color:var(--brand-cream)] dark:hover:bg-[#222222]">
+                      <td className="px-5 py-3 font-medium text-slate-900 dark:text-[#f3f4f6]">
                         {c.name}
                       </td>
-                      <td className="px-5 py-3 text-right text-slate-700">
+                      <td className="px-5 py-3 text-right text-slate-700 dark:text-[#d1d5db]">
                         {c.rides}
                       </td>
-                      <td className="px-5 py-3 text-right text-slate-700">
+                      <td className="px-5 py-3 text-right text-slate-700 dark:text-[#d1d5db]">
                         {c.completion}%
                       </td>
-                      <td className="px-5 py-3 text-right font-medium text-slate-900">
+                      <td className="px-5 py-3 text-right font-medium text-slate-900 dark:text-[#f3f4f6]">
                         {formatCurrency(c.revenue)}
                       </td>
                     </tr>
@@ -269,44 +269,44 @@ export default async function ReportsPage({
           </div>
         </div>
 
-        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
-          <div className="border-b border-slate-200 px-5 py-4">
-            <h3 className="text-sm font-semibold text-slate-900">
+        <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm dark:border-[#2a2a2a] dark:bg-[#1a1a1a]">
+          <div className="border-b border-slate-200 px-5 py-4 dark:border-[#2a2a2a]">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-[#f9fafb]">
               Top drivers
             </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500">
+              <thead className="border-b border-[color:var(--brand-sand-border)] bg-[color:var(--brand-cream)] text-xs uppercase tracking-wider text-slate-500 dark:border-[#2a2a2a] dark:text-[#6b7280]">
                 <tr>
                   <th className="px-5 py-3 text-left">Driver</th>
                   <th className="px-5 py-3 text-right">Rides</th>
                   <th className="px-5 py-3 text-right">Revenue</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-[#2a2a2a]">
                 {data.topDrivers.length === 0 ? (
                   <tr>
                     <td
                       colSpan={3}
-                      className="px-5 py-8 text-center text-sm text-slate-400"
+                      className="px-5 py-8 text-center text-sm text-slate-400 dark:text-[#6b7280]"
                     >
                       No driver activity yet
                     </td>
                   </tr>
                 ) : (
                   data.topDrivers.map((d) => (
-                    <tr key={d.phone} className="hover:bg-[color:var(--brand-cream)]">
+                    <tr key={d.phone} className="hover:bg-[color:var(--brand-cream)] dark:hover:bg-[#222222]">
                       <td className="px-5 py-3">
-                        <div className="font-medium text-slate-900">
+                        <div className="font-medium text-slate-900 dark:text-[#f3f4f6]">
                           {d.name}
                         </div>
-                        <div className="text-xs text-slate-500">{d.phone}</div>
+                        <div className="text-xs text-slate-500 dark:text-[#9ca3af]">{d.phone}</div>
                       </td>
-                      <td className="px-5 py-3 text-right text-slate-700">
+                      <td className="px-5 py-3 text-right text-slate-700 dark:text-[#d1d5db]">
                         {d.rides}
                       </td>
-                      <td className="px-5 py-3 text-right font-medium text-slate-900">
+                      <td className="px-5 py-3 text-right font-medium text-slate-900 dark:text-[#f3f4f6]">
                         {formatCurrency(d.revenue)}
                       </td>
                     </tr>

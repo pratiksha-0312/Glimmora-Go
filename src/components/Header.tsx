@@ -15,7 +15,7 @@ import {
   UserCircle2,
 } from "lucide-react";
 import { ROLE_LABELS } from "@/lib/rbac";
-import { ColorThemePicker } from "./ColorThemePicker";
+import { DarkModeToggle } from "./DarkModeToggle";
 import type { AdminRole } from "../../generated/prisma";
 
 function useNow() {
@@ -109,23 +109,23 @@ export function Header({
     .toUpperCase();
 
   const pillBase =
-    "inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--brand-sand-border)] bg-white px-3 text-sm text-[color:var(--brand-text)] shadow-sm";
+    "inline-flex h-9 items-center gap-2 rounded-full border border-[color:var(--brand-sand-border)] bg-white px-3 text-sm text-[color:var(--brand-text)] shadow-sm dark:border-[#2a2a2a] dark:bg-[#1a1a1a]";
 
   return (
-    <header className="flex h-16 items-center gap-3 border-b border-[color:var(--brand-sand-border)] bg-white px-6 font-sans">
-      <div className={pillBase}>
+    <header className="flex h-16 items-center gap-3 border-b border-[color:var(--brand-sand-border)] bg-white px-6 font-sans dark:border-[#2a2a2a] dark:bg-[#111111] dark:text-[#f1f1f1]">
+      <div className={`hidden xl:inline-flex ${pillBase}`}>
         <Calendar className="h-4 w-4 text-[color:var(--brand-500)]" />
         <span className="text-xs font-medium text-[color:var(--brand-text-muted)]">Date</span>
         <span className="font-medium">{dateText}</span>
       </div>
 
-      <div className={pillBase}>
+      <div className={`hidden xl:inline-flex ${pillBase}`}>
         <Clock className="h-4 w-4 text-[color:var(--brand-500)]" />
         <span className="text-xs font-medium text-[color:var(--brand-text-muted)]">Time</span>
         <span className="font-medium">{timeText}</span>
       </div>
 
-      <div className="relative flex-1 max-w-xl">
+      <div className="relative min-w-0 flex-1 max-w-xl">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--brand-text-soft)]" />
         <input
           type="text"
@@ -137,11 +137,11 @@ export function Header({
         </span>
       </div>
 
-      <ColorThemePicker />
+      <DarkModeToggle />
 
       <button
         type="button"
-        className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[color:var(--brand-sand-border)] bg-white px-3 text-sm font-medium text-[color:var(--brand-text)] shadow-sm transition hover:bg-[color:var(--brand-cream-hover)]"
+        className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[color:var(--brand-sand-border)] bg-white px-3 text-sm font-medium text-[color:var(--brand-text)] shadow-sm transition hover:bg-[color:var(--brand-cream-hover)] dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:hover:bg-[#252525]"
       >
         <Globe className="h-4 w-4 text-[color:var(--brand-500)]" />
         EN
@@ -150,7 +150,7 @@ export function Header({
 
       <button
         type="button"
-        className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[color:var(--brand-sand-border)] bg-white px-3 text-sm font-medium text-[color:var(--brand-text)] shadow-sm transition hover:bg-[color:var(--brand-cream-hover)]"
+        className="hidden lg:inline-flex h-9 items-center gap-1.5 rounded-full border border-[color:var(--brand-sand-border)] bg-white px-3 text-sm font-medium text-[color:var(--brand-text)] shadow-sm transition hover:bg-[color:var(--brand-cream-hover)] dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:hover:bg-[#252525]"
       >
         <HelpCircle className="h-4 w-4 text-[color:var(--brand-500)]" />
         Help
@@ -159,7 +159,7 @@ export function Header({
       <button
         type="button"
         aria-label="Notifications"
-        className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--brand-sand-border)] bg-white text-[color:var(--brand-text)] shadow-sm transition hover:bg-[color:var(--brand-cream-hover)]"
+        className="relative inline-flex h-9 w-9 items-center justify-center rounded-full border border-[color:var(--brand-sand-border)] bg-white text-[color:var(--brand-text)] shadow-sm transition hover:bg-[color:var(--brand-cream-hover)] dark:border-[#2a2a2a] dark:bg-[#1a1a1a] dark:hover:bg-[#252525]"
       >
         <Bell className="h-4 w-4 text-[color:var(--brand-500)]" />
         {sosCount > 0 && (
@@ -174,7 +174,7 @@ export function Header({
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2 transition hover:bg-[color:var(--brand-cream-hover)]"
+          className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2 transition hover:bg-[color:var(--brand-cream-hover)] dark:hover:bg-[#252525]"
         >
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--brand-500)] text-xs font-semibold text-white">
             {initials || "A"}
@@ -191,7 +191,7 @@ export function Header({
         </button>
 
         {menuOpen && (
-          <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 rounded-2xl border border-[color:var(--brand-sand-border)] bg-white shadow-xl">
+          <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 rounded-2xl border border-[color:var(--brand-sand-border)] bg-white shadow-xl dark:border-[#2a2a2a] dark:bg-[#1a1a1a]">
             {/* User info header */}
             <div className="flex items-center gap-3 border-b border-[color:var(--brand-sand-border)] px-4 py-3.5">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[color:var(--brand-500)] text-sm font-semibold text-white">

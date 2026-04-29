@@ -6,15 +6,12 @@ export const metadata: Metadata = {
   description: "Admin panel for Glimmora Go ride-hailing platform",
 };
 
-// Inlined into <head> so the theme is applied before the first paint.
-// Without this, the page renders with the default Terracotta palette and
-// then flashes to the saved theme once ColorThemePicker hydrates.
+// Applied before first paint — no flash of wrong theme or mode.
 const THEME_INIT = `
   try {
     var t = localStorage.getItem('glimmora.theme');
-    if (t && t !== 'terracotta') {
-      document.documentElement.setAttribute('data-theme', t);
-    }
+    if (t && t !== 'terracotta') document.documentElement.setAttribute('data-theme', t);
+    if (localStorage.getItem('glimmora.darkMode') === 'true') document.documentElement.classList.add('dark');
   } catch (e) {}
 `;
 
