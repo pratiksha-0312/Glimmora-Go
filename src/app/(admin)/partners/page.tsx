@@ -107,16 +107,14 @@ export default async function PartnersPage({
                 <th className="px-5 py-3 text-left">Bookings</th>
                 <th className="px-5 py-3 text-left">Status</th>
                 <th className="px-5 py-3 text-left">Joined</th>
-                {canWrite && (
-                  <th className="px-5 py-3 text-right">Actions</th>
-                )}
+                <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {partners.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={canWrite ? 10 : 9}
+                    colSpan={10}
                     className="px-5 py-12 text-center text-sm text-slate-400"
                   >
                     No partners found
@@ -164,15 +162,23 @@ export default async function PartnersPage({
                     <td className="px-5 py-3 text-xs text-slate-500">
                       {formatDate(p.createdAt)}
                     </td>
-                    {canWrite && (
-                      <td className="px-5 py-3 text-right">
-                        <PartnerRowActions
-                          id={p.id}
-                          status={p.status}
-                          commissionPct={p.commissionPct}
-                        />
-                      </td>
-                    )}
+                    <td className="px-5 py-3 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          href={`/partners/${p.id}`}
+                          className="rounded-md border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:bg-[color:var(--brand-cream)] hover:text-brand-600"
+                        >
+                          View
+                        </Link>
+                        {canWrite && (
+                          <PartnerRowActions
+                            id={p.id}
+                            status={p.status}
+                            commissionPct={p.commissionPct}
+                          />
+                        )}
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
