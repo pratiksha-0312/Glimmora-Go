@@ -2,7 +2,7 @@
   "name": "Glimmora Go — Partner",
   "short_name": "Glimmora Partner",
   "description": "Book rides for walk-in customers and earn commission. For kirana shops, CSCs, metro counters, and hospital desks.",
-  "start_url": "/p",
+  "start_url": "/p/",
   "scope": "/p/",
   "id": "glimmora-partner",
   "display": "standalone",
