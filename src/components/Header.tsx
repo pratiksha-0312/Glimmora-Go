@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Bell,
   Calendar,
@@ -9,6 +10,9 @@ import {
   Globe,
   HelpCircle,
   Search,
+  Settings,
+  LogOut,
+  UserCircle2,
 } from "lucide-react";
 import { ROLE_LABELS } from "@/lib/rbac";
 import { ColorThemePicker } from "./ColorThemePicker";
@@ -57,8 +61,29 @@ export function Header({
   email: string;
   role: AdminRole;
 }) {
+  const router = useRouter();
   const now = useNow();
   const sosCount = useSosCount();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    if (menuOpen) document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+  }
 
   const dateText = now
     ? now.toLocaleDateString("en-GB", {
@@ -144,16 +169,81 @@ export function Header({
         )}
       </button>
 
-      <div className="flex items-center gap-2 pl-2">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--brand-500)] text-xs font-semibold text-white">
-          {initials || "A"}
-        </div>
-        <div className="hidden flex-col leading-tight md:flex">
-          <span className="text-sm font-semibold text-[color:var(--brand-text)]">{name}</span>
-          <span className="text-[11px] text-[color:var(--brand-text-soft)]" title={email}>
-            {ROLE_LABELS[role]}
-          </span>
-        </div>
+      {/* ── Profile dropdown ── */}
+      <div ref={menuRef} className="relative pl-2">
+        <button
+          type="button"
+          onClick={() => setMenuOpen((o) => !o)}
+          className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2 transition hover:bg-[color:var(--brand-cream-hover)]"
+        >
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--brand-500)] text-xs font-semibold text-white">
+            {initials || "A"}
+          </div>
+          <div className="hidden flex-col items-start leading-tight md:flex">
+            <span className="text-sm font-semibold text-[color:var(--brand-text)]">{name}</span>
+            <span className="text-[11px] text-[color:var(--brand-text-soft)]">{ROLE_LABELS[role]}</span>
+          </div>
+          <ChevronDown
+            className={`hidden h-3.5 w-3.5 text-[color:var(--brand-text-soft)] transition-transform duration-200 md:block ${
+              menuOpen ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+
+        {menuOpen && (
+          <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-64 rounded-2xl border border-[color:var(--brand-sand-border)] bg-white shadow-xl">
+            {/* User info header */}
+            <div className="flex items-center gap-3 border-b border-[color:var(--brand-sand-border)] px-4 py-3.5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[color:var(--brand-500)] text-sm font-semibold text-white">
+                {initials || "A"}
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold text-[color:var(--brand-text)]">{name}</div>
+                <div className="truncate text-[11px] text-[color:var(--brand-text-soft)]">{email}</div>
+                <span className="mt-0.5 inline-block rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-semibold text-orange-700">
+                  {ROLE_LABELS[role]}
+                </span>
+              </div>
+            </div>
+
+            {/* Menu items */}
+            <div className="p-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setMenuOpen(false);
+                  router.push("/settings");
+                }}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[color:var(--brand-text)] transition hover:bg-[color:var(--brand-cream-hover)]"
+              >
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100">
+                  <Settings className="h-4 w-4 text-slate-600" />
+                </div>
+                Admin Settings
+              </button>
+
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+              >
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-50">
+                  <LogOut className="h-4 w-4 text-red-500" />
+                </div>
+                {loggingOut ? "Signing out…" : "Log Out"}
+              </button>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t border-[color:var(--brand-sand-border)] px-4 py-2.5">
+              <div className="flex items-center gap-1.5 text-[11px] text-[color:var(--brand-text-muted)]">
+                <UserCircle2 className="h-3.5 w-3.5" />
+                <span>Glimmora Go Admin Panel</span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );

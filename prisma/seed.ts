@@ -197,6 +197,51 @@ async function main() {
       ],
     });
     console.log(`  rides: 2`);
+
+    // Historical completed rides for weekly revenue chart
+    // Delete old historical rides first to keep seed idempotent
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    await prisma.ride.deleteMany({
+      where: { status: "COMPLETED", completedAt: { lt: todayStart } },
+    });
+
+    // Daily fares for Mon–Sat (index 0 = 6 days ago, index 5 = yesterday)
+    const dailyFareSets = [
+      [120, 85, 95, 110, 75],
+      [200, 145, 90, 170, 135, 80, 115],
+      [105, 130, 75, 90, 110],
+      [180, 145, 90, 160, 120, 85, 95],
+      [210, 155, 95, 175, 135, 80, 120, 95],
+      [285, 230, 175, 195, 155, 120, 145, 175, 165],
+    ];
+    for (let daysAgo = 6; daysAgo >= 1; daysAgo--) {
+      const fares = dailyFareSets[6 - daysAgo];
+      for (let i = 0; i < fares.length; i++) {
+        const rideTime = new Date();
+        rideTime.setDate(rideTime.getDate() - daysAgo);
+        rideTime.setHours(8 + Math.floor(i * 1.4), (i * 19) % 60, 0, 0);
+        await prisma.ride.create({
+          data: {
+            riderId: [rider1.id, rider2.id][i % 2],
+            driverId: approvedDrivers[i % approvedDrivers.length].id,
+            cityId: rewa.id,
+            pickupAddress: "Rewa Station, Civil Lines",
+            pickupLat: 24.5336, pickupLng: 81.3035,
+            dropAddress: "Civil Hospital, Rewa",
+            dropLat: 24.5421, dropLng: 81.2956,
+            distanceKm: 2 + (i % 5),
+            durationMin: 8 + (i % 10),
+            fareEstimate: fares[i],
+            fareFinal: fares[i],
+            status: "COMPLETED",
+            bookingChannel: "APP",
+            completedAt: new Date(rideTime.getTime() + 20 * 60_000),
+          },
+        });
+      }
+    }
+    console.log(`  historical weekly rides: ${dailyFareSets.flat().length}`);
   }
 
   // Coupons
