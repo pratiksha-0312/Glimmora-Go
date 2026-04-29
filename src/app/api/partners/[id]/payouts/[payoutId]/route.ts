@@ -27,7 +27,17 @@ export async function PATCH(
 
   const payout = await prisma.payout.findUnique({
     where: { id: payoutId },
-    include: { partner: { select: { cityId: true, shopName: true, phone: true } } },
+    include: {
+      partner: {
+        select: {
+          cityId: true,
+          shopName: true,
+          phone: true,
+          bankAccountNumber: true,
+          bankIfsc: true,
+        },
+      },
+    },
   });
   if (!payout || payout.partnerId !== id) {
     return NextResponse.json({ error: "Payout not found" }, { status: 404 });
@@ -38,6 +48,21 @@ export async function PATCH(
 
   const isMarkingPaid =
     parsed.data.status === "PAID" && payout.status !== "PAID";
+
+  // Bank-info gate: refuse to record a payment to a partner with no
+  // bank account on file — there's nowhere for the actual money to go.
+  if (
+    isMarkingPaid &&
+    (!payout.partner.bankAccountNumber || !payout.partner.bankIfsc)
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "Partner has no bank details on file. Ask the partner to add bank info via /p/profile before marking paid.",
+      },
+      { status: 400 }
+    );
+  }
 
   const updated = await prisma.payout.update({
     where: { id: payoutId },

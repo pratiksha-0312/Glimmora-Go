@@ -4,7 +4,7 @@ import { requirePartner } from "@/lib/partnerAuth";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { rideStatusVariant } from "@/lib/format";
 import { Badge } from "@/components/ui/Badge";
-import { Plus, Car, Banknote, Activity } from "lucide-react";
+import { Plus, Car, Banknote, Activity, AlertCircle } from "lucide-react";
 import { RideStatus } from "../../../../generated/prisma";
 
 export const dynamic = "force-dynamic";
@@ -79,14 +79,52 @@ export default async function PartnerHomePage() {
   const session = await requirePartner();
   const partner = await prisma.partner.findUnique({
     where: { id: session.partnerId },
-    select: { commissionPct: true },
+    select: {
+      commissionPct: true,
+      bankAccountNumber: true,
+      bankIfsc: true,
+    },
   });
   const commissionPct = partner?.commissionPct ?? 10;
+  const approvedDocCount = await prisma.partnerDocument.count({
+    where: { partnerId: session.partnerId, status: "APPROVED" },
+  });
+  const needsBank = !partner?.bankAccountNumber || !partner?.bankIfsc;
+  const needsDocs = approvedDocCount === 0;
   const { todayBookings, todayCommission, activeRides, recent } =
     await getStats(session.partnerId, commissionPct);
 
   return (
     <div className="space-y-4">
+      {(needsBank || needsDocs) && (
+        <Link
+          href="/p/profile"
+          className="block rounded-xl border border-amber-200 bg-amber-50 p-4 transition hover:bg-amber-100"
+        >
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+            <div className="flex-1">
+              <div className="text-sm font-semibold text-amber-900">
+                Complete your profile to receive payments
+              </div>
+              <ul className="mt-1 list-inside list-disc space-y-0.5 text-xs text-amber-800">
+                {needsDocs && (
+                  <li>
+                    Upload at least one KYC document (shop license, Aadhaar, etc.)
+                  </li>
+                )}
+                {needsBank && (
+                  <li>Add your bank account &amp; IFSC for payouts</li>
+                )}
+              </ul>
+              <div className="mt-2 text-xs font-semibold text-amber-700 underline">
+                Update profile →
+              </div>
+            </div>
+          </div>
+        </Link>
+      )}
+
       <div className="grid grid-cols-2 gap-3">
         <Stat
           label="Today's bookings"

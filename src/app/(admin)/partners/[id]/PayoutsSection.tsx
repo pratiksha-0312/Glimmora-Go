@@ -52,12 +52,16 @@ export function PayoutsSection({
   initialAccrued,
   commissionPct,
   canManage,
+  hasApprovedDocs,
+  hasBankDetails,
 }: {
   partnerId: string;
   initialPayouts: Payout[];
   initialAccrued: Accrued;
   commissionPct: number;
   canManage: boolean;
+  hasApprovedDocs: boolean;
+  hasBankDetails: boolean;
 }) {
   const router = useRouter();
   const [payouts, setPayouts] = useState(initialPayouts);
@@ -180,13 +184,36 @@ export function PayoutsSection({
           <button
             type="button"
             onClick={() => setShowGenerate((v) => !v)}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-brand-700"
+            disabled={!hasApprovedDocs && !showGenerate}
+            title={
+              !hasApprovedDocs
+                ? "Approve at least one KYC document before generating a payout"
+                : undefined
+            }
+            className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:hover:bg-slate-300"
           >
             {showGenerate ? <X className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
             {showGenerate ? "Cancel" : "Generate payout"}
           </button>
         )}
       </div>
+
+      {canManage && (!hasApprovedDocs || !hasBankDetails) && (
+        <div className="border-b border-amber-200 bg-amber-50 px-5 py-2.5 text-xs text-amber-800">
+          {!hasApprovedDocs && (
+            <div>
+              <strong>KYC incomplete:</strong> approve at least one document
+              before generating a payout.
+            </div>
+          )}
+          {!hasBankDetails && (
+            <div className={!hasApprovedDocs ? "mt-1" : ""}>
+              <strong>Bank details missing:</strong> partner must add bank info
+              via /p/profile before any payout can be marked paid.
+            </div>
+          )}
+        </div>
+      )}
 
       {showGenerate && canManage && (
         <form
@@ -302,7 +329,13 @@ export function PayoutsSection({
                           <button
                             type="button"
                             onClick={() => setEditingPaidId(p.id)}
-                            className="rounded-md bg-green-600 px-2 py-1 text-[11px] font-medium text-white hover:bg-green-700"
+                            disabled={!hasBankDetails}
+                            title={
+                              !hasBankDetails
+                                ? "Partner has no bank details on file"
+                                : undefined
+                            }
+                            className="rounded-md bg-green-600 px-2 py-1 text-[11px] font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:hover:bg-slate-300"
                           >
                             Mark paid
                           </button>

@@ -76,6 +76,22 @@ export async function POST(
   const scope = cityMismatch(auth.session, partner.cityId);
   if (scope) return scope;
 
+  // KYC gate: require at least one APPROVED document before any commission
+  // can accrue into a payout. Compliance asks that we don't owe money to
+  // unverified entities.
+  const approvedDocs = await prisma.partnerDocument.count({
+    where: { partnerId: id, status: "APPROVED" },
+  });
+  if (approvedDocs === 0) {
+    return NextResponse.json(
+      {
+        error:
+          "Partner has no approved KYC documents. Approve at least one document before generating a payout.",
+      },
+      { status: 400 }
+    );
+  }
+
   const periodStart = new Date(parsed.data.periodStart);
   const periodEnd = new Date(parsed.data.periodEnd);
 

@@ -43,6 +43,9 @@ export default async function PartnerDetailPage({
     },
   });
   if (!partner) notFound();
+
+  const hasApprovedDocs = partner.documents.some((d) => d.status === "APPROVED");
+  const hasBankDetails = !!(partner.bankAccountNumber && partner.bankIfsc);
   if (session.cityId && partner.cityId !== session.cityId)
     redirect("/partners");
 
@@ -137,6 +140,8 @@ export default async function PartnerDetailPage({
             initialAccrued={accruedForClient}
             commissionPct={partner.commissionPct}
             canManage={canManage}
+            hasApprovedDocs={hasApprovedDocs}
+            hasBankDetails={hasBankDetails}
           />
 
           <div className="rounded-xl border border-[color:var(--brand-sand-border)] bg-white shadow-sm">
