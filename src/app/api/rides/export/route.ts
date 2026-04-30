@@ -55,7 +55,7 @@ export async function GET(req: Request) {
     "City", "Created At", "Scheduled At",
   ];
 
-  const escape = (v: string | null | undefined) => {
+  const escape = (v: string | number | null | undefined) => {
     if (v == null) return "";
     const s = String(v);
     return s.includes(",") || s.includes('"') || s.includes("\n")
