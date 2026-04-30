@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const THEME_INIT = `
   try {
     var t = localStorage.getItem('glimmora.theme');
-    if (t && t !== 'terracotta') document.documentElement.setAttribute('data-theme', t);
+    if (t && t !== 'ocean-blue') document.documentElement.setAttribute('data-theme', t);
     if (localStorage.getItem('glimmora.darkMode') === 'true') document.documentElement.classList.add('dark');
   } catch (e) {}
 `;

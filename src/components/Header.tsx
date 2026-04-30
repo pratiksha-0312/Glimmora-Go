@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { ROLE_LABELS } from "@/lib/rbac";
 import { DarkModeToggle } from "./DarkModeToggle";
+import { ColorThemePicker } from "./ColorThemePicker";
 import type { AdminRole } from "../../generated/prisma";
 
 function useNow() {
@@ -136,6 +137,8 @@ export function Header({
           Ctrl K
         </span>
       </div>
+
+      <ColorThemePicker />
 
       <DarkModeToggle />
 

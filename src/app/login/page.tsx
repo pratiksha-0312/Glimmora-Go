@@ -44,7 +44,7 @@ function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           autoComplete="email"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-[color:var(--brand-500)] focus:ring-2 focus:ring-[color:var(--brand-200)]"
           placeholder="admin@glimmora.ai"
         />
       </div>
@@ -57,7 +57,7 @@ function LoginForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="current-password"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-[color:var(--brand-500)] focus:ring-2 focus:ring-[color:var(--brand-200)]"
           placeholder="••••••••"
         />
       </div>
@@ -71,7 +71,7 @@ function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-brand-600 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
+        className="w-full rounded-lg bg-[color:var(--brand-600)] py-2.5 text-sm font-semibold text-white transition hover:bg-[color:var(--brand-700)] disabled:opacity-60"
       >
         {loading ? "Signing in..." : "Sign in"}
       </button>

@@ -40,7 +40,7 @@ const THEMES: { id: ThemeId; label: string; swatch: string }[] = [
 const STORAGE_KEY = "glimmora.theme";
 
 function applyTheme(id: ThemeId) {
-  if (id === "terracotta") {
+  if (id === "ocean-blue") {
     document.documentElement.removeAttribute("data-theme");
   } else {
     document.documentElement.setAttribute("data-theme", id);
@@ -49,7 +49,7 @@ function applyTheme(id: ThemeId) {
 
 export function ColorThemePicker() {
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState<ThemeId>("terracotta");
+  const [active, setActive] = useState<ThemeId>("ocean-blue");
   const wrapRef = useRef<HTMLDivElement>(null);
 
   // Load saved theme on mount

@@ -5,40 +5,17 @@
 /* ============================================================================
  * Theme tokens
  * ----------------------------------------------------------------------------
- * Default :root is the existing "Terracotta" palette (cream + warm brown).
- * The [data-theme="..."] selectors below swap every token at once when the
- * <html> element gets data-theme set by ColorThemePicker. Alt-theme values
- * are lifted from verifai's color picker so they match 1:1.
+ * Default :root is the "Ocean Blue" palette. The [data-theme="..."] selectors
+ * below swap every token at once when the <html> element gets data-theme set
+ * by ColorThemePicker. Alt-theme values are lifted from verifai's color picker
+ * so they match 1:1.
  * ========================================================================= */
 
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
 
-  /* Default: Terracotta */
-  --brand-50: #fbf5f2;
-  --brand-100: #f5e8e1;
-  --brand-200: #edd0c2;
-  --brand-300: #e0ae97;
-  --brand-400: #ce8a72;
-  --brand-500: #a57865;
-  --brand-600: #8a6050;
-  --brand-700: #6e4c3e;
-  --brand-800: #573c32;
-  --brand-900: #45302a;
-  --brand-950: #2a1c18;
-  --brand-cream: #fbf7f2;
-  --brand-cream-active: #f3e8db;
-  --brand-cream-hover: #fbf5ef;
-  --brand-cream-soft: #fdf8f4;
-  --brand-sand-border: #f0e4d6;
-  --brand-sand-border-strong: #d5bfb2;
-  --brand-text: #3a2d28;
-  --brand-text-muted: #6b5349;
-  --brand-text-soft: #a89485;
-}
-
-[data-theme="ocean-blue"] {
+  /* Default: Ocean Blue */
   --brand-50: #f0f7fb;
   --brand-100: #dceef7;
   --brand-200: #b8dcef;
@@ -59,6 +36,29 @@
   --brand-text: #1e293b;
   --brand-text-muted: #475569;
   --brand-text-soft: #94a3b8;
+}
+
+[data-theme="terracotta"] {
+  --brand-50: #fbf5f2;
+  --brand-100: #f5e8e1;
+  --brand-200: #edd0c2;
+  --brand-300: #e0ae97;
+  --brand-400: #ce8a72;
+  --brand-500: #a57865;
+  --brand-600: #8a6050;
+  --brand-700: #6e4c3e;
+  --brand-800: #573c32;
+  --brand-900: #45302a;
+  --brand-950: #2a1c18;
+  --brand-cream: #fbf7f2;
+  --brand-cream-active: #f3e8db;
+  --brand-cream-hover: #fbf5ef;
+  --brand-cream-soft: #fdf8f4;
+  --brand-sand-border: #f0e4d6;
+  --brand-sand-border-strong: #d5bfb2;
+  --brand-text: #3a2d28;
+  --brand-text-muted: #6b5349;
+  --brand-text-soft: #a89485;
 }
 
 [data-theme="forest-green"] {
