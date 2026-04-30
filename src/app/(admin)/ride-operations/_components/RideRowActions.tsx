@@ -1,34 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Eye, Share2 } from "lucide-react";
 import type { RideStatus } from "../../../../../generated/prisma";
-
-type DriverOption = { id: string; name: string; phone: string };
 
 export function RideRowActions({
   id,
-  status,
-  cityDrivers,
-  currentDriverId,
+  status: _status,
+  cityDrivers: _cityDrivers,
+  currentDriverId: _currentDriverId,
+  riderPhone: _riderPhone,
 }: {
   id: string;
   status: RideStatus;
-  cityDrivers: DriverOption[];
+  cityDrivers: { id: string; name: string; phone: string }[];
   currentDriverId: string | null;
+  riderPhone?: string;
 }) {
-  const router = useRouter();
-  const [loading, setLoading] = useState<string | null>(null);
-  const [reassigning, setReassigning] = useState(false);
-  const [driverId, setDriverId] = useState(currentDriverId ?? "");
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const terminal = status === "COMPLETED" || status === "CANCELLED";
-
   async function share() {
-    setLoading("SHARE");
-    setError(null);
+    setLoading(true);
     try {
       const res = await fetch(`/api/rides/${id}/token`, { method: "POST" });
       const data = await res.json();
@@ -37,125 +30,31 @@ export function RideRowActions({
       await navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed");
+    } catch {
+      // ignore
     } finally {
-      setLoading(null);
+      setLoading(false);
     }
   }
 
-  async function send(action: "CANCEL" | "COMPLETE" | "REASSIGN") {
-    setError(null);
-    setLoading(action);
-    try {
-      const body: Record<string, unknown> = { action };
-      if (action === "REASSIGN") {
-        if (!driverId) {
-          setError("Pick a driver");
-          return;
-        }
-        body.driverId = driverId;
-      }
-      const res = await fetch(`/api/rides/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed");
-      setReassigning(false);
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed");
-    } finally {
-      setLoading(null);
-    }
-  }
-
-  if (terminal) {
-    return (
-      <button
-        onClick={share}
-        disabled={loading === "SHARE"}
-        className="text-xs font-medium text-slate-500 hover:text-slate-700 disabled:opacity-50"
-      >
-        {copied ? "Link copied ✓" : loading === "SHARE" ? "…" : "Share link"}
-      </button>
-    );
-  }
-
-  if (reassigning) {
-    return (
-      <div className="flex flex-col items-end gap-1">
-        <div className="flex items-center gap-1">
-          <select
-            value={driverId}
-            onChange={(e) => setDriverId(e.target.value)}
-            className="rounded border border-slate-200 px-2 py-1 text-xs outline-none focus:border-brand-500"
-          >
-            <option value="">Pick driver…</option>
-            {cityDrivers.map((d) => (
-              <option key={d.id} value={d.id}>
-                {d.name} ({d.phone})
-              </option>
-            ))}
-          </select>
-          <button
-            onClick={() => send("REASSIGN")}
-            disabled={loading === "REASSIGN"}
-            className="rounded bg-[color:var(--brand-500)] px-2 py-1 text-xs font-semibold text-white hover:bg-[color:var(--brand-600)] disabled:opacity-50"
-          >
-            {loading === "REASSIGN" ? "…" : "Save"}
-          </button>
-          <button
-            onClick={() => {
-              setReassigning(false);
-              setError(null);
-            }}
-            className="text-xs text-slate-500 hover:text-slate-700"
-          >
-            Cancel
-          </button>
-        </div>
-        {error && <span className="text-[10px] text-red-600">{error}</span>}
-      </div>
-    );
-  }
+  const iconBtn =
+    "flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-[#252525] dark:hover:text-[#9ca3af]";
 
   return (
-    <div className="flex justify-end gap-3 text-xs font-medium">
+    <div className="flex items-center justify-end gap-0.5">
+      <button type="button" title="View ride" className={iconBtn}>
+        <Eye className="h-4 w-4" />
+      </button>
+
       <button
+        type="button"
+        title={copied ? "Link copied!" : "Copy tracking link"}
         onClick={share}
-        disabled={loading === "SHARE"}
-        className="text-slate-500 hover:text-slate-700 disabled:opacity-50"
+        disabled={loading}
+        className={`${iconBtn} ${copied ? "text-green-500" : ""}`}
       >
-        {copied ? "Copied ✓" : loading === "SHARE" ? "…" : "Share"}
+        <Share2 className="h-4 w-4" />
       </button>
-      <button
-        onClick={() => setReassigning(true)}
-        className="text-slate-600 hover:text-slate-900"
-      >
-        Reassign
-      </button>
-      {status === "IN_TRIP" || status === "ARRIVED" || status === "EN_ROUTE" ? (
-        <button
-          onClick={() => send("COMPLETE")}
-          disabled={!!loading}
-          className="text-green-600 hover:text-green-700 disabled:opacity-50"
-        >
-          {loading === "COMPLETE" ? "…" : "Complete"}
-        </button>
-      ) : null}
-      <button
-        onClick={() => {
-          if (confirm("Cancel this ride?")) send("CANCEL");
-        }}
-        disabled={!!loading}
-        className="text-red-600 hover:text-red-700 disabled:opacity-50"
-      >
-        {loading === "CANCEL" ? "…" : "Cancel"}
-      </button>
-      {error && <span className="text-red-600">{error}</span>}
     </div>
   );
 }
